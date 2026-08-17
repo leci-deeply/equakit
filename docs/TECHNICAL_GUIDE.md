@@ -551,6 +551,9 @@ TypeDoc 从 core、React、MathLive、MathLive clipboard 和 TipTap 五个公开
 Vite 生产构建使用 `/equakit/` project base，因此资产和 API 链接可部署到 GitHub Pages 子路径。
 GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` push 时自动发布。
 
+- Playground：<https://leci-deeply.github.io/equakit/>
+- API 文档：<https://leci-deeply.github.io/equakit/api/>
+
 ## 21. 安全设计
 
 已经实现：

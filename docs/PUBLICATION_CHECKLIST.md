@@ -38,4 +38,4 @@
 - [ ] 首次发布前通过 npm CLI 或可信发布再次验证写权限。
 - [ ] 启用分支保护、必需 CI、Dependabot/Renovate 和密钥扫描。
 - [ ] 创建签名的 `v0.1.0` tag，并在需要时附带生成的 provenance。
-- [ ] 确认 GitHub Pages 公开地址部署成功。
+- [x] GitHub Pages Playground 与 API 文档公开地址部署成功。
