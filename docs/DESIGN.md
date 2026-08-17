@@ -31,6 +31,10 @@ Adapter 可以管理第三方编辑器的 DOM、选区和静态资源，但不�
 ProseMirror 和 Mathematics 必须保持 peer dependency。Adapter 只固定安全 KaTeX 配置、
 `data-latex` 剪贴板边界和迁移规则；React NodeView 仍由宿主应用按需提供。
 
+多格式剪贴板只处理单公式选区。core 定义同步 converter 契约但不引入转换引擎；React 在原生
+copy 事件内写入全部可用 MIME；MathLive `./clipboard` 子入口按需提供实际格式转换。混合正文
+必须降级为 `text/plain`。
+
 ## 安全决策
 
 1. Markdown 使用 `react-markdown`、`remark-math` 和 `rehype-katex`，但不启用 `rehype-raw`。

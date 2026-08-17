@@ -31,6 +31,68 @@ test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ pa
   expect(copied).toContain('\\(\\int_0^1 x^2\\,\\mathrm{d}x=\\frac{1}{3}\\)');
 });
 
+test('单公式复制写入 LaTeX、MathML、AsciiMath 和 MathJSON MIME', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: '多格式公式复制' }),
+  });
+  await expect(card.getByRole('status')).toHaveText('多格式转换器已加载。');
+  const formula = card.getByRole('math', { name: '二分之一' });
+
+  await page.evaluate(() => {
+    document.addEventListener(
+      'copy',
+      (event) => {
+        if (!(event instanceof ClipboardEvent) || !event.clipboardData) return;
+        const payload: Record<string, string> = {};
+        for (const mimeType of event.clipboardData.types) {
+          payload[mimeType] = event.clipboardData.getData(mimeType);
+        }
+        Object.assign(globalThis, { __equakitClipboardPayload: payload });
+      },
+      { once: true },
+    );
+  });
+  await formula.evaluate((element) => {
+    const selection = document.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  });
+  await page.keyboard.press('ControlOrMeta+C');
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            globalThis as typeof globalThis & {
+              __equakitClipboardPayload?: Record<string, string>;
+            }
+          ).__equakitClipboardPayload,
+      ),
+    )
+    .not.toBeUndefined();
+
+  const captured = await page.evaluate(
+    () =>
+      (
+        globalThis as typeof globalThis & {
+          __equakitClipboardPayload?: Record<string, string>;
+        }
+      ).__equakitClipboardPayload ?? {},
+  );
+  expect(captured['text/plain']).toBe('\\(\\frac{1}{2}\\)');
+  expect(captured['application/x-latex']).toBe('\\frac{1}{2}');
+  expect(captured['application/mathml+xml']).toContain('<math');
+  expect(captured['text/asciimath']).toBe('(1)/(2)');
+  expect(JSON.parse(captured['application/vnd.equakit.mathjson+json'] ?? 'null')).toEqual([
+    'Divide',
+    1,
+    2,
+  ]);
+});
+
 test('公式面板在当前选区插入片段并把光标放进占位符', async ({ page }) => {
   const card = page.locator('article').filter({
     has: page.getByRole('heading', { name: '公式输入', exact: true }),

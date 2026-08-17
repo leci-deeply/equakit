@@ -2,9 +2,11 @@ import { useCallback } from 'react';
 import type { ClipboardEvent, ReactNode } from 'react';
 
 import {
+  createMathClipboardPayload,
   normalizeClipboardText as normalizeCoreClipboardText,
   richDomToMarkdown,
   richSelectionToMarkdown,
+  type MathClipboardFormatConverter,
   type RichClipboardOptions,
 } from '@equakit/core';
 
@@ -26,6 +28,7 @@ export interface UseMathClipboardOptions {
   serializer?: MathClipboardSerializer;
   core?: CoreMathSerializationModule;
   options?: RichClipboardOptions;
+  converter?: MathClipboardFormatConverter;
 }
 
 export interface MathCopyBoundaryProps extends UseMathClipboardOptions {
@@ -62,7 +65,12 @@ export function serializeRenderedMath({
     : richDomToMarkdown(root, plainText, coreOptions);
 }
 
-export function useMathClipboard({ serializer, core, options }: UseMathClipboardOptions = {}) {
+export function useMathClipboard({
+  serializer,
+  core,
+  options,
+  converter,
+}: UseMathClipboardOptions = {}) {
   const activeSerializer =
     serializer ?? (core ? createCoreMathClipboardSerializer(core) : serializeRenderedMath);
 
@@ -90,9 +98,16 @@ export function useMathClipboard({ serializer, core, options }: UseMathClipboard
       const text = activeSerializer(input);
       if (!text) return;
       event.preventDefault();
-      event.clipboardData.setData('text/plain', text);
+      const payload = createMathClipboardPayload(text, converter);
+      for (const [mimeType, value] of Object.entries(payload)) {
+        try {
+          event.clipboardData.setData(mimeType, value);
+        } catch {
+          // 浏览器拒绝某个自定义 MIME 时继续保留其余格式。
+        }
+      }
     },
-    [activeSerializer, options],
+    [activeSerializer, converter, options],
   );
 
   return { handleCopy, serializeSelection };
@@ -104,11 +119,13 @@ export function MathCopyBoundary({
   serializer,
   core,
   options,
+  converter,
 }: MathCopyBoundaryProps) {
   const clipboardOptions: UseMathClipboardOptions = {};
   if (serializer) clipboardOptions.serializer = serializer;
   if (core) clipboardOptions.core = core;
   if (options) clipboardOptions.options = options;
+  if (converter) clipboardOptions.converter = converter;
   const { handleCopy } = useMathClipboard(clipboardOptions);
   return (
     <div className={className ?? 'mre-copy-boundary'} onCopy={handleCopy}>

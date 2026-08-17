@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { MathLiveFormulaEditor } from '@equakit/adapter-mathlive';
 import {
@@ -13,6 +13,7 @@ import {
   MarkdownMath,
   MathCopyBoundary,
   MathFormula,
+  type MathClipboardFormatConverter,
 } from '@equakit/react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -55,6 +56,12 @@ export function App() {
           <MathCopyBoundary>
             <MarkdownMath>{explanation}</MarkdownMath>
           </MathCopyBoundary>
+        </article>
+
+        <article className="demo-card demo-card--wide">
+          <h2>多格式公式复制</h2>
+          <p>选中公式后复制，同时提供 LaTeX、MathML、AsciiMath 和 MathJSON。</p>
+          <MultiFormatCopyDemo />
         </article>
 
         <article className="demo-card">
@@ -104,6 +111,41 @@ export function App() {
         </article>
       </section>
     </main>
+  );
+}
+
+function MultiFormatCopyDemo() {
+  const [converter, setConverter] = useState<MathClipboardFormatConverter | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  useEffect(() => {
+    let disposed = false;
+    void import('@equakit/adapter-mathlive/clipboard')
+      .then(({ mathLiveClipboardConverter }) => {
+        if (!disposed) setConverter(mathLiveClipboardConverter);
+      })
+      .catch(() => {
+        if (!disposed) setLoadFailed(true);
+      });
+    return () => {
+      disposed = true;
+    };
+  }, []);
+
+  if (loadFailed) return <span role="alert">多格式转换器加载失败。</span>;
+  if (!converter) return <span role="status">正在加载多格式转换器。</span>;
+
+  return (
+    <>
+      <span className="mre-visually-hidden" role="status">
+        多格式转换器已加载。
+      </span>
+      <MathCopyBoundary converter={converter}>
+        <div aria-label="多格式复制公式" role="group">
+          <MathFormula ariaLabel="二分之一" display expression={'\\frac{1}{2}'} />
+        </div>
+      </MathCopyBoundary>
+    </>
   );
 }
 

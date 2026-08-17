@@ -25,6 +25,7 @@
 - [x] 已记录浏览器支持和 Node.js 支持。
 - [x] 已为 Markdown、URL、HTML 和剪贴板这些敏感路径准备测试。
 - [x] 已加入 Chromium 复制、光标、IME、MathLive、TipTap、键盘语义和 axe 无障碍测试。
+- [x] 已验证单公式五种 MIME 输出和混合正文降级策略。
 - [x] 已审查生产依赖许可证报告。
 
 ## 发布

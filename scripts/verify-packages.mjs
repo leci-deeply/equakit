@@ -85,6 +85,9 @@ try {
   const mathLiveAdapter = await import(
     pathToFileURL(resolve(root, 'packages/adapter-mathlive/dist/index.js')).href
   );
+  const mathLiveClipboardAdapter = await import(
+    pathToFileURL(resolve(root, 'packages/adapter-mathlive/dist/clipboard.js')).href
+  );
   const tipTapAdapter = await import(
     pathToFileURL(resolve(root, 'packages/adapter-tiptap/dist/index.js')).href
   );
@@ -96,6 +99,9 @@ try {
   }
   if (!mathLiveAdapter.MathLiveFormulaEditor) {
     throw new Error('构建后的 MathLive adapter 入口没有暴露 MathLiveFormulaEditor。');
+  }
+  if (typeof mathLiveClipboardAdapter.createMathLiveClipboardConverter !== 'function') {
+    throw new Error('构建后的 MathLive clipboard 入口没有暴露转换器。');
   }
   if (typeof tipTapAdapter.createTipTapMathExtensions !== 'function') {
     throw new Error('构建后的 TipTap adapter 入口没有暴露 createTipTapMathExtensions。');

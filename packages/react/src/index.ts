@@ -39,11 +39,19 @@ export type { MarkdownMathProps } from './MarkdownMath.js';
 export { MathFormula } from './MathFormula.js';
 export type { MathFormulaProps } from './MathFormula.js';
 export {
+  createMathClipboardPayload,
   extractMathTokens,
+  MATH_CLIPBOARD_MIME_TYPES,
   normalizeLatexExpression,
   normalizeMarkdownMath,
   stripMathDelimiters,
   validateLatexExpression,
   validateMarkdownMath,
 } from '@equakit/core';
-export type { MathToken, MathValidationIssue, MathValidationResult } from '@equakit/core';
+export type {
+  MathClipboardFormatConverter,
+  MathClipboardPayload,
+  MathToken,
+  MathValidationIssue,
+  MathValidationResult,
+} from '@equakit/core';

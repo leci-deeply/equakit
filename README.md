@@ -273,6 +273,28 @@ Adapter 复用 TipTap 官方 `inlineMath`/`blockMath` schema 和命令，固定�
 并通过 `TIPTAP_MATH_CLIPBOARD_OPTIONS` 接入 EquaKit 数学复制。完整用法见
 [`@equakit/adapter-tiptap`](packages/adapter-tiptap/README.md)。
 
+### 多格式公式复制
+
+```tsx
+import { mathLiveClipboardConverter } from '@equakit/adapter-mathlive/clipboard';
+import { MathCopyBoundary, MathFormula } from '@equakit/react';
+
+<MathCopyBoundary converter={mathLiveClipboardConverter}>
+  <MathFormula expression={'\\frac{1}{2}'} />
+</MathCopyBoundary>;
+```
+
+选区只有一个公式时会同时写入：
+
+- `text/plain`：带数学分隔符的可编辑文本；
+- `application/x-latex`：纯 LaTeX；
+- `application/mathml+xml`：带标准命名空间的完整 MathML；
+- `text/asciimath`：AsciiMath；
+- `application/vnd.equakit.mathjson+json`：MathJSON。
+
+混合正文或多个公式时只写入 `text/plain`，不会把整段内容错误转换成单个表达式。
+MathML 是 IANA 注册类型；其余数学 MIME 是兼容或 EquaKit 私有格式，可能被原生应用过滤。
+
 ### 分步答案编辑
 
 ```tsx
@@ -341,8 +363,8 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - Prettier 格式检查；
 - ESLint 静态检查；
 - TypeScript 类型检查；
-- 49 个 Vitest 测试；
-- 8 个 Playwright Chromium 测试，覆盖真实复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描；
+- 55 个 Vitest 测试；
+- 9 个 Playwright Chromium 测试，覆盖多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描；
 - core、React 和 Demo 构建；
 - 构建后 ESM 入口动态导入；
 - npm tarball 文件白名单与 workspace 协议检查；
@@ -371,7 +393,7 @@ pnpm check
 - [x] 增加真实浏览器复制、光标、IME 和无障碍测试；
 - [x] 为 `FormulaInput` 增加可选 MathLive adapter；
 - [x] 提供 TipTap inline/block math node adapter；
-- [ ] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
+- [x] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
 - [ ] 增加自动 API 文档和在线 playground；
 - [ ] 评估升级到 KaTeX `0.18.x` 并执行视觉回归。
 

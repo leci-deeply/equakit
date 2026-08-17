@@ -82,6 +82,36 @@ adapter，应统一这两个路径，不要为不同实例配置相互冲突的�
 - 加载失败时显示中文 `role="alert"`，不会静默吞掉错误；
 - adapter 不提供 MathLive SSR 静态渲染，静态展示仍使用 EquaKit 的 KaTeX 组件。
 
+## 多格式剪贴板转换器
+
+`./clipboard` 子入口是独立 opt-in，不会进入默认 MathLive 编辑器入口：
+
+```sh
+pnpm add @cortex-js/compute-engine
+```
+
+```tsx
+import { mathLiveClipboardConverter } from '@equakit/adapter-mathlive/clipboard';
+import { MathCopyBoundary } from '@equakit/react';
+
+<MathCopyBoundary converter={mathLiveClipboardConverter}>...</MathCopyBoundary>;
+```
+
+它使用 `mathlive/ssr` 同步生成 MathML 和 AsciiMath，使用 Cortex Compute Engine 生成
+MathJSON。默认 MathJSON 使用接近原始 LaTeX 的 raw form；需要规范化表达式时可以使用：
+
+```ts
+import { createMathLiveClipboardConverter } from '@equakit/adapter-mathlive/clipboard';
+
+const converter = createMathLiveClipboardConverter({ canonicalMathJSON: true });
+```
+
+MathML 会补充 `<math xmlns="http://www.w3.org/1998/Math/MathML">` 根节点，可以直接作为
+`application/mathml+xml` 使用。
+
+Compute Engine 体积较大。浏览器应用建议动态导入 `@equakit/adapter-mathlive/clipboard`，
+加载完成后再把 converter 传给 `MathCopyBoundary`；默认编辑器入口不会加载这个子模块。
+
 ## 许可证
 
 [MIT License](./LICENSE) © 2026 leci

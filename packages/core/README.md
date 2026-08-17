@@ -70,6 +70,22 @@ const selected = richSelectionToMarkdown(range, editorRoot, selection.toString()
 如果富文本模型区分行内和块级数学，可以通过 `displayMathSelector` 指定块级公式节点。
 匹配节点会输出独立一行的 `\\[...\\]`，其他公式继续输出 `\\(...\\)`。
 
+## 多格式剪贴板 payload
+
+```ts
+import { createMathClipboardPayload } from '@equakit/core';
+
+const payload = createMathClipboardPayload('\\(x^2+1\\)', {
+  toMathML: (latex) => convertToMathML(latex),
+  toAsciiMath: (latex) => convertToAsciiMath(latex),
+  toMathJSON: (latex) => convertToMathJSON(latex),
+});
+```
+
+core 始终生成 `text/plain`，并为单公式生成 `application/x-latex`。MathML、AsciiMath 和
+MathJSON 通过同步 `MathClipboardFormatConverter` 注入，core 不绑定具体转换引擎。
+混合正文或多公式选区只保留 `text/plain`。
+
 ## 分步答案辅助
 
 ```ts

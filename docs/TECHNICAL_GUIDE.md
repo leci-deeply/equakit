@@ -361,7 +361,32 @@ TipTap adapter 同时设置 `displayMathSelector`：inline 节点复制为 `\\(.
 2. clone 当前 Range；
 3. 调用 core serializer；
 4. 阻止浏览器默认复制；
-5. 写入规范化 `text/plain`。
+5. 调用同步 converter 构建 MIME payload；
+6. 逐项写入 `clipboardData`，单个自定义格式失败不影响其他格式。
+
+### 12.1 多格式数学剪贴板
+
+实现文件：[`packages/core/src/clipboardFormats.ts`](../packages/core/src/clipboardFormats.ts)
+
+core 先把选区归一化并确认它只包含一个数学 token。单公式可生成以下 payload：
+
+| 格式      | MIME                                    | 状态                     |
+| --------- | --------------------------------------- | ------------------------ |
+| 可读文本  | `text/plain`                            | 浏览器标准回退           |
+| LaTeX     | `application/x-latex`                   | 非 IANA 注册的兼容格式   |
+| MathML    | `application/mathml+xml`                | IANA 注册                |
+| AsciiMath | `text/asciimath`                        | 非 IANA 注册的惯例格式   |
+| MathJSON  | `application/vnd.equakit.mathjson+json` | EquaKit 私有 vendor MIME |
+
+混合正文和多公式只输出 `text/plain`。这是为了避免把一整段富文本误表示成单个 MathJSON 或
+MathML 表达式。自定义 MIME 主要用于浏览器内和已知集成方，不能假定操作系统原生应用会保留。
+
+MathLive `./clipboard` 子入口使用 `mathlive/ssr` 同步生成完整 MathML 和 AsciiMath，并用
+Cortex Compute Engine 生成 raw 或 canonical MathJSON。转换器保持独立 opt-in，默认 React
+和 core 包不引入 Compute Engine。
+
+Demo 将该子入口构建为独立动态 chunk；默认主路径不包含 Compute Engine。转换器加载完成前
+仍可使用 `text/plain`/LaTeX 基础复制。
 
 当前只写 `text/plain`。未来可增加：
 
@@ -399,8 +424,8 @@ React 构建与 typecheck 使用不同配置：
 format:check
 → lint
 → typecheck
-→ 49 个 Vitest 测试
-→ 8 个 Playwright Chromium 测试
+→ 55 个 Vitest 测试
+→ 9 个 Playwright Chromium 测试
 → core/react/adapters/demo build
 → 真实 pnpm pack
 → tarball 文件白名单
@@ -533,9 +558,9 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 - 不是完整数学 WYSIWYG；
 - 默认 textarea 没有虚拟键盘；可选 MathLive adapter 提供结构化输入和虚拟键盘；
-- 只输出单一 clipboard MIME；
+- 多格式数学 MIME 只适用于单公式选区，混合正文仍回退 `text/plain`；
+- 自定义 MIME 可能被操作系统或非 Web 应用过滤；
 - 没有 AST round-trip；
-- 没有 MathJSON；
 - 不支持协同编辑；
 - 选择题限定 A-H。
 
@@ -546,6 +571,7 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 - Chromium DevTools Protocol 已覆盖 compositionstart/update/end 与中文提交；
 - MathLive 已覆盖动态加载、受控值、调色板 placeholder、键盘输入和静态资源失败检查；
 - TipTap 已覆盖 inline/block NodeView、命令插入、旧文本迁移和 EquaKit 剪贴板；
+- Chromium 已覆盖 copy 事件中的 LaTeX、MathML、AsciiMath、MathJSON 自定义 MIME；
 - axe 已覆盖自动无障碍规则，原生键盘单选行为也已验证；
 - Firefox、WebKit、真实输入法候选窗和 VoiceOver/NVDA 矩阵尚未覆盖。
 
@@ -592,12 +618,12 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 ### P3：多格式
 
-- LaTeX；
+- LaTeX（已实现）；
 - Markdown preset；
-- MathML；
-- AsciiMath；
-- MathJSON；
-- 多 MIME clipboard。
+- MathML（已实现）；
+- AsciiMath（已实现）；
+- MathJSON（已实现）；
+- 多 MIME clipboard（已实现）。
 
 ### P4：开发者体验
 
@@ -617,6 +643,7 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 | 输入     | textarea + 可选 MathLive  | 默认轻量、富输入按需加载  | 更多框架 editor adapter         |
 | UI       | React 可选层              | 受控组件和生态            | Vue/Web Components              |
 | 富文本   | TipTap Mathematics        | 官方节点、命令和 NodeView | 自定义 React NodeView 按需提供  |
+| 剪贴板   | 同步 converter + 多 MIME  | 原生 copy 事件内可靠写入  | Async Clipboard web custom 格式 |
 | Markdown | remark/rehype             | AST 分层和安全默认        | 可配置 preset                   |
 | 解析     | 保守启发式                | 轻量和可预测              | unified-latex adapter           |
 | 包管理   | pnpm                      | workspace 和严格依赖      | 暂无迁移动机                    |
