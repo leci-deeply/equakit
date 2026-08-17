@@ -1,10 +1,10 @@
 # 发布清单
 
-## 法律与所有权 - 阻断项
+## 法律与所有权
 
-- [ ] 获得代码权利人的书面批准。
+- [x] 项目维护者已选择以 MIT License 对外授权。
 - [ ] 确认贡献者署名要求。
-- [ ] 选择并加入已批准的开源许可证。
+- [x] 已加入 `Copyright (c) 2026 leci` 的 MIT License。
 - [ ] 检查名称和包 scope 是否存在商标冲突。
 - [ ] 确认没有复制第三方内容或私有 fixtures。
 
@@ -27,7 +27,7 @@
 
 ## 发布
 
-- [ ] 只有在所有阻断项通过后，才移除 `private: true`。
+- [ ] 准备发布 npm 时移除 package 的 `private: true`。
 - [ ] 补齐 repository、bugs、homepage、author/maintainer 和 funding 元数据。
 - [ ] 选定最终 package scope，并验证 registry 所有权。
 - [ ] 启用分支保护、必需 CI、Dependabot/Renovate 和密钥扫描。

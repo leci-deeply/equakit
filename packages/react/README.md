@@ -54,3 +54,7 @@ import { MathCopyBoundary } from '@equakit/react';
 ```
 
 这个 React 包还包含一个 DOM 回退方案，会读取中性的 `data-math-source` 标记和 KaTeX 注释。
+
+## 许可证
+
+[MIT License](./LICENSE) © 2026 leci

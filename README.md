@@ -5,7 +5,6 @@
 EquaKit 提供一个与框架无关的核心包，以及一个可选的 React 组件包。它专注于数学内容在
 “源码 → 渲染 → 复制 → 再编辑”链路中的可靠性，同时提供分步答案编辑、选择题判分和异步过期响应保护。
 
-
 ## 为什么需要 EquaKit
 
 数学内容在普通富文本工具中经常遇到这些问题：
@@ -327,7 +326,7 @@ pnpm check
 
 ## 路线图
 
-- [ ] 确认代码权利人授权和开源许可证；
+- [x] 添加 MIT License；
 - [ ] 确认 GitHub 与 npm scope 元数据；
 - [ ] 增加真实浏览器复制、光标、IME 和无障碍测试；
 - [ ] 为 `FormulaInput` 增加可选 MathLive adapter；
@@ -338,6 +337,7 @@ pnpm check
 
 ## 文档
 
+- [技术实现与技术选型说明](docs/TECHNICAL_GUIDE.md)
 - [设计与包边界](docs/DESIGN.md)
 - [安全策略](SECURITY.md)
 - [脱敏记录](docs/REDACTION.md)
@@ -353,5 +353,10 @@ GitHub：<https://github.com/leci-deeply>
 
 ## 许可证
 
-许可证仍在等待代码权利人批准。在仓库加入正式 `LICENSE` 文件之前，本项目不授予复制、修改、
-再发布或商业使用许可。
+EquaKit 使用 [MIT License](LICENSE)。
+
+```text
+Copyright (c) 2026 leci
+```
+
+在保留版权声明和许可证文本的前提下，可以使用、复制、修改、合并、发布、分发、再授权和销售本软件。

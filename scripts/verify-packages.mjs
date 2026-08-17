@@ -26,6 +26,7 @@ try {
       (entry) =>
         !entry.startsWith('package/dist/') &&
         entry !== 'package/README.md' &&
+        entry !== 'package/LICENSE' &&
         entry !== 'package/package.json',
     );
     if (unexpected.length > 0) {
@@ -38,6 +39,9 @@ try {
     const dependencyValues = Object.values(manifest.dependencies ?? {});
     if (dependencyValues.some((value) => String(value).startsWith('workspace:'))) {
       throw new Error(`${packageName} tarball 仍包含 workspace 协议依赖。`);
+    }
+    if (!entries.includes('package/LICENSE')) {
+      throw new Error(`${packageName} tarball 缺少 LICENSE。`);
     }
   }
 

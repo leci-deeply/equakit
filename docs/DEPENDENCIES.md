@@ -22,4 +22,5 @@ pnpm licenses list --prod --json
 | remark-math / rehype-katex | Markdown 数学解析与 KaTeX 转换 | MIT    |
 | remark-gfm                 | GFM 表格、任务列表及相关语法   | MIT    |
 
-这份清单不代表已经为仓库选定许可证。项目许可证仍然取决于权利人批准。
+EquaKit 自身采用 MIT License；依赖项继续遵循各自的许可证。完整授权文本见根目录
+[`LICENSE`](../LICENSE)。

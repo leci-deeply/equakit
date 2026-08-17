@@ -121,3 +121,7 @@ if (guard.isCurrent(snapshot)) {
 ```
 
 如果只用普通的 map 状态，也可以改用 `nextMutationVersion` 和 `isCurrentMutation`。
+
+## 许可证
+
+[MIT License](./LICENSE) © 2026 leci
