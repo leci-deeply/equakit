@@ -33,14 +33,18 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "vitest run",
+    "pretest:browser": "pnpm --filter @equakit/react... build",
+    "test:browser": "playwright test",
     "verify:packages": "node scripts/verify-packages.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm verify:packages"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:browser && pnpm build && pnpm verify:packages"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.62.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "eslint": "^9.39.4",

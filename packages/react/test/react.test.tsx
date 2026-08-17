@@ -22,6 +22,7 @@ describe('@equakit/react', () => {
     const html = renderToStaticMarkup(<MathFormula expression={'\\frac{1}{2}'} />);
     expect(html).toContain('katex');
     expect(html).toContain('mfrac');
+    expect(html).toContain('role="math"');
     expect(html).toMatch(/data-math-source="\\+frac\{1\}\{2\}"/);
   });
 
@@ -88,6 +89,8 @@ describe('@equakit/react', () => {
       />,
     );
     expect(html).toContain('type="radio"');
+    expect(html).toContain('<legend');
+    expect(html).toContain('选择答案');
     expect(html).toContain('mre-interactive-choices__item--wrong');
     expect(html).toContain('mre-interactive-choices__item--correct');
   });

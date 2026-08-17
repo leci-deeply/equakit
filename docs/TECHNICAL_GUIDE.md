@@ -362,7 +362,8 @@ React 构建与 typecheck 使用不同配置：
 format:check
 → lint
 → typecheck
-→ 42 个测试
+→ 42 个 Vitest 测试
+→ 5 个 Playwright Chromium 测试
 → core/react/demo build
 → 真实 pnpm pack
 → tarball 文件白名单
@@ -497,40 +498,41 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 ### 测试
 
-- 真实浏览器 Selection/Range/ClipboardEvent 测试尚未添加；
-- IME/composition 尚未测试；
-- 屏幕阅读器矩阵尚未测试；
-- React 测试以 SSR 和纯函数为主。
+- Playwright Chromium 已覆盖 Selection、Range、ClipboardEvent 和系统剪贴板读取；
+- 公式片段插入后的 selectionStart/selectionEnd 已在浏览器中验证；
+- Chromium DevTools Protocol 已覆盖 compositionstart/update/end 与中文提交；
+- axe 已覆盖自动无障碍规则，原生键盘单选行为也已验证；
+- Firefox、WebKit、真实输入法候选窗和 VoiceOver/NVDA 矩阵尚未覆盖。
 
 ### 无障碍
 
-- `InteractiveChoices` 需要补 legend；
+- `InteractiveChoices` 已提供可配置且视觉隐藏的 legend；
+- `MathFormula` 已声明 math role，公式面板和预览区具有有效语义；
 - 结果和边界待确认状态需要 aria-live；
-- MathFormula 的 aria-label 与 KaTeX MathML 组合需要真实屏幕阅读器验证。
+- MathFormula 的 aria-label 与 KaTeX MathML 组合仍需要真实屏幕阅读器验证。
 
 ### 工程
 
 - Demo 同时打包所有能力，chunk 偏大；
 - 尚未提供自动 API 文档；
 - 尚未提供浏览器兼容矩阵和 bundle budget；
-- npm package 已补齐 GitHub、作者和公开发布策略元数据，但在确认 `@equakit` scope
-  所有权前仍保持 private。
+- npm `equakit` 组织与 `@equakit` scope 已创建；package 已补齐 GitHub、作者和公开发布
+  策略元数据，但在首次发布准备完成前仍保持 private。
 
 ## 23. 演进路线
 
 ### P0：开源治理
 
 - 确认贡献者署名；
-- 登录 npm 确认 `@equakit` scope 所有权；包清单元数据已完成；
+- 首次发布前通过 npm CLI 或可信发布再次验证 `@equakit` 写权限；
 - 更新公开安全联系渠道；
 - 启用 Dependabot 和 CodeQL。
 
 ### P1：真实浏览器和无障碍
 
-- Playwright 测试；
-- Selection/Range/ClipboardEvent；
-- 光标和 IME；
-- fieldset legend；
+- 已加入 Playwright Chromium 与 axe 测试；
+- 已覆盖 Selection/Range/ClipboardEvent、系统剪贴板、光标和 IME composition；
+- 已补 fieldset legend、math role、toolbar group 和 preview region；
 - aria-live；
 - VoiceOver/NVDA 测试。
 
@@ -563,17 +565,17 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 ## 24. 技术决策总结
 
-| 领域     | 当前选择           | 原因                 | 未来增强                 |
-| -------- | ------------------ | -------------------- | ------------------------ |
-| 语言     | TypeScript         | 浏览器/npm/类型共享  | Rust/WASM parser adapter |
-| 渲染     | KaTeX              | 轻量、同步、SSR      | MathJax adapter          |
-| 输入     | textarea + palette | 默认成本低           | MathLive adapter         |
-| UI       | React 可选层       | 受控组件和生态       | Vue/Web Components       |
-| Markdown | remark/rehype      | AST 分层和安全默认   | 可配置 preset            |
-| 解析     | 保守启发式         | 轻量和可预测         | unified-latex adapter    |
-| 包管理   | pnpm               | workspace 和严格依赖 | 暂无迁移动机             |
-| 测试     | Vitest             | ESM/Vite 集成        | Playwright 浏览器层      |
-| 构建     | tsc + Vite Demo    | 保留模块边界         | tsup/Rollup 按需引入     |
+| 领域     | 当前选择                  | 原因                     | 未来增强                        |
+| -------- | ------------------------- | ------------------------ | ------------------------------- |
+| 语言     | TypeScript                | 浏览器/npm/类型共享      | Rust/WASM parser adapter        |
+| 渲染     | KaTeX                     | 轻量、同步、SSR          | MathJax adapter                 |
+| 输入     | textarea + palette        | 默认成本低               | MathLive adapter                |
+| UI       | React 可选层              | 受控组件和生态           | Vue/Web Components              |
+| Markdown | remark/rehype             | AST 分层和安全默认       | 可配置 preset                   |
+| 解析     | 保守启发式                | 轻量和可预测             | unified-latex adapter           |
+| 包管理   | pnpm                      | workspace 和严格依赖     | 暂无迁移动机                    |
+| 测试     | Vitest + Playwright + axe | 单元、浏览器与无障碍规则 | Firefox/WebKit 与屏幕阅读器矩阵 |
+| 构建     | tsc + Vite Demo           | 保留模块边界             | tsup/Rollup 按需引入            |
 
 ## 25. 结论
 

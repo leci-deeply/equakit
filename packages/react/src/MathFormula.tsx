@@ -37,7 +37,7 @@ export function MathFormula({
 
   if (html == null) {
     return (
-      <span className={classes} aria-label={ariaLabel ?? normalized}>
+      <span aria-label={ariaLabel ?? normalized} className={classes} role="math">
         {fallback ?? normalized}
       </span>
     );
@@ -49,6 +49,7 @@ export function MathFormula({
       data-math-source={normalized}
       aria-label={ariaLabel ?? normalized}
       dangerouslySetInnerHTML={{ __html: html }}
+      role="math"
     />
   );
 }

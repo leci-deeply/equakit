@@ -80,6 +80,7 @@ EquaKit
 
 ```bash
 pnpm install
+pnpm exec playwright install chromium
 pnpm check
 ```
 
@@ -303,6 +304,7 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - ESLint 静态检查；
 - TypeScript 类型检查；
 - 42 个 Vitest 测试；
+- 5 个 Playwright Chromium 测试，覆盖真实复制、光标、IME、键盘和 axe 无障碍扫描；
 - core、React 和 Demo 构建；
 - 构建后 ESM 入口动态导入；
 - npm tarball 文件白名单与 workspace 协议检查；
@@ -327,8 +329,8 @@ pnpm check
 ## 路线图
 
 - [x] 添加 MIT License；
-- [ ] 确认 npm 上 `@equakit` scope 的所有权（GitHub 与包清单元数据已校准）；
-- [ ] 增加真实浏览器复制、光标、IME 和无障碍测试；
+- [x] 创建 npm `equakit` 组织并校准 GitHub 与包清单元数据；
+- [x] 增加真实浏览器复制、光标、IME 和无障碍测试；
 - [ ] 为 `FormulaInput` 增加可选 MathLive adapter；
 - [ ] 提供 TipTap inline/block math node adapter；
 - [ ] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；

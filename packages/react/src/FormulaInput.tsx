@@ -144,7 +144,12 @@ export function FormulaInput({
     <div className={className ? `mre-formula-input ${className}` : 'mre-formula-input'}>
       <div className="mre-formula-input__palette" role="toolbar" aria-label="公式面板">
         {palette.map((group) => (
-          <div className="mre-formula-input__group" key={group.label} aria-label={group.label}>
+          <div
+            aria-label={group.label}
+            className="mre-formula-input__group"
+            key={group.label}
+            role="group"
+          >
             {group.keys.map((key) => (
               <button
                 className="mre-formula-input__key"
@@ -174,7 +179,7 @@ export function FormulaInput({
         value={value}
       />
       {!hidePreview && (
-        <div aria-label={previewLabel} className="mre-formula-input__preview">
+        <div aria-label={previewLabel} className="mre-formula-input__preview" role="region">
           <span className="mre-formula-input__preview-label">{previewLabel}</span>
           {trimmed ? (
             <MathFormula display expression={value} />

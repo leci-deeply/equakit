@@ -5,6 +5,7 @@
 提交变更前：
 
 ```bash
+pnpm exec playwright install chromium
 pnpm check
 ```
 

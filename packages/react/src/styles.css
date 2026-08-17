@@ -2,6 +2,16 @@
   display: inline;
 }
 
+.mre-visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .mre-math-formula--display {
   display: block;
   margin: 0.75rem 0;

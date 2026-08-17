@@ -15,6 +15,7 @@ export interface InteractiveChoicesProps {
   correct?: readonly string[];
   reveal?: boolean;
   name?: string;
+  legend?: string;
   className?: string;
   choiceLabel?: (index: number) => string;
 }
@@ -30,6 +31,7 @@ export function InteractiveChoices({
   correct,
   reveal = false,
   name = 'mre-choice',
+  legend = '选择答案',
   className,
   choiceLabel = defaultChoiceLabel,
 }: InteractiveChoicesProps) {
@@ -54,6 +56,7 @@ export function InteractiveChoices({
     <fieldset
       className={className ? `mre-interactive-choices ${className}` : 'mre-interactive-choices'}
     >
+      <legend className="mre-visually-hidden">{legend}</legend>
       {normalizedChoices.map((choice, index) => {
         const checked = selectedSet.has(choice.id);
         const correctChoice = correctSet.has(choice.id);
