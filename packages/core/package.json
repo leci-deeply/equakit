@@ -1,8 +1,33 @@
 {
   "name": "@equakit/core",
   "version": "0.1.0",
+  "description": "数学富文本归一化、校验、剪贴板恢复与答案编辑核心工具",
   "private": true,
   "license": "MIT",
+  "author": {
+    "name": "leci",
+    "url": "https://github.com/leci-deeply"
+  },
+  "homepage": "https://github.com/leci-deeply/equakit/tree/main/packages/core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leci-deeply/equakit.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/leci-deeply/equakit/issues"
+  },
+  "keywords": [
+    "math",
+    "latex",
+    "katex",
+    "markdown",
+    "clipboard",
+    "typescript"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

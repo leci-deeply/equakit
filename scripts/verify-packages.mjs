@@ -7,6 +7,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const packages = ['core', 'react'];
 const temp = mkdtempSync(resolve(tmpdir(), 'equakit-pack-'));
+const repositoryUrl = 'git+https://github.com/leci-deeply/equakit.git';
+const bugsUrl = 'https://github.com/leci-deeply/equakit/issues';
 
 try {
   for (const packageName of packages) {
@@ -42,6 +44,34 @@ try {
     }
     if (!entries.includes('package/LICENSE')) {
       throw new Error(`${packageName} tarball 缺少 LICENSE。`);
+    }
+    if (manifest.name !== `@equakit/${packageName}`) {
+      throw new Error(`${packageName} tarball 的 npm scope 或包名不正确。`);
+    }
+    if (manifest.license !== 'MIT') {
+      throw new Error(`${packageName} tarball 的许可证元数据不是 MIT。`);
+    }
+    if (
+      manifest.author?.name !== 'leci' ||
+      manifest.author?.url !== 'https://github.com/leci-deeply'
+    ) {
+      throw new Error(`${packageName} tarball 的作者元数据不完整。`);
+    }
+    if (
+      manifest.repository?.type !== 'git' ||
+      manifest.repository?.url !== repositoryUrl ||
+      manifest.repository?.directory !== `packages/${packageName}`
+    ) {
+      throw new Error(`${packageName} tarball 的 GitHub 仓库元数据不完整。`);
+    }
+    if (
+      manifest.bugs?.url !== bugsUrl ||
+      !manifest.homepage?.startsWith('https://github.com/leci-deeply/equakit/')
+    ) {
+      throw new Error(`${packageName} tarball 的主页或问题反馈地址不完整。`);
+    }
+    if (manifest.publishConfig?.access !== 'public') {
+      throw new Error(`${packageName} tarball 没有声明公开发布 scoped package。`);
     }
   }
 

@@ -513,14 +513,15 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 - Demo 同时打包所有能力，chunk 偏大；
 - 尚未提供自动 API 文档；
 - 尚未提供浏览器兼容矩阵和 bundle budget；
-- npm package 仍保持 private。
+- npm package 已补齐 GitHub、作者和公开发布策略元数据，但在确认 `@equakit` scope
+  所有权前仍保持 private。
 
 ## 23. 演进路线
 
 ### P0：开源治理
 
 - 确认贡献者署名；
-- 完成 npm scope 和元数据；
+- 登录 npm 确认 `@equakit` scope 所有权；包清单元数据已完成；
 - 更新公开安全联系渠道；
 - 启用 Dependabot 和 CodeQL。
 

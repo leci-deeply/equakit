@@ -1,8 +1,29 @@
 {
   "name": "equakit-workspace",
   "version": "0.1.0",
+  "description": "EquaKit 数学富文本与答案编辑工具集",
   "private": true,
   "license": "MIT",
+  "author": {
+    "name": "leci",
+    "url": "https://github.com/leci-deeply"
+  },
+  "homepage": "https://github.com/leci-deeply/equakit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leci-deeply/equakit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/leci-deeply/equakit/issues"
+  },
+  "keywords": [
+    "math",
+    "latex",
+    "katex",
+    "markdown",
+    "react",
+    "typescript"
+  ],
   "type": "module",
   "packageManager": "pnpm@10.18.0",
   "engines": {

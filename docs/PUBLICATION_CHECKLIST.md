@@ -28,7 +28,8 @@
 ## 发布
 
 - [ ] 准备发布 npm 时移除 package 的 `private: true`。
-- [ ] 补齐 repository、bugs、homepage、author/maintainer 和 funding 元数据。
-- [ ] 选定最终 package scope，并验证 registry 所有权。
+- [x] 补齐 repository、bugs、homepage、author 和公开发布策略元数据。
+- [ ] npm 身份确定后补充 maintainer；存在真实赞助入口时再补 funding。
+- [ ] 已选定 `@equakit` package scope；仍需登录 npm 验证 registry 所有权。
 - [ ] 启用分支保护、必需 CI、Dependabot/Renovate 和密钥扫描。
 - [ ] 创建签名的 `v0.1.0` tag，并在需要时附带生成的 provenance。

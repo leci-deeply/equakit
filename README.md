@@ -91,7 +91,7 @@ pnpm --filter @equakit/react build
 pnpm --filter @equakit/demo build
 ```
 
-> npm 包尚未公开发布。许可证和 registry scope 确认后，安装命令预计为
+> npm 包尚未公开发布。确认 `@equakit` registry scope 所有权后，安装命令预计为
 > `pnpm add @equakit/core` 或 `pnpm add @equakit/react`。
 
 ## Core 使用示例
@@ -327,7 +327,7 @@ pnpm check
 ## 路线图
 
 - [x] 添加 MIT License；
-- [ ] 确认 GitHub 与 npm scope 元数据；
+- [ ] 确认 npm 上 `@equakit` scope 的所有权（GitHub 与包清单元数据已校准）；
 - [ ] 增加真实浏览器复制、光标、IME 和无障碍测试；
 - [ ] 为 `FormulaInput` 增加可选 MathLive adapter；
 - [ ] 提供 TipTap inline/block math node adapter；
