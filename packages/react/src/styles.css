@@ -1,0 +1,178 @@
+.mre-math-formula {
+  display: inline;
+}
+
+.mre-math-formula--display {
+  display: block;
+  margin: 0.75rem 0;
+  overflow-x: auto;
+}
+
+.mre-markdown-math {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.mre-markdown-math :where(p, ul, ol, blockquote, pre, table) {
+  margin: 0.65rem 0;
+}
+
+.mre-markdown-math :where(table) {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.mre-markdown-math :where(th, td) {
+  border: 1px solid #d8dee4;
+  padding: 0.4rem 0.55rem;
+  vertical-align: top;
+}
+
+.mre-formula-input {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.mre-formula-input__palette {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.mre-formula-input__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.mre-formula-input__key,
+.mre-answer-steps__add,
+.mre-answer-steps__delete {
+  border: 1px solid #c9d1d9;
+  border-radius: 6px;
+  background: #fff;
+  color: #24292f;
+  cursor: pointer;
+  font: inherit;
+  min-height: 2rem;
+  padding: 0.3rem 0.55rem;
+}
+
+.mre-formula-input__key:hover,
+.mre-answer-steps__add:hover,
+.mre-answer-steps__delete:hover {
+  background: #f6f8fa;
+}
+
+.mre-formula-input__key:disabled,
+.mre-answer-steps__add:disabled,
+.mre-answer-steps__delete:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mre-formula-input__textarea,
+.mre-answer-steps__textarea {
+  border: 1px solid #c9d1d9;
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: #24292f;
+  font: inherit;
+  line-height: 1.5;
+  min-width: 0;
+  padding: 0.6rem 0.7rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.mre-formula-input__preview {
+  border: 1px solid #d8dee4;
+  border-radius: 6px;
+  min-height: 2.5rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.mre-formula-input__preview-label {
+  color: #57606a;
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.mre-formula-input__empty,
+.mre-formula-input__error {
+  color: #6e7781;
+}
+
+.mre-formula-input__error {
+  color: #b42318;
+}
+
+.mre-interactive-choices {
+  border: 0;
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.mre-interactive-choices__item {
+  align-items: flex-start;
+  border: 1px solid #d8dee4;
+  border-radius: 6px;
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: auto auto 1fr;
+  padding: 0.65rem 0.75rem;
+}
+
+.mre-interactive-choices__item--selected {
+  border-color: #0969da;
+  background: #ddf4ff;
+}
+
+.mre-interactive-choices__item--correct {
+  border-color: #1a7f37;
+  background: #dafbe1;
+}
+
+.mre-interactive-choices__item--wrong {
+  border-color: #cf222e;
+  background: #ffebe9;
+}
+
+.mre-interactive-choices__marker {
+  color: #57606a;
+  font-weight: 700;
+  min-width: 1.5rem;
+}
+
+.mre-interactive-choices__content > .mre-markdown-math > :first-child {
+  margin-top: 0;
+}
+
+.mre-interactive-choices__content > .mre-markdown-math > :last-child {
+  margin-bottom: 0;
+}
+
+.mre-answer-steps {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.mre-answer-steps__row {
+  align-items: end;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.mre-answer-steps__label {
+  color: #57606a;
+  display: grid;
+  font-size: 0.9rem;
+  gap: 0.35rem;
+}
+
+.mre-copy-boundary {
+  display: contents;
+}
