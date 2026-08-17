@@ -59,16 +59,18 @@ EquaKit 将这些问题拆成纯函数、受控组件和明确的安全边界，
 
 ## 包结构
 
-| 包               | 职责                                                                  |
-| ---------------- | --------------------------------------------------------------------- |
-| `@equakit/core`  | 数学归一化、校验、剪贴板恢复、答案步骤、选择题判分、异步过期保护。    |
-| `@equakit/react` | KaTeX/Markdown 渲染、公式输入、可访问选择题、分步答案编辑和复制边界。 |
-| `@equakit/demo`  | 使用合成数据展示完整交互链路的 Vite 示例。                            |
+| 包                          | 职责                                                                  |
+| --------------------------- | --------------------------------------------------------------------- |
+| `@equakit/core`             | 数学归一化、校验、剪贴板恢复、答案步骤、选择题判分、异步过期保护。    |
+| `@equakit/react`            | KaTeX/Markdown 渲染、公式输入、可访问选择题、分步答案编辑和复制边界。 |
+| `@equakit/adapter-mathlive` | 按需加载的 MathLive 结构化数学输入器。                                |
+| `@equakit/demo`             | 使用合成数据展示完整交互链路的 Vite 示例。                            |
 
 ```text
 EquaKit
 ├── packages/core        # 与框架无关的 TypeScript 核心
 ├── packages/react       # 受控 React 组件
+├── packages/adapter-mathlive # 可选 MathLive 输入 adapter
 ├── examples/basic       # 交互示例
 ├── docs                 # 设计、脱敏、安全和发布文档
 └── scripts              # 发布包与 ESM 入口验证
@@ -89,11 +91,12 @@ pnpm check
 ```bash
 pnpm --filter @equakit/core build
 pnpm --filter @equakit/react build
+pnpm --filter @equakit/adapter-mathlive build
 pnpm --filter @equakit/demo build
 ```
 
-> npm 包尚未公开发布。确认 `@equakit` registry scope 所有权后，安装命令预计为
-> `pnpm add @equakit/core` 或 `pnpm add @equakit/react`。
+> npm 包尚未公开发布。首次发布完成后，可安装 `@equakit/core`、`@equakit/react` 和按需的
+> `@equakit/adapter-mathlive`。
 
 ## Core 使用示例
 
@@ -235,6 +238,25 @@ export function FormulaEditor() {
 }
 ```
 
+### MathLive 可选输入
+
+```tsx
+import 'mathlive/fonts.css';
+
+import { useState } from 'react';
+import { MathLiveFormulaEditor } from '@equakit/adapter-mathlive';
+import { FormulaInput } from '@equakit/react';
+
+export function RichFormulaEditor() {
+  const [value, setValue] = useState(String.raw`\frac{1}{2}`);
+
+  return <FormulaInput editor={MathLiveFormulaEditor} onChange={setValue} value={value} />;
+}
+```
+
+MathLive 不进入 React 主包，只有导入 adapter 后才会在浏览器动态加载。高级配置、字体资源
+和安全版本要求见 [`@equakit/adapter-mathlive`](packages/adapter-mathlive/README.md)。
+
 ### 分步答案编辑
 
 ```tsx
@@ -290,7 +312,7 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - 使用 [react-markdown](https://github.com/remarkjs/react-markdown)、
   [remark-math](https://github.com/remarkjs/remark-math) 和
   [rehype-katex](https://github.com/remarkjs/remark-math) 作为 Markdown 数学管线；
-- 计划以可选 adapter 方式接入 [MathLive](https://github.com/arnog/mathlive)，而不是增加默认包体积；
+- 已用独立可选 adapter 接入 [MathLive](https://github.com/arnog/mathlive)，不增加 React 主包体积；
 - 计划为 [TipTap Mathematics](https://tiptap.dev/docs/editor/extensions/nodes/mathematics)
   提供 inline/block math node 适配；
 - AST 级处理将作为可选的 [unified-latex](https://github.com/siefkenj/unified-latex) 集成，
@@ -303,8 +325,8 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - Prettier 格式检查；
 - ESLint 静态检查；
 - TypeScript 类型检查；
-- 42 个 Vitest 测试；
-- 5 个 Playwright Chromium 测试，覆盖真实复制、光标、IME、键盘和 axe 无障碍扫描；
+- 44 个 Vitest 测试；
+- 6 个 Playwright Chromium 测试，覆盖真实复制、光标、IME、MathLive、键盘和 axe 无障碍扫描；
 - core、React 和 Demo 构建；
 - 构建后 ESM 入口动态导入；
 - npm tarball 文件白名单与 workspace 协议检查；
@@ -331,7 +353,7 @@ pnpm check
 - [x] 添加 MIT License；
 - [x] 创建 npm `equakit` 组织并校准 GitHub 与包清单元数据；
 - [x] 增加真实浏览器复制、光标、IME 和无障碍测试；
-- [ ] 为 `FormulaInput` 增加可选 MathLive adapter；
+- [x] 为 `FormulaInput` 增加可选 MathLive adapter；
 - [ ] 提供 TipTap inline/block math node adapter；
 - [ ] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
 - [ ] 增加自动 API 文档和在线 playground；

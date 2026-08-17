@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 
 import {
   validateLatexExpression,
@@ -30,9 +31,29 @@ export interface FormulaInputProps {
   hidePreview?: boolean;
   disabled?: boolean;
   validationMode?: 'latex' | 'markdown';
+  editor?: FormulaInputEditorComponent;
   className?: string;
   onValidationChange?: (result: MathValidationResult | null) => void;
 }
+
+export interface FormulaInputEditorHandle {
+  focus: () => void;
+  insertSnippet: (key: FormulaPaletteKey) => void;
+}
+
+export interface FormulaInputEditorProps {
+  value: string;
+  onChange: (nextValue: string) => void;
+  ariaLabel: string;
+  className: string;
+  disabled: boolean;
+  placeholder: string;
+  rows: number;
+}
+
+export type FormulaInputEditorComponent = ForwardRefExoticComponent<
+  FormulaInputEditorProps & RefAttributes<FormulaInputEditorHandle>
+>;
 
 export const DEFAULT_FORMULA_PALETTE: readonly FormulaPaletteGroup[] = [
   {
@@ -108,10 +129,12 @@ export function FormulaInput({
   hidePreview = false,
   disabled = false,
   validationMode = 'latex',
+  editor,
   className,
   onValidationChange,
 }: FormulaInputProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<FormulaInputEditorHandle>(null);
+  const Editor = editor ?? TextareaFormulaEditor;
   const trimmed = value.trim();
   const validation = useMemo(
     () =>
@@ -129,15 +152,7 @@ export function FormulaInput({
 
   function insertKey(key: FormulaPaletteKey) {
     if (disabled) return;
-    const textarea = textareaRef.current;
-    const start = textarea?.selectionStart ?? value.length;
-    const end = textarea?.selectionEnd ?? value.length;
-    const next = insertFormulaSnippet(value, key, start, end);
-    onChange(next.value);
-    globalThis.requestAnimationFrame?.(() => {
-      textarea?.focus();
-      textarea?.setSelectionRange(next.caret, next.caret);
-    });
+    editorRef.current?.insertSnippet(key);
   }
 
   return (
@@ -168,13 +183,13 @@ export function FormulaInput({
           </div>
         ))}
       </div>
-      <textarea
-        aria-label={textareaLabel}
+      <Editor
+        ariaLabel={textareaLabel}
         className="mre-formula-input__textarea"
         disabled={disabled}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={onChange}
         placeholder={placeholder}
-        ref={textareaRef}
+        ref={editorRef}
         rows={rows}
         value={value}
       />
@@ -196,3 +211,46 @@ export function FormulaInput({
     </div>
   );
 }
+
+const TextareaFormulaEditor = forwardRef<FormulaInputEditorHandle, FormulaInputEditorProps>(
+  function TextareaFormulaEditor(
+    { value, onChange, ariaLabel, className, disabled, placeholder, rows },
+    ref,
+  ) {
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        focus() {
+          textareaRef.current?.focus();
+        },
+        insertSnippet(key) {
+          const textarea = textareaRef.current;
+          const start = textarea?.selectionStart ?? value.length;
+          const end = textarea?.selectionEnd ?? value.length;
+          const next = insertFormulaSnippet(value, key, start, end);
+          onChange(next.value);
+          globalThis.requestAnimationFrame?.(() => {
+            textarea?.focus();
+            textarea?.setSelectionRange(next.caret, next.caret);
+          });
+        },
+      }),
+      [onChange, value],
+    );
+
+    return (
+      <textarea
+        aria-label={ariaLabel}
+        className={className}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        ref={textareaRef}
+        rows={rows}
+        value={value}
+      />
+    );
+  },
+);

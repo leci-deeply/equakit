@@ -42,6 +42,8 @@ equakit
 │   ├── InteractiveChoices.tsx
 │   ├── AnswerStepsEditor.tsx
 │   └── clipboard.tsx
+├── packages/adapter-mathlive
+│   └── MathLiveFormulaEditor.tsx
 ├── examples/basic
 ├── scripts/verify-packages.mjs
 └── .github/workflows/ci.yml
@@ -51,11 +53,14 @@ equakit
 
 ```mermaid
 flowchart LR
-    Demo[Demo] --> React[@equakit/react]
+    Demo[Demo] --> MathLiveAdapter[@equakit/adapter-mathlive]
+    Demo --> React[@equakit/react]
     Demo --> Core[@equakit/core]
     React --> Core
     React --> KaTeX
     React --> Markdown[react-markdown]
+    MathLiveAdapter --> React
+    MathLiveAdapter --> MathLive
     Markdown --> RemarkMath[remark-math]
     Markdown --> RehypeKatex[rehype-katex]
     Core --> KaTeX
@@ -284,7 +289,9 @@ flowchart LR
 
 实现文件：[`packages/react/src/FormulaInput.tsx`](../packages/react/src/FormulaInput.tsx)
 
-`FormulaInput` 是轻量 textarea + palette，而不是完整的结构化 math field。
+`FormulaInput` 默认是轻量 textarea + palette，并通过 `FormulaInputEditorComponent` 接口
+接受可选编辑器。这个接口只暴露受控值、可访问名称、禁用状态，以及 `focus()` 和
+`insertSnippet()` 两个命令，避免把具体第三方 API 泄漏到主包。
 
 它支持：
 
@@ -296,6 +303,10 @@ flowchart LR
 - 受控 `value/onChange`。
 
 校验结果通过 `useMemo()` 缓存，避免重复触发 `onValidationChange`。
+
+`@equakit/adapter-mathlive` 实现同一接口：服务端只输出加载宿主，浏览器挂载后动态导入
+MathLive；MathLive 的 `input` 事件同步外部值，外部值真正变化时才调用 `setValue()`，避免
+重置结构化选区。调色板通过 `insert()` 的 `replaceSelection` 和 `placeholder` 模式工作。
 
 ## 11. React：选择题和分步答案
 
@@ -362,8 +373,8 @@ React 构建与 typecheck 使用不同配置：
 format:check
 → lint
 → typecheck
-→ 42 个 Vitest 测试
-→ 5 个 Playwright Chromium 测试
+→ 44 个 Vitest 测试
+→ 6 个 Playwright Chromium 测试
 → core/react/demo build
 → 真实 pnpm pack
 → tarball 文件白名单
@@ -408,7 +419,13 @@ MathJax 的 TeX/MathML 覆盖更广，但运行时和配置更重。当前轻量
 
 ### 相比 MathLive
 
-MathLive 的结构化输入、虚拟键盘、多格式和无障碍能力更强，但它更像完整输入引擎。EquaKit 保留 KaTeX 作为轻量默认层，未来为 `FormulaInput` 增加按需加载的 MathLive adapter。
+MathLive 的结构化输入、虚拟键盘、多格式和无障碍能力更强，但它更像完整输入引擎。EquaKit
+继续保留 KaTeX 和 textarea 作为轻量默认层，并通过 `@equakit/adapter-mathlive` 在浏览器挂载后
+动态加载 MathLive。Adapter 使用受控值、`input` 事件和 `insert()` 的结构化 placeholder，
+不会让 MathLive 进入 React 主包。
+
+当前固定 MathLive `^0.110.0`，因为该版本修复了 `GHSA-fm7p-gw32-828p` 记录的 HTML
+转义问题。字体通过 `mathlive/fonts.css` 进入示例资产管线，可选按键音默认关闭。
 
 相关项目：
 
@@ -489,7 +506,7 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 ### 功能
 
 - 不是完整数学 WYSIWYG；
-- 没有虚拟键盘；
+- 默认 textarea 没有虚拟键盘；可选 MathLive adapter 提供结构化输入和虚拟键盘；
 - 只输出单一 clipboard MIME；
 - 没有 AST round-trip；
 - 没有 MathJSON；
@@ -501,6 +518,7 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 - Playwright Chromium 已覆盖 Selection、Range、ClipboardEvent 和系统剪贴板读取；
 - 公式片段插入后的 selectionStart/selectionEnd 已在浏览器中验证；
 - Chromium DevTools Protocol 已覆盖 compositionstart/update/end 与中文提交；
+- MathLive 已覆盖动态加载、受控值、调色板 placeholder、键盘输入和静态资源失败检查；
 - axe 已覆盖自动无障碍规则，原生键盘单选行为也已验证；
 - Firefox、WebKit、真实输入法候选窗和 VoiceOver/NVDA 矩阵尚未覆盖。
 
@@ -539,7 +557,7 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 ### P2：可选 adapter
 
 ```text
-@equakit/adapter-mathlive
+@equakit/adapter-mathlive（已实现）
 @equakit/adapter-tiptap
 @equakit/adapter-unified-latex
 @equakit/adapter-mathjax
@@ -569,7 +587,7 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 | -------- | ------------------------- | ------------------------ | ------------------------------- |
 | 语言     | TypeScript                | 浏览器/npm/类型共享      | Rust/WASM parser adapter        |
 | 渲染     | KaTeX                     | 轻量、同步、SSR          | MathJax adapter                 |
-| 输入     | textarea + palette        | 默认成本低               | MathLive adapter                |
+| 输入     | textarea + 可选 MathLive  | 默认轻量、富输入按需加载 | 更多框架 editor adapter         |
 | UI       | React 可选层              | 受控组件和生态           | Vue/Web Components              |
 | Markdown | remark/rehype             | AST 分层和安全默认       | 可配置 preset                   |
 | 解析     | 保守启发式                | 轻量和可预测             | unified-latex adapter           |

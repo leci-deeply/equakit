@@ -24,7 +24,14 @@ export type {
   UseMathClipboardOptions,
 } from './clipboard.js';
 export { DEFAULT_FORMULA_PALETTE, FormulaInput, insertFormulaSnippet } from './FormulaInput.js';
-export type { FormulaInputProps, FormulaPaletteGroup, FormulaPaletteKey } from './FormulaInput.js';
+export type {
+  FormulaInputEditorComponent,
+  FormulaInputEditorHandle,
+  FormulaInputEditorProps,
+  FormulaInputProps,
+  FormulaPaletteGroup,
+  FormulaPaletteKey,
+} from './FormulaInput.js';
 export { InteractiveChoices } from './InteractiveChoices.js';
 export type { InteractiveChoice, InteractiveChoicesProps } from './InteractiveChoices.js';
 export { MarkdownMath, safeUrlTransform } from './MarkdownMath.js';

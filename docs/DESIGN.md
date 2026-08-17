@@ -19,6 +19,14 @@
 
 这个包必须继续支持自定义应用状态和自定义 CSS token。界面上的公开文案默认使用中文，并且在控件出现的位置可以通过 props 覆盖。
 
+## Adapter 边界
+
+`@equakit/adapter-mathlive` 只实现 `FormulaInputEditorComponent` 契约。MathLive 必须保持
+peer dependency，并在浏览器挂载后动态加载，不能进入 `@equakit/react` 的默认依赖图。
+
+Adapter 可以管理第三方编辑器的 DOM、选区和静态资源，但不能接管 `FormulaInput` 的校验、
+预览、应用状态或远程持久化。MathLive 版本不得低于修复已知 HTML 转义问题的 `0.110.0`。
+
 ## 安全决策
 
 1. Markdown 使用 `react-markdown`、`remark-math` 和 `rehype-katex`，但不启用 `rehype-raw`。

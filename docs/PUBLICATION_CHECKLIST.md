@@ -20,6 +20,7 @@
 
 - [x] `pnpm check` 在干净检出上通过。
 - [x] 包 tarball 只包含预期文件（`npm pack --dry-run --json`）。
+- [x] core、React 和 MathLive adapter 都具备独立 LICENSE 与发布元数据。
 - [x] 公共 API 具备 README 示例和声明文件。
 - [x] 已记录浏览器支持和 Node.js 支持。
 - [x] 已为 Markdown、URL、HTML 和剪贴板这些敏感路径准备测试。

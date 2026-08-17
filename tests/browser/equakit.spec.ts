@@ -1,6 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+interface BrowserMathfieldElement extends HTMLElement {
+  value: string;
+  setValue: (value: string, options?: { silenceNotifications?: boolean }) => void;
+}
+
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
@@ -24,13 +29,16 @@ test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ pa
 });
 
 test('公式面板在当前选区插入片段并把光标放进占位符', async ({ page }) => {
-  const textarea = page.getByRole('textbox', { name: '公式源码' });
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: '公式输入', exact: true }),
+  });
+  const textarea = card.getByRole('textbox', { name: '公式源码' });
   await textarea.fill('ab');
   await textarea.evaluate((element) => {
-    element.setSelectionRange(1, 1);
+    (element as HTMLTextAreaElement).setSelectionRange(1, 1);
   });
 
-  await page.getByRole('button', { name: '分式', exact: true }).click();
+  await card.getByRole('button', { name: '分式', exact: true }).click();
 
   await expect(textarea).toHaveValue('a\\frac{}{}b');
   await expect(textarea).toHaveJSProperty('selectionStart', 7);
@@ -41,7 +49,7 @@ test('公式面板在当前选区插入片段并把光标放进占位符', async
 });
 
 test('Chromium IME composition 期间保持受控输入值并正常提交中文', async ({ page }) => {
-  const textarea = page.getByRole('textbox', { name: '公式源码' });
+  const textarea = page.getByRole('textbox', { name: '公式源码', exact: true });
   await textarea.fill('');
   await textarea.focus();
   await textarea.evaluate((element) => {
@@ -83,6 +91,59 @@ test('Chromium IME composition 期间保持受控输入值并正常提交中文'
   expect(events.filter((event) => event === 'compositionupdate').length).toBeGreaterThanOrEqual(2);
 });
 
+test('MathLive adapter 按需加载并使用结构化占位符插入公式', async ({ page }) => {
+  const failedAssets: string[] = [];
+  page.on('response', (response) => {
+    if (response.status() >= 400 && /\/(?:fonts|sounds)\//.test(response.url())) {
+      failedAssets.push(`${response.status()} ${response.url()}`);
+    }
+  });
+  await page.reload();
+
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: 'MathLive 可选输入' }),
+  });
+  const mathfield = card.locator('math-field');
+
+  await expect(mathfield).toHaveAttribute('aria-label', 'MathLive 公式源码');
+  await expect(mathfield).toHaveAttribute('role', 'group');
+  await expect(mathfield).not.toHaveAttribute('contenteditable');
+  await expect
+    .poll(() =>
+      mathfield.evaluate((element) =>
+        element.shadowRoot?.querySelector('[part~="keyboard-sink"]')?.getAttribute('aria-label'),
+      ),
+    )
+    .toBe('MathLive 公式源码');
+  await expect
+    .poll(() => mathfield.evaluate((element) => (element as BrowserMathfieldElement).value))
+    .toBe('x^2+1');
+
+  await mathfield.evaluate((element) => {
+    (element as BrowserMathfieldElement).setValue('', { silenceNotifications: true });
+    element.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        composed: true,
+        inputType: 'deleteContent',
+      }),
+    );
+  });
+  await card.getByRole('button', { name: '分式', exact: true }).click();
+
+  await expect
+    .poll(() => mathfield.evaluate((element) => (element as BrowserMathfieldElement).value))
+    .toContain('\\frac');
+  await mathfield.focus();
+  await expect(card.locator('[part~="keyboard-sink"]')).toBeFocused();
+  await page.keyboard.type('1');
+  await expect
+    .poll(() => mathfield.evaluate((element) => (element as BrowserMathfieldElement).value))
+    .toContain('1');
+  await expect(card.getByRole('region', { name: 'MathLive 预览' })).toContainText('1');
+  expect(failedAssets).toEqual([]);
+});
+
 test('选择题支持可访问分组和原生键盘单选行为', async ({ page }) => {
   const choices = page.getByRole('group', { name: '选择答案' });
   const radios = choices.getByRole('radio');
@@ -98,9 +159,9 @@ test('选择题支持可访问分组和原生键盘单选行为', async ({ page 
 });
 
 test('页面通过自动无障碍规则扫描且关键控件具有可访问名称', async ({ page }) => {
-  await expect(page.getByRole('toolbar', { name: '公式面板' })).toBeVisible();
-  await expect(page.getByRole('group', { name: '常用' })).toBeVisible();
-  await expect(page.getByRole('region', { name: '预览' })).toBeVisible();
+  await expect(page.getByRole('toolbar', { name: '公式面板' })).toHaveCount(2);
+  await expect(page.getByRole('group', { name: '常用' })).toHaveCount(2);
+  await expect(page.getByRole('region', { name: '预览', exact: true })).toBeVisible();
   await expect(page.getByRole('textbox', { name: '步骤 1' })).toBeVisible();
 
   const results = await new AxeBuilder({ page }).analyze();

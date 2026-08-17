@@ -55,6 +55,10 @@ import { MathCopyBoundary } from '@equakit/react';
 
 这个 React 包还包含一个 DOM 回退方案，会读取中性的 `data-math-source` 标记和 KaTeX 注释。
 
+`FormulaInput` 的 `editor` 属性接受实现 `FormulaInputEditorComponent` 契约的可选输入器。
+默认实现仍是轻量 textarea；结构化输入可以安装独立的
+[`@equakit/adapter-mathlive`](../adapter-mathlive/README.md)，不会增加本包的默认体积。
+
 `InteractiveChoices` 默认使用“选择答案”作为无障碍分组名称，可以通过 `legend`
 属性传入更具体的题目上下文；文字在视觉上隐藏，但会被辅助技术读取。
 

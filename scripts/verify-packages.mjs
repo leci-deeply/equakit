@@ -5,7 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const packages = ['core', 'react'];
+const packages = ['core', 'react', 'adapter-mathlive'];
 const temp = mkdtempSync(resolve(tmpdir(), 'equakit-pack-'));
 const repositoryUrl = 'git+https://github.com/leci-deeply/equakit.git';
 const bugsUrl = 'https://github.com/leci-deeply/equakit/issues';
@@ -38,7 +38,12 @@ try {
     const manifest = JSON.parse(
       execFileSync('tar', ['-xOf', archive, 'package/package.json'], { encoding: 'utf8' }),
     );
-    const dependencyValues = Object.values(manifest.dependencies ?? {});
+    const dependencyValues = [
+      ...Object.values(manifest.dependencies ?? {}),
+      ...Object.values(manifest.peerDependencies ?? {}),
+      ...Object.values(manifest.optionalDependencies ?? {}),
+      ...Object.values(manifest.devDependencies ?? {}),
+    ];
     if (dependencyValues.some((value) => String(value).startsWith('workspace:'))) {
       throw new Error(`${packageName} tarball 仍包含 workspace 协议依赖。`);
     }
@@ -77,11 +82,17 @@ try {
 
   const core = await import(pathToFileURL(resolve(root, 'packages/core/dist/index.js')).href);
   const react = await import(pathToFileURL(resolve(root, 'packages/react/dist/index.js')).href);
+  const mathLiveAdapter = await import(
+    pathToFileURL(resolve(root, 'packages/adapter-mathlive/dist/index.js')).href
+  );
   if (typeof core.normalizeMarkdownMath !== 'function') {
     throw new Error('构建后的 core 入口没有暴露 normalizeMarkdownMath。');
   }
   if (typeof react.MathFormula !== 'function') {
     throw new Error('构建后的 React 入口没有暴露 MathFormula。');
+  }
+  if (!mathLiveAdapter.MathLiveFormulaEditor) {
+    throw new Error('构建后的 MathLive adapter 入口没有暴露 MathLiveFormulaEditor。');
   }
 } finally {
   rmSync(temp, { recursive: true, force: true });

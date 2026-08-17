@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { MathLiveFormulaEditor } from '@equakit/adapter-mathlive';
 import {
   AnswerStepsEditor,
   FormulaInput,
@@ -23,6 +24,7 @@ $$
 
 export function App() {
   const [formula, setFormula] = useState(String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`);
+  const [mathLiveFormula, setMathLiveFormula] = useState(String.raw`x^2+1`);
   const [steps, setSteps] = useState([
     String.raw`展开 $(x+1)^2=x^2+2x+1$。`,
     String.raw`合并同类项并求出 $x$。`,
@@ -52,6 +54,18 @@ export function App() {
           <div className="demo-result">
             <MathFormula display expression={formula} />
           </div>
+        </article>
+
+        <article className="demo-card">
+          <h2>MathLive 可选输入</h2>
+          <p>主包保持轻量，按需安装 adapter 后可以切换为结构化数学输入器。</p>
+          <FormulaInput
+            editor={MathLiveFormulaEditor}
+            onChange={setMathLiveFormula}
+            previewLabel="MathLive 预览"
+            textareaLabel="MathLive 公式源码"
+            value={mathLiveFormula}
+          />
         </article>
 
         <article className="demo-card">

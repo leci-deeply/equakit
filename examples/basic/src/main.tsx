@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import 'katex/dist/katex.min.css';
+import 'mathlive/fonts.css';
 import '@equakit/react/styles.css';
 import './styles.css';
 

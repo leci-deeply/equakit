@@ -1,6 +1,6 @@
 # 生产依赖许可证
 
-于 2026-08-16 使用以下命令审查：
+于 2026-08-17 使用以下命令审查：
 
 ```bash
 pnpm licenses list --prod --json
@@ -21,6 +21,8 @@ pnpm licenses list --prod --json
 | react-markdown             | Markdown 转 React 渲染         | MIT    |
 | remark-math / rehype-katex | Markdown 数学解析与 KaTeX 转换 | MIT    |
 | remark-gfm                 | GFM 表格、任务列表及相关语法   | MIT    |
+| MathLive                   | 可选的结构化数学输入器         | MIT    |
+| Cortex Compute Engine      | MathLive 的数学表达式依赖      | MIT    |
 
 EquaKit 自身采用 MIT License；依赖项继续遵循各自的许可证。完整授权文本见根目录
 [`LICENSE`](../LICENSE)。
