@@ -2,6 +2,11 @@ import { useMemo, useState } from 'react';
 
 import { MathLiveFormulaEditor } from '@equakit/adapter-mathlive';
 import {
+  TIPTAP_MATH_CLIPBOARD_OPTIONS,
+  createTipTapMathExtensions,
+  migrateEquaKitMathStrings,
+} from '@equakit/adapter-tiptap';
+import {
   AnswerStepsEditor,
   FormulaInput,
   InteractiveChoices,
@@ -9,6 +14,10 @@ import {
   MathCopyBoundary,
   MathFormula,
 } from '@equakit/react';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+
+const tipTapMathExtensions = createTipTapMathExtensions();
 
 const explanation = String.raw`
 ## 安全的数学富文本工作流
@@ -68,6 +77,12 @@ export function App() {
           />
         </article>
 
+        <article className="demo-card demo-card--wide">
+          <h2>TipTap inline/block 数学节点</h2>
+          <p>节点保存 LaTeX 属性，使用官方命令编辑，并接入 EquaKit 数学剪贴板。</p>
+          <TipTapMathDemo />
+        </article>
+
         <article className="demo-card">
           <h2>可访问的选择题</h2>
           <InteractiveChoices
@@ -89,5 +104,63 @@ export function App() {
         </article>
       </section>
     </main>
+  );
+}
+
+function TipTapMathDemo() {
+  const editor = useEditor({
+    content: String.raw`
+      <p>行内公式：<span data-type="inline-math" data-latex="x^2+1"></span></p>
+      <div data-type="block-math" data-latex="\int_0^1 x^2\,\mathrm{d}x"></div>
+    `,
+    editorProps: {
+      attributes: {
+        'aria-label': 'TipTap 数学编辑器',
+        'aria-multiline': 'true',
+        class: 'demo-tiptap__editor',
+        role: 'textbox',
+      },
+    },
+    extensions: [StarterKit, ...tipTapMathExtensions],
+    immediatelyRender: false,
+  });
+
+  return (
+    <div className="demo-tiptap">
+      <div className="demo-actions" role="toolbar" aria-label="TipTap 数学节点操作">
+        <button
+          disabled={!editor}
+          onClick={() =>
+            editor?.chain().focus('end').insertInlineMath({ latex: '\\sqrt{x}' }).run()
+          }
+          type="button"
+        >
+          插入行内公式
+        </button>
+        <button
+          disabled={!editor}
+          onClick={() =>
+            editor?.chain().focus('end').insertBlockMath({ latex: '\\sum_{i=1}^{n} i' }).run()
+          }
+          type="button"
+        >
+          插入块级公式
+        </button>
+        <button
+          disabled={!editor}
+          onClick={() => {
+            if (!editor) return;
+            editor.commands.setContent('<p>价格 $100$，旧公式 $a+b$。</p>');
+            migrateEquaKitMathStrings(editor);
+          }}
+          type="button"
+        >
+          迁移旧公式文本
+        </button>
+      </div>
+      <MathCopyBoundary options={TIPTAP_MATH_CLIPBOARD_OPTIONS}>
+        <EditorContent editor={editor} />
+      </MathCopyBoundary>
+    </div>
   );
 }

@@ -11,7 +11,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ page }) => {
-  const boundary = page.locator('.mre-copy-boundary');
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: 'Markdown 与复制恢复' }),
+  });
+  const boundary = card.locator('.mre-copy-boundary');
   await boundary.evaluate((element) => {
     const selection = document.getSelection();
     const range = document.createRange();
@@ -142,6 +145,56 @@ test('MathLive adapter 按需加载并使用结构化占位符插入公式', asy
     .toContain('1');
   await expect(card.getByRole('region', { name: 'MathLive 预览' })).toContainText('1');
   expect(failedAssets).toEqual([]);
+});
+
+test('TipTap adapter 渲染并插入 inline/block 数学节点且支持 EquaKit 复制', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
+  });
+  const editor = card.getByRole('textbox', { name: 'TipTap 数学编辑器' });
+  const inlineMath = editor.locator('[data-type="inline-math"]');
+  const blockMath = editor.locator('[data-type="block-math"]');
+
+  await expect(inlineMath).toHaveCount(1);
+  await expect(inlineMath).toHaveAttribute('data-latex', 'x^2+1');
+  await expect(blockMath).toHaveCount(1);
+  await expect(blockMath).toHaveAttribute('data-latex', '\\int_0^1 x^2\\,\\mathrm{d}x');
+
+  await card.getByRole('button', { name: '插入行内公式' }).click();
+  await expect(inlineMath).toHaveCount(2);
+  await expect
+    .poll(() =>
+      inlineMath.evaluateAll((elements) => elements.map((element) => element.dataset.latex)),
+    )
+    .toContain('\\sqrt{x}');
+
+  await card.getByRole('button', { name: '插入块级公式' }).click();
+  await expect(blockMath).toHaveCount(2);
+  await expect
+    .poll(() =>
+      blockMath.evaluateAll((elements) => elements.map((element) => element.dataset.latex)),
+    )
+    .toContain('\\sum_{i=1}^{n} i');
+
+  await editor.focus();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.press('ControlOrMeta+C');
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toContain('\\(x^2+1\\)');
+  expect(copied).toContain('\\[\\sum_{i=1}^{n} i\\]');
+});
+
+test('TipTap adapter 迁移旧公式文本时不把价格识别为数学节点', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
+  });
+  const editor = card.getByRole('textbox', { name: 'TipTap 数学编辑器' });
+
+  await card.getByRole('button', { name: '迁移旧公式文本' }).click();
+
+  await expect(editor.locator('[data-type="inline-math"]')).toHaveCount(1);
+  await expect(editor.locator('[data-type="inline-math"]')).toHaveAttribute('data-latex', 'a+b');
+  await expect(editor).toContainText('价格 $100$，旧公式');
 });
 
 test('选择题支持可访问分组和原生键盘单选行为', async ({ page }) => {

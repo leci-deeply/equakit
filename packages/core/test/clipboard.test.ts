@@ -50,7 +50,11 @@ class ElementNode {
   private matchesOne(selector: string): boolean {
     if (selector === '') return false;
     if (selector.startsWith('[') && selector.endsWith(']')) {
-      return this.hasAttribute(selector.slice(1, -1));
+      const match = selector.match(/^\[([^=\]]+)(?:="([^"]*)")?\]$/);
+      if (!match?.[1]) return false;
+      return match[2] === undefined
+        ? this.hasAttribute(match[1])
+        : this.getAttribute(match[1]) === match[2];
     }
     if (selector.startsWith('.')) return false;
     if (selector === 'strong' || selector === 'b') return ['STRONG', 'B'].includes(this.tagName);
@@ -145,5 +149,21 @@ describe('剪贴板恢复', () => {
     ]);
 
     expect(richDomToMarkdown(root as unknown as ParentNode)).toBe('\\(x^2\\)');
+  });
+
+  it('按可选 selector 保留块级公式分隔符', () => {
+    vi.stubGlobal('Node', { TEXT_NODE: 3, ELEMENT_NODE: 1 });
+
+    const root = element('div', [
+      element('span', [], { 'data-latex': 'x^2' }),
+      element('div', [], { 'data-latex': '\\sum_i i', 'data-type': 'block-math' }),
+    ]);
+
+    expect(
+      richDomToMarkdown(root as unknown as ParentNode, '', {
+        displayMathSelector: '[data-type="block-math"]',
+        mathSourceAttribute: 'data-latex',
+      }),
+    ).toBe('\\(x^2\\)\n\\[\\sum_i i\\]');
   });
 });

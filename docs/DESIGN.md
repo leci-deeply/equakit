@@ -27,6 +27,10 @@ peer dependency，并在浏览器挂载后动态加载，不能进入 `@equakit/
 Adapter 可以管理第三方编辑器的 DOM、选区和静态资源，但不能接管 `FormulaInput` 的校验、
 预览、应用状态或远程持久化。MathLive 版本不得低于修复已知 HTML 转义问题的 `0.110.0`。
 
+`@equakit/adapter-tiptap` 复用官方 Mathematics extension，不另建持久化 schema。TipTap、
+ProseMirror 和 Mathematics 必须保持 peer dependency。Adapter 只固定安全 KaTeX 配置、
+`data-latex` 剪贴板边界和迁移规则；React NodeView 仍由宿主应用按需提供。
+
 ## 安全决策
 
 1. Markdown 使用 `react-markdown`、`remark-math` 和 `rehype-katex`，但不启用 `rehype-raw`。

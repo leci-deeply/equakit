@@ -44,6 +44,8 @@ equakit
 │   └── clipboard.tsx
 ├── packages/adapter-mathlive
 │   └── MathLiveFormulaEditor.tsx
+├── packages/adapter-tiptap
+│   └── index.ts
 ├── examples/basic
 ├── scripts/verify-packages.mjs
 └── .github/workflows/ci.yml
@@ -54,6 +56,7 @@ equakit
 ```mermaid
 flowchart LR
     Demo[Demo] --> MathLiveAdapter[@equakit/adapter-mathlive]
+    Demo --> TipTapAdapter[@equakit/adapter-tiptap]
     Demo --> React[@equakit/react]
     Demo --> Core[@equakit/core]
     React --> Core
@@ -61,6 +64,8 @@ flowchart LR
     React --> Markdown[react-markdown]
     MathLiveAdapter --> React
     MathLiveAdapter --> MathLive
+    TipTapAdapter --> Core
+    TipTapAdapter --> TipTap
     Markdown --> RemarkMath[remark-math]
     Markdown --> RehypeKatex[rehype-katex]
     Core --> KaTeX
@@ -308,6 +313,27 @@ flowchart LR
 MathLive；MathLive 的 `input` 事件同步外部值，外部值真正变化时才调用 `setValue()`，避免
 重置结构化选区。调色板通过 `insert()` 的 `replaceSelection` 和 `placeholder` 模式工作。
 
+### 10.1 TipTap inline/block 数学节点
+
+实现文件：[`packages/adapter-tiptap/src/index.ts`](../packages/adapter-tiptap/src/index.ts)
+
+Adapter 直接配置 TipTap 官方 `InlineMath` 和 `BlockMath`，不另建 ProseMirror schema：
+
+- JSON 节点名保持 `inlineMath` / `blockMath`；
+- LaTeX 保存在 `attrs.latex`；
+- HTML/NodeView 使用 `data-type` 和 `data-latex`；
+- 官方 insert/update/delete 命令保持不变；
+- inline 强制 `displayMode: false`，block 强制 `displayMode: true`；
+- KaTeX 固定 `trust: false`、`throwOnError: false` 和 `strict: 'ignore'`；
+- `TIPTAP_MATH_CLIPBOARD_OPTIONS` 让 EquaKit 复制边界读取 `data-latex`。
+
+TipTap adapter 同时设置 `displayMathSelector`：inline 节点复制为 `\\(...\\)`，block 节点
+复制为独立一行的 `\\[...\\]`，保留节点的展示语义。
+
+官方迁移正则在价格和公式连续出现时可能跨越两个 `$` 边界。Adapter 提供更保守的
+`EQUAKIT_MATH_MIGRATION_REGEX` 和 `migrateEquaKitMathStrings()`，避免把 `$100$` 识别成
+数学节点，同时保留官方迁移函数的重新导出。
+
 ## 11. React：选择题和分步答案
 
 ### `InteractiveChoices`
@@ -373,9 +399,9 @@ React 构建与 typecheck 使用不同配置：
 format:check
 → lint
 → typecheck
-→ 44 个 Vitest 测试
-→ 6 个 Playwright Chromium 测试
-→ core/react/demo build
+→ 49 个 Vitest 测试
+→ 8 个 Playwright Chromium 测试
+→ core/react/adapters/demo build
 → 真实 pnpm pack
 → tarball 文件白名单
 → ESM 动态导入
@@ -519,6 +545,7 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 - 公式片段插入后的 selectionStart/selectionEnd 已在浏览器中验证；
 - Chromium DevTools Protocol 已覆盖 compositionstart/update/end 与中文提交；
 - MathLive 已覆盖动态加载、受控值、调色板 placeholder、键盘输入和静态资源失败检查；
+- TipTap 已覆盖 inline/block NodeView、命令插入、旧文本迁移和 EquaKit 剪贴板；
 - axe 已覆盖自动无障碍规则，原生键盘单选行为也已验证；
 - Firefox、WebKit、真实输入法候选窗和 VoiceOver/NVDA 矩阵尚未覆盖。
 
@@ -558,7 +585,7 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 ```text
 @equakit/adapter-mathlive（已实现）
-@equakit/adapter-tiptap
+@equakit/adapter-tiptap（已实现）
 @equakit/adapter-unified-latex
 @equakit/adapter-mathjax
 ```
@@ -583,17 +610,18 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 ## 24. 技术决策总结
 
-| 领域     | 当前选择                  | 原因                     | 未来增强                        |
-| -------- | ------------------------- | ------------------------ | ------------------------------- |
-| 语言     | TypeScript                | 浏览器/npm/类型共享      | Rust/WASM parser adapter        |
-| 渲染     | KaTeX                     | 轻量、同步、SSR          | MathJax adapter                 |
-| 输入     | textarea + 可选 MathLive  | 默认轻量、富输入按需加载 | 更多框架 editor adapter         |
-| UI       | React 可选层              | 受控组件和生态           | Vue/Web Components              |
-| Markdown | remark/rehype             | AST 分层和安全默认       | 可配置 preset                   |
-| 解析     | 保守启发式                | 轻量和可预测             | unified-latex adapter           |
-| 包管理   | pnpm                      | workspace 和严格依赖     | 暂无迁移动机                    |
-| 测试     | Vitest + Playwright + axe | 单元、浏览器与无障碍规则 | Firefox/WebKit 与屏幕阅读器矩阵 |
-| 构建     | tsc + Vite Demo           | 保留模块边界             | tsup/Rollup 按需引入            |
+| 领域     | 当前选择                  | 原因                      | 未来增强                        |
+| -------- | ------------------------- | ------------------------- | ------------------------------- |
+| 语言     | TypeScript                | 浏览器/npm/类型共享       | Rust/WASM parser adapter        |
+| 渲染     | KaTeX                     | 轻量、同步、SSR           | MathJax adapter                 |
+| 输入     | textarea + 可选 MathLive  | 默认轻量、富输入按需加载  | 更多框架 editor adapter         |
+| UI       | React 可选层              | 受控组件和生态            | Vue/Web Components              |
+| 富文本   | TipTap Mathematics        | 官方节点、命令和 NodeView | 自定义 React NodeView 按需提供  |
+| Markdown | remark/rehype             | AST 分层和安全默认        | 可配置 preset                   |
+| 解析     | 保守启发式                | 轻量和可预测              | unified-latex adapter           |
+| 包管理   | pnpm                      | workspace 和严格依赖      | 暂无迁移动机                    |
+| 测试     | Vitest + Playwright + axe | 单元、浏览器与无障碍规则  | Firefox/WebKit 与屏幕阅读器矩阵 |
+| 构建     | tsc + Vite Demo           | 保留模块边界              | tsup/Rollup 按需引入            |
 
 ## 25. 结论
 

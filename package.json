@@ -33,7 +33,7 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck && tsc -p tests/browser/tsconfig.json",
     "test": "vitest run",
-    "pretest:browser": "pnpm --filter @equakit/adapter-mathlive... build",
+    "pretest:browser": "pnpm --filter @equakit/adapter-mathlive... --filter @equakit/adapter-tiptap... build",
     "test:browser": "playwright test",
     "verify:packages": "node scripts/verify-packages.mjs",
     "lint": "eslint .",

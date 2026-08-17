@@ -5,7 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const packages = ['core', 'react', 'adapter-mathlive'];
+const packages = ['core', 'react', 'adapter-mathlive', 'adapter-tiptap'];
 const temp = mkdtempSync(resolve(tmpdir(), 'equakit-pack-'));
 const repositoryUrl = 'git+https://github.com/leci-deeply/equakit.git';
 const bugsUrl = 'https://github.com/leci-deeply/equakit/issues';
@@ -85,6 +85,9 @@ try {
   const mathLiveAdapter = await import(
     pathToFileURL(resolve(root, 'packages/adapter-mathlive/dist/index.js')).href
   );
+  const tipTapAdapter = await import(
+    pathToFileURL(resolve(root, 'packages/adapter-tiptap/dist/index.js')).href
+  );
   if (typeof core.normalizeMarkdownMath !== 'function') {
     throw new Error('构建后的 core 入口没有暴露 normalizeMarkdownMath。');
   }
@@ -93,6 +96,9 @@ try {
   }
   if (!mathLiveAdapter.MathLiveFormulaEditor) {
     throw new Error('构建后的 MathLive adapter 入口没有暴露 MathLiveFormulaEditor。');
+  }
+  if (typeof tipTapAdapter.createTipTapMathExtensions !== 'function') {
+    throw new Error('构建后的 TipTap adapter 入口没有暴露 createTipTapMathExtensions。');
   }
 } finally {
   rmSync(temp, { recursive: true, force: true });

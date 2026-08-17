@@ -4,6 +4,7 @@ export interface RichClipboardOptions {
   mathSourceAttribute?: string;
   decodeMathSource?: (value: string) => string | null | undefined;
   excludeSelector?: string;
+  displayMathSelector?: string;
 }
 
 const BLOCK_TAGS = new Set([
@@ -183,7 +184,10 @@ function serializeRichDom(
     if (isFormulaElement(element, marker)) {
       const latex = latexFromElement(element, marker, options.decodeMathSource);
       if (latex) {
-        chunks.push(`\\(${latex}\\)`);
+        const display = matchesDisplayMathSelector(element, options.displayMathSelector);
+        if (display) appendNewline();
+        chunks.push(display ? `\\[${latex}\\]` : `\\(${latex}\\)`);
+        if (display) appendNewline();
         return;
       }
     }
@@ -244,5 +248,14 @@ function matchesExcludeSelector(element: Element, selector: string): boolean {
     return element.matches(selector);
   } catch {
     return element.matches(DEFAULT_EXCLUDE_SELECTOR);
+  }
+}
+
+function matchesDisplayMathSelector(element: Element, selector: string | undefined): boolean {
+  if (!selector) return false;
+  try {
+    return element.matches(selector);
+  } catch {
+    return false;
   }
 }

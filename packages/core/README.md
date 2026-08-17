@@ -67,6 +67,9 @@ const selected = richSelectionToMarkdown(range, editorRoot, selection.toString()
 当没有标记属性时，序列化器还会回退到 MathML 注释，例如
 `annotation[encoding="application/x-tex"]`。
 
+如果富文本模型区分行内和块级数学，可以通过 `displayMathSelector` 指定块级公式节点。
+匹配节点会输出独立一行的 `\\[...\\]`，其他公式继续输出 `\\(...\\)`。
+
 ## 分步答案辅助
 
 ```ts
