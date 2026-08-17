@@ -16,6 +16,14 @@ pnpm docs:check
 pnpm build:site
 ```
 
+KaTeX、公式 CSS 或字体发生变化时必须运行视觉测试：
+
+```bash
+pnpm test:visual
+```
+
+只有人工审查差异通过后，才能使用 `--update-snapshots` 更新截图基线。
+
 要求：
 
 - 行为变更必须补充聚焦的测试。

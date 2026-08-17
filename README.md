@@ -350,7 +350,7 @@ export function ChoiceExample() {
 
 EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的基础能力：
 
-- 使用 [KaTeX](https://github.com/KaTeX/KaTeX) 作为默认渲染和校验基础；
+- 使用 [KaTeX](https://github.com/KaTeX/KaTeX) `0.18.4` 作为默认渲染和校验基础；
 - 使用 [react-markdown](https://github.com/remarkjs/react-markdown)、
   [remark-math](https://github.com/remarkjs/remark-math) 和
   [rehype-katex](https://github.com/remarkjs/remark-math) 作为 Markdown 数学管线；
@@ -368,7 +368,7 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - ESLint 静态检查；
 - TypeScript 类型检查；
 - 55 个 Vitest 测试；
-- 10 个 Playwright Chromium 测试，覆盖站点导航、多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描；
+- 11 个 Playwright Chromium 测试，覆盖 KaTeX 截图回归、站点导航、多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描；
 - TypeDoc 多入口 API 校验；
 - Playground + API 静态站点构建、相对路径和脱敏验证；
 - core、React 和 Demo 构建；
@@ -388,6 +388,7 @@ pnpm check
 - 发布目标：ES2022 ESM；
 - 开发环境：Node.js 22+、pnpm 10；
 - React：18；
+- KaTeX：`0.18.4`，通过 workspace override 保证 rehype/TipTap 使用同一版本；
 - 支持 SSR；
 - 富文本选区恢复依赖浏览器的 `DOMParser`、`Selection` 和 `Range`；
 - 浏览器 API 不可用时自动回退为规范化纯文本。
@@ -401,7 +402,7 @@ pnpm check
 - [x] 提供 TipTap inline/block math node adapter；
 - [x] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
 - [x] 增加自动 API 文档和在线 playground；
-- [ ] 评估升级到 KaTeX `0.18.x` 并执行视觉回归。
+- [x] 升级到 KaTeX `0.18.4` 并执行持续视觉回归。
 
 ## 文档
 

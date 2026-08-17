@@ -27,6 +27,7 @@
 - [x] 已加入 Chromium 复制、光标、IME、MathLive、TipTap、键盘语义和 axe 无障碍测试。
 - [x] 已验证单公式五种 MIME 输出和混合正文降级策略。
 - [x] TypeDoc API 转换、Playground/API 站点组合与静态脱敏检查通过。
+- [x] KaTeX 0.18.4 单版本解析、0.17/0.18 像素一致性和持续截图回归通过。
 - [x] 已审查生产依赖许可证报告。
 
 ## 发布

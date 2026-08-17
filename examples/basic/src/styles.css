@@ -114,6 +114,44 @@ input {
   padding: 1rem;
 }
 
+.demo-katex-visual {
+  background: #fff;
+  border: 1px solid #d8dee4;
+  display: grid;
+  font-family: KaTeX_Main, serif;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+.demo-katex-visual__cell {
+  align-items: center;
+  border-bottom: 1px solid #d8dee4;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  min-height: 8.5rem;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.demo-katex-visual__cell:nth-child(odd) {
+  border-right: 1px solid #d8dee4;
+}
+
+.demo-katex-visual__cell:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.demo-katex-visual__index {
+  color: #57606a;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.demo-katex-visual .mre-math-formula--display {
+  margin: 0;
+  text-align: center;
+}
+
 .demo-actions {
   display: flex;
   flex-wrap: wrap;
@@ -171,5 +209,19 @@ input {
 
   .demo-card--wide {
     grid-column: auto;
+  }
+
+  .demo-katex-visual {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-katex-visual__cell,
+  .demo-katex-visual__cell:nth-child(odd) {
+    border-bottom: 1px solid #d8dee4;
+    border-right: 0;
+  }
+
+  .demo-katex-visual__cell:last-child {
+    border-bottom: 0;
   }
 }

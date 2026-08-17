@@ -16,7 +16,7 @@ pnpm licenses list --prod --json
 
 | 依赖                       | 作用                           | 许可证 |
 | -------------------------- | ------------------------------ | ------ |
-| KaTeX                      | LaTeX 解析与 HTML 渲染         | MIT    |
+| KaTeX 0.18.4               | LaTeX 解析与 HTML 渲染         | MIT    |
 | React / React DOM          | 可选的 React 组件层            | MIT    |
 | react-markdown             | Markdown 转 React 渲染         | MIT    |
 | remark-math / rehype-katex | Markdown 数学解析与 KaTeX 转换 | MIT    |

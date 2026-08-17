@@ -37,6 +37,7 @@
     "build:site": "node scripts/build-site.mjs",
     "verify:site": "node scripts/verify-site.mjs",
     "test": "vitest run",
+    "test:visual": "playwright test tests/browser/katex.visual.spec.ts",
     "pretest:browser": "pnpm --filter @equakit/adapter-mathlive... --filter @equakit/adapter-tiptap... build",
     "test:browser": "playwright test",
     "verify:packages": "node scripts/verify-packages.mjs",

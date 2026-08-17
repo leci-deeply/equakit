@@ -68,6 +68,12 @@ export function App() {
           <MultiFormatCopyDemo />
         </article>
 
+        <article className="demo-card demo-card--wide">
+          <h2>KaTeX 视觉回归矩阵</h2>
+          <p>覆盖分式、根式、定界符、矩阵、极限、积分、字体和上下标布局。</p>
+          <KaTeXVisualMatrix />
+        </article>
+
         <article className="demo-card">
           <h2>公式输入</h2>
           <FormulaInput onChange={setFormula} value={formula} />
@@ -115,6 +121,28 @@ export function App() {
         </article>
       </section>
     </main>
+  );
+}
+
+const visualRegressionFormulas = [
+  String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`,
+  String.raw`\left(\frac{x+1}{x-1}\right)^2 + \left\lVert \vec{v}\right\rVert`,
+  String.raw`\begin{pmatrix}a&b\\c&d\end{pmatrix}\begin{cases}x+y=1\\x-y=0\end{cases}`,
+  String.raw`\lim_{n\to\infty}\sum_{i=1}^{n}\frac{1}{i^2}=\frac{\pi^2}{6}`,
+  String.raw`\int_0^1 x^2\,\mathrm{d}x + \prod_{k=1}^{m} k`,
+  String.raw`\mathbb{R}\;\mathcal{F}\;\boldsymbol{\alpha}\;\overbrace{a+b}^{n}\;x_{i_j}^{2^k}`,
+] as const;
+
+function KaTeXVisualMatrix() {
+  return (
+    <div className="demo-katex-visual" data-testid="katex-visual-matrix">
+      {visualRegressionFormulas.map((expression, index) => (
+        <div className="demo-katex-visual__cell" key={expression}>
+          <span className="demo-katex-visual__index">{String(index + 1).padStart(2, '0')}</span>
+          <MathFormula ariaLabel={`视觉公式 ${index + 1}`} display expression={expression} />
+        </div>
+      ))}
+    </div>
   );
 }
 

@@ -49,6 +49,6 @@
     "test": "vitest run --root ../.. packages/core/test"
   },
   "dependencies": {
-    "katex": "^0.17.0"
+    "katex": "^0.18.4"
   }
 }

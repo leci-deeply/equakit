@@ -425,7 +425,7 @@ format:check
 → lint
 → typecheck
 → 55 个 Vitest 测试
-→ 10 个 Playwright Chromium 测试
+→ 11 个 Playwright Chromium 测试
 → core/react/adapters/demo build
 → 真实 pnpm pack
 → tarball 文件白名单
@@ -463,6 +463,24 @@ KaTeX 的优势：
 - `trust: false` 安全边界清晰；
 - 与 remark/rehype 集成成熟；
 - 默认包含 HTML + MathML。
+
+### 0.18.4 升级结论
+
+项目已从 `0.17.0` 升级到 `0.18.4`。选择最新 patch 而不是停在 `0.18.0`，因为
+`0.18.2` 修复 settings prototype pollution，`0.18.3`/`0.18.4` 继续修复定界符和非法环境
+解析。
+
+`0.18.0` 的 breaking change 是内部 CSS class 前缀化。EquaKit 只依赖 `.katex`、
+`.katex-display`、`.katex-mathml` 这些稳定外层标记，不覆盖 `mord`、`vlist` 等内部布局类。
+TipTap 官方 peer range 包含 0.18；`rehype-katex@7` 仍声明 `^0.16`，因此 workspace override
+统一强制解析到 `0.18.4`，并通过 Markdown 浏览器测试验证实际兼容性。
+
+视觉回归使用六组固定公式，覆盖分式/根式、定界符、矩阵/cases、极限/求和、积分/连乘、
+字体/重音/多层上下标。0.17.0 与 0.18.4 的 Chromium 截图 SHA-256 完全一致。当前
+Playwright baseline 持续检查像素差，允许的最大差异比例为 3%，用于容纳跨平台抗锯齿差异。
+
+回滚条件：稳定外层 class 消失、Markdown/TipTap 渲染失败、截图差异超过阈值、SSR HTML
+结构异常或现有公式出现新 ParseError。
 
 ### 相比 MathJax
 
@@ -591,6 +609,7 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 - MathLive 已覆盖动态加载、受控值、调色板 placeholder、键盘输入和静态资源失败检查；
 - TipTap 已覆盖 inline/block NodeView、命令插入、旧文本迁移和 EquaKit 剪贴板；
 - Chromium 已覆盖 copy 事件中的 LaTeX、MathML、AsciiMath、MathJSON 自定义 MIME；
+- KaTeX 已覆盖固定公式矩阵的持续 Playwright 截图回归；
 - axe 已覆盖自动无障碍规则，原生键盘单选行为也已验证；
 - Firefox、WebKit、真实输入法候选窗和 VoiceOver/NVDA 矩阵尚未覆盖。
 
@@ -657,7 +676,7 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 | 领域     | 当前选择                  | 原因                      | 未来增强                        |
 | -------- | ------------------------- | ------------------------- | ------------------------------- |
 | 语言     | TypeScript                | 浏览器/npm/类型共享       | Rust/WASM parser adapter        |
-| 渲染     | KaTeX                     | 轻量、同步、SSR           | MathJax adapter                 |
+| 渲染     | KaTeX 0.18.4              | 轻量、同步、SSR           | MathJax adapter                 |
 | 输入     | textarea + 可选 MathLive  | 默认轻量、富输入按需加载  | 更多框架 editor adapter         |
 | UI       | React 可选层              | 受控组件和生态            | Vue/Web Components              |
 | 富文本   | TipTap Mathematics        | 官方节点、命令和 NodeView | 自定义 React NodeView 按需提供  |

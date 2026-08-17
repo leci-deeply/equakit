@@ -4,6 +4,7 @@ coverage/
 playwright-report/
 test-results/
 site-dist/
+.omx/
 .DS_Store
 *.tsbuildinfo
 *.log
