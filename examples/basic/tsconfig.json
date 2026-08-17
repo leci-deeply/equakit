@@ -6,6 +6,7 @@
     "baseUrl": "../..",
     "paths": {
       "@equakit/adapter-mathlive": ["packages/adapter-mathlive/src/index.ts"],
+      "@equakit/adapter-mathlive/clipboard": ["packages/adapter-mathlive/src/clipboard.ts"],
       "@equakit/adapter-tiptap": ["packages/adapter-tiptap/src/index.ts"],
       "@equakit/core": ["packages/core/src/index.ts"],
       "@equakit/react": ["packages/react/src/index.ts"],
