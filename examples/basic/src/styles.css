@@ -58,6 +58,32 @@ input {
   line-height: 1.7;
 }
 
+.demo-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.demo-links a {
+  border: 1px solid #c9d1d9;
+  border-radius: 999px;
+  color: #172033;
+  font-weight: 700;
+  padding: 0.5rem 0.85rem;
+  text-decoration: none;
+}
+
+.demo-links a:hover {
+  background: #fff;
+  border-color: #0969da;
+}
+
+.demo-links a:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 2px;
+}
+
 .demo-grid {
   display: grid;
   gap: 1rem;

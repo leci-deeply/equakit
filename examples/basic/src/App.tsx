@@ -48,6 +48,10 @@ export function App() {
         <p className="demo-eyebrow">框架安全的数学内容编写</p>
         <h1>EquaKit</h1>
         <p>一个中性的示例，展示数学渲染、公式编写、可访问答案和规范化复制行为。</p>
+        <nav className="demo-links" aria-label="项目链接">
+          <a href={`${import.meta.env.BASE_URL}api/`}>API 文档</a>
+          <a href="https://github.com/leci-deeply/equakit">GitHub</a>
+        </nav>
       </header>
 
       <section className="demo-grid">

@@ -425,7 +425,7 @@ format:check
 → lint
 → typecheck
 → 55 个 Vitest 测试
-→ 9 个 Playwright Chromium 测试
+→ 10 个 Playwright Chromium 测试
 → core/react/adapters/demo build
 → 真实 pnpm pack
 → tarball 文件白名单
@@ -535,6 +535,22 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 如果未来需要 CJS、多入口 bundle 或 minify，可评估 tsup/Rollup。当前 ESM-only 与 Node.js 22+ 的目标一致。
 
+### 20.1 TypeDoc 与在线 Playground
+
+TypeDoc 从 core、React、MathLive、MathLive clipboard 和 TipTap 五个公开入口生成 HTML API
+文档。`pnpm docs:check` 使用 `--emit none` 在常规 CI 中验证类型和文档模型，不写生成物。
+
+`pnpm build:site` 执行以下步骤：
+
+1. 构建全部 packages 和 Vite Demo；
+2. 把 Demo 复制为站点根目录 Playground；
+3. 把 TypeDoc 输出到 `api/`；
+4. 写入 `.nojekyll`；
+5. 验证入口、相对资产路径和本机路径脱敏。
+
+Vite 生产构建使用 `/equakit/` project base，因此资产和 API 链接可部署到 GitHub Pages 子路径。
+GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` push 时自动发布。
+
 ## 21. 安全设计
 
 已经实现：
@@ -585,7 +601,6 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 ### 工程
 
 - Demo 同时打包所有能力，chunk 偏大；
-- 尚未提供自动 API 文档；
 - 尚未提供浏览器兼容矩阵和 bundle budget；
 - npm `equakit` 组织与 `@equakit` scope 已创建；package 已补齐 GitHub、作者和公开发布
   策略元数据，但在首次发布准备完成前仍保持 private。
@@ -627,8 +642,8 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 ### P4：开发者体验
 
-- TypeDoc；
-- 在线 playground；
+- TypeDoc（已实现）；
+- 在线 playground（已实现）；
 - CHANGELOG；
 - Changesets/semantic-release；
 - bundle size CI；

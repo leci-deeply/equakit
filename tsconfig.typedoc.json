@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@equakit/core": ["packages/core/src/index.ts"],
+      "@equakit/react": ["packages/react/src/index.ts"],
+      "@equakit/adapter-mathlive": ["packages/adapter-mathlive/src/index.ts"],
+      "@equakit/adapter-mathlive/clipboard": ["packages/adapter-mathlive/src/clipboard.ts"],
+      "@equakit/adapter-tiptap": ["packages/adapter-tiptap/src/index.ts"]
+    }
+  },
+  "include": ["docs/api/**/*.ts", "packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"]
+}

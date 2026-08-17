@@ -10,6 +10,14 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
+test('Playground 提供 API 文档和 GitHub 导航', async ({ page }) => {
+  await expect(page.getByRole('link', { name: 'API 文档' })).toHaveAttribute('href', '/api/');
+  await expect(page.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+    'href',
+    'https://github.com/leci-deeply/equakit',
+  );
+});
+
 test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ page }) => {
   const card = page.locator('article').filter({
     has: page.getByRole('heading', { name: 'Markdown 与复制恢复' }),

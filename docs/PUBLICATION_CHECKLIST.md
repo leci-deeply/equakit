@@ -26,6 +26,7 @@
 - [x] 已为 Markdown、URL、HTML 和剪贴板这些敏感路径准备测试。
 - [x] 已加入 Chromium 复制、光标、IME、MathLive、TipTap、键盘语义和 axe 无障碍测试。
 - [x] 已验证单公式五种 MIME 输出和混合正文降级策略。
+- [x] TypeDoc API 转换、Playground/API 站点组合与静态脱敏检查通过。
 - [x] 已审查生产依赖许可证报告。
 
 ## 发布
@@ -37,3 +38,4 @@
 - [ ] 首次发布前通过 npm CLI 或可信发布再次验证写权限。
 - [ ] 启用分支保护、必需 CI、Dependabot/Renovate 和密钥扫描。
 - [ ] 创建签名的 `v0.1.0` tag，并在需要时附带生成的 provenance。
+- [ ] 确认 GitHub Pages 公开地址部署成功。

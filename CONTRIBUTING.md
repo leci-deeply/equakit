@@ -9,6 +9,13 @@ pnpm exec playwright install chromium
 pnpm check
 ```
 
+检查 API 文档或构建完整在线站点：
+
+```bash
+pnpm docs:check
+pnpm build:site
+```
+
 要求：
 
 - 行为变更必须补充聚焦的测试。

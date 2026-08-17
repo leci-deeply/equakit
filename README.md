@@ -2,6 +2,10 @@
 
 > 面向数学富文本渲染、复制与答案编辑的 TypeScript 工具集。
 
+[在线 Playground](https://leci-deeply.github.io/equakit/) ·
+[API 文档](https://leci-deeply.github.io/equakit/api/) ·
+[GitHub](https://github.com/leci-deeply/equakit)
+
 EquaKit 提供一个与框架无关的核心包，以及一个可选的 React 组件包。它专注于数学内容在
 “源码 → 渲染 → 复制 → 再编辑”链路中的可靠性，同时提供分步答案编辑、选择题判分和异步过期响应保护。
 
@@ -364,7 +368,9 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - ESLint 静态检查；
 - TypeScript 类型检查；
 - 55 个 Vitest 测试；
-- 9 个 Playwright Chromium 测试，覆盖多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描；
+- 10 个 Playwright Chromium 测试，覆盖站点导航、多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描；
+- TypeDoc 多入口 API 校验；
+- Playground + API 静态站点构建、相对路径和脱敏验证；
 - core、React 和 Demo 构建；
 - 构建后 ESM 入口动态导入；
 - npm tarball 文件白名单与 workspace 协议检查；
@@ -394,7 +400,7 @@ pnpm check
 - [x] 为 `FormulaInput` 增加可选 MathLive adapter；
 - [x] 提供 TipTap inline/block math node adapter；
 - [x] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
-- [ ] 增加自动 API 文档和在线 playground；
+- [x] 增加自动 API 文档和在线 playground；
 - [ ] 评估升级到 KaTeX `0.18.x` 并执行视觉回归。
 
 ## 文档

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "docs/api/core.ts",
+    "docs/api/react.ts",
+    "docs/api/adapter-mathlive.ts",
+    "docs/api/adapter-mathlive-clipboard.ts",
+    "docs/api/adapter-tiptap.ts"
+  ],
+  "tsconfig": "tsconfig.typedoc.json",
+  "out": "site-dist/api",
+  "name": "EquaKit API",
+  "includeVersion": true,
+  "readme": "README.md",
+  "alwaysCreateEntryPointModule": true,
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "githubPages": true,
+  "gitRevision": "main",
+  "lang": "zh",
+  "navigationLinks": {
+    "在线 Playground": "https://leci-deeply.github.io/equakit/",
+    "GitHub": "https://github.com/leci-deeply/equakit"
+  },
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true,
+    "includeFolders": false,
+    "compactFolders": true,
+    "excludeReferences": false
+  }
+}
