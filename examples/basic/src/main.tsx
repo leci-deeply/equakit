@@ -7,7 +7,7 @@ import './styles.css';
 import { App } from './App';
 
 const root = document.getElementById('root');
-if (!root) throw new Error('Demo root element is missing.');
+if (!root) throw new Error('缺少示例应用根节点。');
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>

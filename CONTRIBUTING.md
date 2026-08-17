@@ -1,18 +1,17 @@
-# Contributing
+# 贡献指南
 
-The project is currently a private publication draft. Contributions should preserve the package
-boundaries and security defaults documented in `docs/DESIGN.md`.
+本项目当前仍是私有发布草稿。提交修改时，请继续保持 `docs/DESIGN.md` 里定义的包边界和安全默认值。
 
-Before submitting a change:
+提交变更前：
 
 ```bash
 pnpm check
 ```
 
-Requirements:
+要求：
 
-- add focused tests for behavior changes;
-- keep fixtures synthetic and free of organization/product references;
-- do not enable raw HTML or broad KaTeX trust callbacks;
-- avoid application DTOs, API clients, analytics, and account state;
-- document public API changes in package READMEs.
+- 行为变更必须补充聚焦的测试。
+- 示例数据必须是合成数据，不能带组织名或产品名。
+- 不要启用原始 HTML，也不要放宽 KaTeX 的广泛信任回调。
+- 不要引入应用层 DTO、API 客户端、埋点、账号状态。
+- 对外 API 的变更要同步更新包级 README。

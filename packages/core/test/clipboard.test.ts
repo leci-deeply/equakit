@@ -69,8 +69,8 @@ const element = (
   attributes: Record<string, string> = {},
 ) => new ElementNode(tagName.toUpperCase(), children, attributes);
 
-describe('clipboard recovery', () => {
-  it('normalizes whitespace and wraps loose LaTeX lines', () => {
+describe('剪贴板恢复', () => {
+  it('归一化空白并包裹松散的 LaTeX 行', () => {
     expect(normalizeClipboardText('  A\u00a0\u00a0B \n\n\n \\frac{1}{2}  ')).toBe(
       'A B\n\n\\(\\frac{1}{2}\\)',
     );
@@ -80,26 +80,26 @@ describe('clipboard recovery', () => {
     );
   });
 
-  it('recovers Markdown and marked formula sources from rendered DOM', () => {
+  it('从渲染后的 DOM 恢复 Markdown 和带标记的公式源码', () => {
     vi.stubGlobal('Node', { TEXT_NODE: 3, ELEMENT_NODE: 1 });
 
     const root = element('div', [
       element('p', [
-        text('Use '),
-        element('strong', [text('bold')]),
-        text(' and '),
+        text('使用 '),
+        element('strong', [text('加粗')]),
+        text(' 和 '),
         element('span', [], { 'data-math-source': '\\frac{a}{b}' }),
         text('.'),
       ]),
-      element('ul', [element('li', [text('first')]), element('li', [text('second')])]),
+      element('ul', [element('li', [text('第一项')]), element('li', [text('第二项')])]),
     ]);
 
     expect(richDomToMarkdown(root as unknown as ParentNode)).toBe(
-      'Use **bold** and \\(\\frac{a}{b}\\).\n- first\n- second',
+      '使用 **加粗** 和 \\(\\frac{a}{b}\\).\n- 第一项\n- 第二项',
     );
   });
 
-  it('supports custom math source attributes and decoders', () => {
+  it('支持自定义数学源码属性和解码器', () => {
     vi.stubGlobal('Node', { TEXT_NODE: 3, ELEMENT_NODE: 1 });
 
     const root = element('div', [
@@ -116,13 +116,13 @@ describe('clipboard recovery', () => {
     ).toBe('\\(\\sqrt{x}\\)');
   });
 
-  it('falls back to safe marker and exclusion defaults for invalid configuration', () => {
+  it('配置无效时回退到安全标记和默认排除规则', () => {
     vi.stubGlobal('Node', { TEXT_NODE: 3, ELEMENT_NODE: 1 });
 
-    const hidden = element('script', [text('private payload')]);
+    const hidden = element('script', [text('私有内容')]);
     const originalMatches = hidden.matches.bind(hidden);
     hidden.matches = (selector: string) => {
-      if (selector === '[') throw new DOMException('Invalid selector');
+      if (selector === '[') throw new DOMException('选择器无效');
       return originalMatches(selector);
     };
     const root = element('div', [element('span', [], { 'data-math-source': 'x^2' }), hidden]);
@@ -135,7 +135,7 @@ describe('clipboard recovery', () => {
     ).toBe('\\(x^2\\)');
   });
 
-  it('falls back to MathML TeX annotations', () => {
+  it('回退读取 MathML TeX annotation', () => {
     vi.stubGlobal('Node', { TEXT_NODE: 3, ELEMENT_NODE: 1 });
 
     const root = element('math', [

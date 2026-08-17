@@ -7,8 +7,8 @@ import {
   nextMutationVersion,
 } from '../src';
 
-describe('keyed mutation versions', () => {
-  it('increments and checks versions per key', () => {
+describe('按键管理的变更版本', () => {
+  it('按 key 递增并检查版本', () => {
     const versions = new Map<string, number>();
 
     const firstA = nextMutationVersion(versions, 'a');
@@ -22,7 +22,7 @@ describe('keyed mutation versions', () => {
     expect(isCurrentMutation(versions, 'a', secondA)).toBe(true);
   });
 
-  it('offers an object-oriented version tracker', () => {
+  it('提供面向对象的版本追踪器', () => {
     const versions = new KeyedMutationVersion();
     const first = versions.begin('resource:1');
     const second = versions.begin('resource:1');
@@ -35,7 +35,7 @@ describe('keyed mutation versions', () => {
     expect(versions.isCurrent('resource:1', second)).toBe(false);
   });
 
-  it('never revalidates an old snapshot after clearing and reusing a key', () => {
+  it('清理并复用 key 后不会重新认可旧快照', () => {
     const versions = new KeyedMutationVersion();
     const old = versions.snapshot('save');
 
@@ -47,8 +47,8 @@ describe('keyed mutation versions', () => {
   });
 });
 
-describe('stale response guard', () => {
-  it('rejects responses from older versions', () => {
+describe('过期响应保护器', () => {
+  it('拒绝旧版本响应', () => {
     const guard = new StaleResponseGuard();
 
     const older = guard.begin('answer:1');
@@ -58,18 +58,18 @@ describe('stale response guard', () => {
     expect(guard.isCurrent(newer)).toBe(true);
   });
 
-  it('rejects responses captured under a previous scope', () => {
+  it('拒绝旧作用域下捕获的响应', () => {
     const guard = new StaleResponseGuard<string>();
 
     guard.setScope('problem-a');
     const snapshot = guard.begin('check');
     guard.setScope('problem-b');
 
-    expect(guard.accept(snapshot, 'stale')).toBeUndefined();
-    expect(guard.accept(snapshot, 'stale', { fallback: 'fallback' })).toBe('fallback');
+    expect(guard.accept(snapshot, '过期')).toBeUndefined();
+    expect(guard.accept(snapshot, '过期', { fallback: '回退' })).toBe('回退');
   });
 
-  it('accepts custom scope comparators', () => {
+  it('接受自定义作用域比较器', () => {
     const guard = new StaleResponseGuard<{ id: number }>({
       sameScope: (left, right) => left?.id === right?.id,
     });

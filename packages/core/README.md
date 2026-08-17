@@ -1,38 +1,36 @@
 # @math-rich-editor/core
 
-Framework-free TypeScript utilities for math-heavy rich-text editors.
+面向数学富文本编辑器的无框架 TypeScript 工具集。
 
-This package is intentionally generic: it contains no product names, no backend APIs, no
-domain-specific learning concepts, and no private marker conventions. It is suitable as the core
-layer for React, Vue, Svelte, ProseMirror, Slate, Lexical, or plain `contenteditable` integrations.
+这个包保持通用：不包含产品名、后端 API、特定学习场景概念或私有标记约定。它可以作为 React、Vue、Svelte、ProseMirror、Slate、Lexical 或纯 `contenteditable` 集成的核心层。
 
-## Features
+## 能力
 
-- Normalize Markdown and LaTeX math delimiters before rendering.
-- Strip math delimiters from standalone LaTeX expressions.
-- Validate inline and display math with KaTeX.
-- Recover Markdown and LaTeX from rendered DOM/HTML copied out of a rich math surface.
-- Configure the formula marker attribute, defaulting to `data-math-source`.
-- Convert OCR/uploaded/free-form answer text into stable step lines.
-- Use a two-press Backspace/Delete state machine for step-boundary merges.
-- Parse and grade A-H single-choice or multiple-choice answers.
-- Guard async responses with keyed mutation versions and optional scope matching.
+- 在渲染前归一化 Markdown 和 LaTeX 数学分隔符。
+- 从独立的 LaTeX 表达式中移除数学分隔符。
+- 使用 KaTeX 校验行内和块级数学。
+- 从富数学区域复制出来的渲染 DOM / HTML 中恢复 Markdown 和 LaTeX。
+- 配置公式标记属性，默认值为 `data-math-source`。
+- 将 OCR、上传内容或自由输入的答案文本转换成稳定的分步行。
+- 使用“按两次 Backspace/Delete”状态机处理分步边界合并。
+- 解析并判定 A-H 单选或多选答案。
+- 使用带键的变更版本和可选作用域匹配来保护异步响应。
 
-## Install
+## 安装
 
 ```sh
 pnpm add @math-rich-editor/core katex
 ```
 
-KaTeX is a runtime dependency for the default validation functions.
+KaTeX 是默认校验函数的运行时依赖。
 
-## Math normalization
+## 数学归一化
 
 ```ts
 import { normalizeMarkdownMath, validateMarkdownMath } from '@math-rich-editor/core';
 
 const markdown = normalizeMarkdownMath(String.raw`
-Area is \(a^2\).
+面积为 \(a^2\)。
 \frac{1}{2} + \sqrt{x}
 `);
 
@@ -42,15 +40,15 @@ if (!result.ok) {
 }
 ```
 
-## Rich clipboard recovery
+## 富剪贴板恢复
 
-When rendering formulas, attach the source LaTeX to the formula wrapper:
+渲染公式时，请把源 LaTeX 挂到公式包裹节点上：
 
 ```html
 <span class="katex" data-math-source="\frac{a}{b}">...</span>
 ```
 
-Then recover editable Markdown/LaTeX from copied HTML or a live selection:
+然后就可以从复制的 HTML 或当前选区中恢复可编辑的 Markdown / LaTeX：
 
 ```ts
 import { richHtmlToMarkdown, richSelectionToMarkdown } from '@math-rich-editor/core';
@@ -66,10 +64,10 @@ const selected = richSelectionToMarkdown(range, editorRoot, selection.toString()
 });
 ```
 
-The serializer also falls back to MathML annotations such as
-`annotation[encoding="application/x-tex"]` when no marker is present.
+当没有标记属性时，序列化器还会回退到 MathML 注释，例如
+`annotation[encoding="application/x-tex"]`。
 
-## Step-answer helpers
+## 分步答案辅助
 
 ```ts
 import {
@@ -78,7 +76,7 @@ import {
   stepTextToLines,
 } from '@math-rich-editor/core';
 
-const lines = stepTextToLines('1. Let x = 1\n2. Therefore x^2 = 1');
+const lines = stepTextToLines('1. 令 x = 1\n2. 因此 x^2 = 1');
 const text = formatStepAnswer({ steps: lines });
 
 const action = stepBoundaryDeletionAction({
@@ -89,14 +87,14 @@ const action = stepBoundaryDeletionAction({
 });
 ```
 
-`stepBoundaryDeletionAction` returns:
+`stepBoundaryDeletionAction` 的返回值含义如下：
 
-- `none`: let the editor handle the event normally.
-- `arm`: prevent default deletion and remember the boundary range.
-- `hold`: ignore repeated keydown while the same boundary is armed.
-- `merge`: perform the step merge after an intentional second press.
+- `none`：让编辑器正常处理事件。
+- `arm`：阻止默认删除，并记住边界范围。
+- `hold`：在同一个边界已被武装时忽略重复按键。
+- `merge`：在有意按第二次后执行分步合并。
 
-## Choice grading
+## 选择题判分
 
 ```ts
 import { gradeChoiceAnswer, parseChoiceAnswer } from '@math-rich-editor/core';
@@ -108,10 +106,9 @@ if (expected) {
 }
 ```
 
-Answers are limited to A-H. Punctuation, spacing, `选 D`, `$D$`, `答案：AC`, and
-`\mathrm{A C}`-style display answers are accepted. Negative phrases such as `不是 A` are not guessed.
+答案限制为 A-H。标点、空格、`选 D`、`$D$`、`答案：AC` 以及 `\mathrm{A C}` 这类显示答案都会被接受。像 `不是 A` 这样的否定语句不会被猜测。
 
-## Async stale-response guard
+## 异步过期保护
 
 ```ts
 import { StaleResponseGuard } from '@math-rich-editor/core';
@@ -127,4 +124,4 @@ if (guard.isCurrent(snapshot)) {
 }
 ```
 
-For plain map-based state, use `nextMutationVersion` and `isCurrentMutation`.
+如果只用普通的 map 状态，也可以改用 `nextMutationVersion` 和 `isCurrentMutation`。

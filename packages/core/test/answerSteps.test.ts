@@ -13,37 +13,41 @@ import {
   textToStepAnswer,
 } from '../src';
 
-describe('step answer text helpers', () => {
-  it('formats and parses numbered step answers', () => {
-    const formatted = formatStepAnswer({ steps: ['  let x = 1 ', 'therefore x^2 = 1'] });
+describe('分步答案文本工具', () => {
+  it('格式化并解析带编号的分步答案', () => {
+    const formatted = formatStepAnswer({ steps: ['  设 x = 1 ', '因此 x^2 = 1'] });
 
-    expect(formatted).toBe('1. let x = 1\n2. therefore x^2 = 1');
-    expect(stepTextToLines(formatted)).toEqual(['let x = 1', 'therefore x^2 = 1']);
-    expect(textToStepAnswer(formatted).steps).toEqual(['let x = 1', 'therefore x^2 = 1']);
+    expect(formatted).toBe('1. 设 x = 1\n2. 因此 x^2 = 1');
+    expect(stepTextToLines(formatted)).toEqual(['设 x = 1', '因此 x^2 = 1']);
+    expect(textToStepAnswer(formatted).steps).toEqual(['设 x = 1', '因此 x^2 = 1']);
   });
 
-  it('handles bullets, empty input, and raw editor lines', () => {
-    expect(stepTextToLines('* first\n- second\nA. third')).toEqual(['first', 'second', 'third']);
+  it('处理项目符号、空输入和编辑器原始行', () => {
+    expect(stepTextToLines('* 第一步\n- 第二步\nA. 第三步')).toEqual([
+      '第一步',
+      '第二步',
+      '第三步',
+    ]);
     expect(stepTextToLines('')).toEqual(['']);
     expect(rawTextToEditorLines('  a  \n\n b')).toEqual(['a', 'b']);
     expect(joinEditorLines([' a ', '', ' b '])).toBe('a\nb');
   });
 
-  it('splits and merges step text around cursor positions', () => {
+  it('按光标位置拆分和合并步骤文本', () => {
     expect(splitStepAtCursor(['abcdef'], 0, 3)).toEqual(['abc', 'def']);
-    expect(mergeStepWithPrevious(['one', 'two'], 1)).toEqual(['one\ntwo']);
-    expect(mergeStepWithNext(['one', 'two'], 0)).toEqual(['one\ntwo']);
+    expect(mergeStepWithPrevious(['前一步', '后一步'], 1)).toEqual(['前一步\n后一步']);
+    expect(mergeStepWithNext(['前一步', '后一步'], 0)).toEqual(['前一步\n后一步']);
   });
 });
 
-describe('step boundary deletion state machine', () => {
-  it('maps beforeinput deletion types to physical keys', () => {
+describe('步骤边界删除状态机', () => {
+  it('将 beforeinput 删除类型映射为物理按键', () => {
     expect(deletionKeyFromInputType('deleteContentBackward')).toBe('Backspace');
     expect(deletionKeyFromInputType('deleteContentForward')).toBe('Delete');
     expect(deletionKeyFromInputType('insertText')).toBeNull();
   });
 
-  it('arms on first boundary deletion and merges on the confirmed second press', () => {
+  it('第一次边界删除进入待确认状态，第二次确认后合并', () => {
     expect(
       stepBoundaryDeletionAction({
         key: 'Backspace',
@@ -63,7 +67,7 @@ describe('step boundary deletion state machine', () => {
     ).toBe('merge');
   });
 
-  it('does not merge repeated keydown events while already armed', () => {
+  it('待确认状态下不会因重复 keydown 事件直接合并', () => {
     expect(
       stepBoundaryDeletionAction({
         key: 'Delete',

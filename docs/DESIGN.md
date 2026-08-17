@@ -1,39 +1,35 @@
-# Design and package boundaries
+# 设计与包边界
 
-## Core boundary
+## 核心边界
 
-`@math-rich-editor/core` owns deterministic transformations and browser-DOM serialization. It must
-not import React, application DTOs, API clients, authentication state, storage, or analytics.
+`@math-rich-editor/core` 负责确定性的转换和浏览器 DOM 序列化。它不能引入 React、应用层 DTO、API 客户端、认证状态、存储或埋点。
 
-Public capabilities are grouped by concern:
+公开能力按职责分组如下：
 
-- math source normalization and delimiter handling;
-- KaTeX-backed validation with structured issues;
-- rendered DOM / selection serialization to Markdown and canonical LaTeX;
-- answer-step text conversion and keyboard-boundary decisions;
-- choice-answer normalization and grading;
-- keyed mutation versions for rejecting stale asynchronous results.
+- 数学源内容归一化和分隔符处理；
+- 基于 KaTeX 的校验和结构化问题输出；
+- 将渲染后的 DOM / 选区序列化为 Markdown 和规范化 LaTeX；
+- 分步答案文本转换和键盘边界判定；
+- 选择题答案归一化和判分；
+- 使用键控变更版本拒绝过期的异步结果。
 
-## React boundary
+## React 边界
 
-`@math-rich-editor/react` owns controlled UI components. Components receive values and callbacks;
-they do not fetch, persist, grade remotely, or assume a user/account model.
+`@math-rich-editor/react` 负责受控 UI 组件。组件只接收值和回调，不负责拉取、持久化、远程判分，也不假定具体的用户或账号模型。
 
-The package must remain usable with custom application state and custom CSS tokens. Public text is
-English by default and may be overridden through props where it appears in controls.
+这个包必须继续支持自定义应用状态和自定义 CSS token。界面上的公开文案默认使用中文，并且在控件出现的位置可以通过 props 覆盖。
 
-## Security decisions
+## 安全决策
 
-1. Markdown uses `react-markdown`, `remark-math`, and `rehype-katex` without `rehype-raw`.
-2. KaTeX `trust` is disabled unless a future opt-in API documents an exact allowlist.
-3. Rendered clipboard extraction ignores script/style nodes and accepts a configurable data
-   attribute for canonical math source.
-4. Formula validation returns issues; it never executes TeX or arbitrary HTML.
-5. URL handling is fail-closed for unsafe protocols.
+1. Markdown 使用 `react-markdown`、`remark-math` 和 `rehype-katex`，但不启用 `rehype-raw`。
+2. 除非未来有明确的白名单式 opt-in API，否则关闭 KaTeX 的 `trust`。
+3. 渲染后的剪贴板提取会忽略 `script` / `style` 节点，并接受可配置的数据属性作为规范数学源。
+4. 公式校验只返回问题，不执行 TeX 或任意 HTML。
+5. 对不安全协议的 URL 采取失败即拒绝的策略。
 
-## Non-goals
+## 非目标
 
-- Collaborative editing or CRDT synchronization.
-- A complete TeX parser.
-- OCR, handwriting recognition, remote grading, or persistence.
-- Product-specific question, course, account, or entitlement models.
+- 协作编辑或 CRDT 同步。
+- 完整的 TeX 解析器。
+- OCR、手写识别、远程判分或持久化。
+- 具体到产品的题目、课程、账号或权益模型。

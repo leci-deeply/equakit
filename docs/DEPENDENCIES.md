@@ -1,26 +1,25 @@
-# Production dependency licenses
+# 生产依赖许可证
 
-Reviewed on 2026-08-16 with:
+于 2026-08-16 使用以下命令审查：
 
 ```bash
 pnpm licenses list --prod --json
 ```
 
-The installed production dependency graph contains only these license families:
+已安装的生产依赖图只包含以下许可证家族：
 
 - MIT
 - ISC
 - BSD-2-Clause
 
-Direct runtime dependencies:
+直接运行时依赖：
 
-| Dependency                 | Purpose                                        | License |
-| -------------------------- | ---------------------------------------------- | ------- |
-| KaTeX                      | LaTeX parsing and HTML rendering               | MIT     |
-| React / React DOM          | Optional React component layer                 | MIT     |
-| react-markdown             | Markdown-to-React rendering                    | MIT     |
-| remark-math / rehype-katex | Markdown math parsing and KaTeX transformation | MIT     |
-| remark-gfm                 | GFM tables, task lists, and related syntax     | MIT     |
+| 依赖                       | 作用                           | 许可证 |
+| -------------------------- | ------------------------------ | ------ |
+| KaTeX                      | LaTeX 解析与 HTML 渲染         | MIT    |
+| React / React DOM          | 可选的 React 组件层            | MIT    |
+| react-markdown             | Markdown 转 React 渲染         | MIT    |
+| remark-math / rehype-katex | Markdown 数学解析与 KaTeX 转换 | MIT    |
+| remark-gfm                 | GFM 表格、任务列表及相关语法   | MIT    |
 
-This inventory does not select a license for this repository. The project license remains blocked
-on rights-owner approval.
+这份清单不代表已经为仓库选定许可证。项目许可证仍然取决于权利人批准。

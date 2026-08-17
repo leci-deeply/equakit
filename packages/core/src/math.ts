@@ -183,7 +183,7 @@ function validateKatex(
   } catch (error) {
     const issue: MathValidationIssue = {
       kind: 'latex',
-      message: error instanceof Error ? error.message : 'KaTeX parse error',
+      message: error instanceof Error ? error.message : 'KaTeX 解析错误',
       expression,
       display,
     };
@@ -210,7 +210,7 @@ function findDelimiterIssues(source: string): MathValidationIssue[] {
   if (singleDollars.length % 2 === 1) {
     issues.push({
       kind: 'delimiter',
-      message: 'Inline math delimiters are not balanced.',
+      message: '行内数学分隔符不成对。',
     });
   }
 
@@ -223,7 +223,7 @@ function findDelimiterIssues(source: string): MathValidationIssue[] {
     if (opens !== closes) {
       issues.push({
         kind: 'delimiter',
-        message: `${pattern.label} delimiters are not balanced.`,
+        message: `${pattern.label} 分隔符不成对。`,
       });
     }
   }

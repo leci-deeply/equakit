@@ -1,19 +1,17 @@
-# Security policy
+# 安全策略
 
-This repository is not public yet. Security reports should be sent through the private channel
-chosen by the rights owner before publication.
+本仓库目前尚未公开。安全报告请在发布前通过权利人指定的私密渠道提交。
 
-When a public repository is created, replace this section with a monitored security contact and
-supported-version table.
+一旦建立公开仓库，请把这里替换成可监控的安全联系渠道和受支持版本表。
 
-## Scope
+## 范围
 
-Please report:
+请报告以下问题：
 
-- unsafe URL or raw-HTML rendering;
-- script execution through Markdown, SVG, MathML, or KaTeX input;
-- clipboard serialization that leaks excluded DOM content;
-- denial-of-service inputs in normalization or validation;
-- stale-response guards that publish data for the wrong logical resource.
+- 不安全的 URL 或原始 HTML 渲染；
+- 通过 Markdown、SVG、MathML 或 KaTeX 输入触发脚本执行；
+- 剪贴板序列化泄漏了被排除的 DOM 内容；
+- 归一化或校验路径中的拒绝服务输入；
+- 过期响应保护把数据发布到了错误的逻辑资源上。
 
-Do not include real credentials, production content, or personal data in reports or fixtures.
+报告或示例里不要包含真实凭据、生产内容或个人数据。

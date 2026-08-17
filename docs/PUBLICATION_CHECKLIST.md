@@ -1,34 +1,34 @@
-# Publication checklist
+# 发布清单
 
-## Legal and ownership — blocking
+## 法律与所有权 - 阻断项
 
-- [ ] Written approval from the code rights owner.
-- [ ] Confirm contributor attribution requirements.
-- [ ] Select and add an approved open-source license.
-- [ ] Review names and package scopes for trademark conflicts.
-- [ ] Confirm that no third-party content or private fixtures were copied.
+- [ ] 获得代码权利人的书面批准。
+- [ ] 确认贡献者署名要求。
+- [ ] 选择并加入已批准的开源许可证。
+- [ ] 检查名称和包 scope 是否存在商标冲突。
+- [ ] 确认没有复制第三方内容或私有 fixtures。
 
-## Redaction — blocking
+## 脱敏 - 阻断项
 
-- [x] Search tracked files for internal organization/product names.
-- [x] Search for domains, IP addresses, emails, tokens, credentials, bucket names, and service IDs.
-- [x] Inspect generated bundles, source maps, lockfiles, examples, snapshots, and test output.
-- [x] Confirm Git history begins in this repository and contains no private parent commits.
-- [x] Confirm examples use synthetic English data.
+- [x] 搜索跟踪文件中的内部组织名和产品名。
+- [x] 搜索域名、IP 地址、邮箱、token、凭据、bucket 名和服务 ID。
+- [x] 检查生成产物、source map、lockfile、示例、快照和测试输出。
+- [x] 确认 Git 历史从本仓库开始，且没有私有父提交。
+- [x] 确认示例使用的是无业务归属的合成数据。
 
-## Engineering quality
+## 工程质量
 
-- [x] `pnpm check` passes on a clean checkout.
-- [x] Package tarballs contain only intended files (`npm pack --dry-run --json`).
-- [x] Public APIs have README examples and declaration files.
-- [x] Browser support and Node.js support are documented.
-- [x] Security-sensitive Markdown, URL, HTML, and clipboard paths have tests.
-- [x] A production dependency license report has been reviewed.
+- [x] `pnpm check` 在干净检出上通过。
+- [x] 包 tarball 只包含预期文件（`npm pack --dry-run --json`）。
+- [x] 公共 API 具备 README 示例和声明文件。
+- [x] 已记录浏览器支持和 Node.js 支持。
+- [x] 已为 Markdown、URL、HTML 和剪贴板这些敏感路径准备测试。
+- [x] 已审查生产依赖许可证报告。
 
-## Release
+## 发布
 
-- [ ] Remove `private: true` only after all blocking items pass.
-- [ ] Add repository, bugs, homepage, author/maintainer, and funding metadata.
-- [ ] Choose the final package scope and verify registry ownership.
-- [ ] Enable branch protection, required CI, Dependabot/Renovate, and secret scanning.
-- [ ] Create a signed `v0.1.0` tag and attach generated provenance if required.
+- [ ] 只有在所有阻断项通过后，才移除 `private: true`。
+- [ ] 补齐 repository、bugs、homepage、author/maintainer 和 funding 元数据。
+- [ ] 选定最终 package scope，并验证 registry 所有权。
+- [ ] 启用分支保护、必需 CI、Dependabot/Renovate 和密钥扫描。
+- [ ] 创建签名的 `v0.1.0` tag，并在需要时附带生成的 provenance。

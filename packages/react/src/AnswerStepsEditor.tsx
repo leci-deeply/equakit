@@ -74,10 +74,10 @@ export function AnswerStepsEditor({
   className,
   disabled = false,
   minSteps = 1,
-  addLabel = 'Add step',
-  deleteLabel = 'Delete step',
-  stepLabel = (index) => `Step ${index + 1}`,
-  placeholder = (index) => `Write step ${index + 1}`,
+  addLabel = '添加步骤',
+  deleteLabel = '删除步骤',
+  stepLabel = (index) => `步骤 ${index + 1}`,
+  placeholder = (index) => `填写步骤 ${index + 1}`,
 }: AnswerStepsEditorProps) {
   const [armedStepIndex, setArmedStepIndex] = useState<number | null>(null);
   const normalizedSteps = steps.length > 0 ? [...steps] : [''];

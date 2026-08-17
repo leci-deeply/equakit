@@ -19,7 +19,7 @@ try {
     });
 
     const archiveName = readdirSync(destination).find((entry) => entry.endsWith('.tgz'));
-    if (!archiveName) throw new Error(`No tarball produced for ${packageName}.`);
+    if (!archiveName) throw new Error(`${packageName} 没有生成 tarball。`);
     const archive = resolve(destination, archiveName);
     const entries = execFileSync('tar', ['-tzf', archive], { encoding: 'utf8' }).trim().split('\n');
     const unexpected = entries.filter(
@@ -29,7 +29,7 @@ try {
         entry !== 'package/package.json',
     );
     if (unexpected.length > 0) {
-      throw new Error(`${packageName} tarball contains unexpected files: ${unexpected.join(', ')}`);
+      throw new Error(`${packageName} tarball 包含非预期文件：${unexpected.join(', ')}`);
     }
 
     const manifest = JSON.parse(
@@ -37,20 +37,20 @@ try {
     );
     const dependencyValues = Object.values(manifest.dependencies ?? {});
     if (dependencyValues.some((value) => String(value).startsWith('workspace:'))) {
-      throw new Error(`${packageName} tarball still contains workspace protocol dependencies.`);
+      throw new Error(`${packageName} tarball 仍包含 workspace 协议依赖。`);
     }
   }
 
   const core = await import(pathToFileURL(resolve(root, 'packages/core/dist/index.js')).href);
   const react = await import(pathToFileURL(resolve(root, 'packages/react/dist/index.js')).href);
   if (typeof core.normalizeMarkdownMath !== 'function') {
-    throw new Error('Built core entry does not expose normalizeMarkdownMath.');
+    throw new Error('构建后的 core 入口没有暴露 normalizeMarkdownMath。');
   }
   if (typeof react.MathFormula !== 'function') {
-    throw new Error('Built React entry does not expose MathFormula.');
+    throw new Error('构建后的 React 入口没有暴露 MathFormula。');
   }
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }
 
-globalThis.console.log('Package tarballs and built ESM entries verified.');
+globalThis.console.log('已验证包 tarball 和构建后的 ESM 入口。');

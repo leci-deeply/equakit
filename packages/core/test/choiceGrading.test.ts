@@ -10,25 +10,25 @@ import {
   parseChoiceAnswer,
 } from '../src';
 
-describe('choice grading', () => {
-  it('normalizes strict A-H answers with punctuation and duplicated letters', () => {
+describe('选择题判分', () => {
+  it('归一化带标点和重复字母的严格 A-H 答案', () => {
     expect([...(normalizeAnswerLetters(' B、A、A ') ?? [])].sort()).toEqual(['A', 'B']);
     expect(normalizeAnswerLetters('I')).toBeNull();
   });
 
-  it('parses display-style choice answers', () => {
+  it('解析展示样式的选择题答案', () => {
     expect([...(parseChoiceAnswer('$D$') ?? [])]).toEqual(['D']);
     expect([...(parseChoiceAnswer('正确答案：A、C') ?? [])].sort()).toEqual(['A', 'C']);
     expect(parseChoiceAnswer('不是 A')).toBeNull();
   });
 
-  it('converts between selected indices and choice letters', () => {
+  it('在选项索引和选项字母之间转换', () => {
     expect(choiceIndicesToLetters([2, 0, 2, 10])).toEqual(['A', 'C']);
     expect(choiceLettersToIndices(['c', 'A', 'Z'])).toEqual([0, 2]);
     expect(choiceLettersToString(['B', 'A'])).toBe('AB');
   });
 
-  it('grades single and multiple choice answers with missing and extra details', () => {
+  it('判定单选和多选答案并给出缺选与多选明细', () => {
     expect(inferMultipleChoice(['A', 'C'])).toBe(true);
 
     expect(gradeChoiceAnswer([0, 2], ['C', 'A'])).toMatchObject({

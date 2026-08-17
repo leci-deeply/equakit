@@ -1,25 +1,22 @@
-# Redaction record
+# 脱敏记录
 
-This project is a clean-room-style secondary edit of reusable engineering patterns from a private
-production codebase. It is intentionally stored in a new Git repository with no imported history.
+本项目是对私有生产代码库里可复用工程模式的“洁净室式”二次整理。它被刻意放在一个新的 Git 仓库里，不带入任何历史记录。
 
-## Removed boundaries
+## 已移除的边界
 
-- organization, product, book, course, exam, and assistant names;
-- internal package scopes, domains, IP addresses, API routes, error codes, and environment names;
-- production content, images, subtitles, prompts, fixtures, database models, and deployment files;
-- authentication, entitlement, analytics, and user identifiers;
-- cloud-vendor upload and storage adapters.
+- 组织、产品、书籍、课程、考试和助手名称；
+- 内部 package scope、域名、IP 地址、API 路由、错误码和环境名；
+- 生产内容、图片、字幕、提示词、fixtures、数据库模型和部署文件；
+- 认证、权益、埋点和用户标识符；
+- 云厂商上传与存储适配器。
 
-## Renamed concepts
+## 已重命名的概念
 
-- internal formula marker attributes become configurable, with `data-math-source` as the default;
-- problem-specific answer types become generic answer-step and choice types;
-- application-specific mutation keys become caller-owned string keys;
-- product wording becomes overridable component labels.
+- 内部公式标记属性改为可配置，默认值是 `data-math-source`；
+- 题目专用答案类型改为通用的分步答案和选择题类型；
+- 应用专用变更键改为由调用方持有的字符串键；
+- 产品化文案改为可覆盖的组件标签。
 
-## History rule
+## 历史规则
 
-Do not merge, subtree-add, or filter the private repository into this repository. Public releases
-must contain only this clean history. Provenance and copyright attribution must be reviewed by the
-rights owner before publication.
+不要把私有仓库 merge、subtree-add 或 filter 到这个仓库里。公开发布只能保留这份洁净历史。发布前，权利人必须审查来源和版权署名。

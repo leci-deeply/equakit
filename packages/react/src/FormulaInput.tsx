@@ -36,48 +36,48 @@ export interface FormulaInputProps {
 
 export const DEFAULT_FORMULA_PALETTE: readonly FormulaPaletteGroup[] = [
   {
-    label: 'Common',
+    label: '常用',
     keys: [
-      { label: 'frac', insert: '\\frac{}{}', caretOffset: 6, title: '\\frac{}{}' },
+      { label: '分式', insert: '\\frac{}{}', caretOffset: 6, title: '\\frac{}{}' },
       { label: 'x^n', insert: '^{}', caretOffset: 2 },
       { label: 'x_i', insert: '_{}', caretOffset: 2 },
-      { label: 'sqrt', insert: '\\sqrt{}', caretOffset: 6 },
+      { label: '根式', insert: '\\sqrt{}', caretOffset: 6 },
       { label: '()', insert: '\\left(\\right)', caretOffset: 6 },
       { label: '||', insert: '\\left|\\right|', caretOffset: 6 },
     ],
   },
   {
-    label: 'Operators',
+    label: '运算符',
     keys: [
-      { label: 'times', insert: '\\times ' },
-      { label: 'div', insert: '\\div ' },
-      { label: 'pm', insert: '\\pm ' },
-      { label: 'leq', insert: '\\leq ' },
-      { label: 'geq', insert: '\\geq ' },
-      { label: 'neq', insert: '\\neq ' },
-      { label: 'approx', insert: '\\approx ' },
-      { label: 'to', insert: '\\to ' },
+      { label: '乘', insert: '\\times ' },
+      { label: '除', insert: '\\div ' },
+      { label: '正负', insert: '\\pm ' },
+      { label: '小于等于', insert: '\\leq ' },
+      { label: '大于等于', insert: '\\geq ' },
+      { label: '不等于', insert: '\\neq ' },
+      { label: '约等于', insert: '\\approx ' },
+      { label: '趋于', insert: '\\to ' },
     ],
   },
   {
-    label: 'Calculus',
+    label: '微积分',
     keys: [
-      { label: 'lim', insert: '\\lim_{}', caretOffset: 6 },
-      { label: 'int', insert: '\\int_{}^{}', caretOffset: 6 },
-      { label: 'sum', insert: '\\sum_{}^{}', caretOffset: 6 },
-      { label: 'prod', insert: '\\prod_{}^{}', caretOffset: 7 },
-      { label: 'd', insert: '\\mathrm{d}' },
+      { label: '极限', insert: '\\lim_{}', caretOffset: 6 },
+      { label: '积分', insert: '\\int_{}^{}', caretOffset: 6 },
+      { label: '求和', insert: '\\sum_{}^{}', caretOffset: 6 },
+      { label: '连乘', insert: '\\prod_{}^{}', caretOffset: 7 },
+      { label: '微分', insert: '\\mathrm{d}' },
     ],
   },
   {
-    label: 'Greek',
+    label: '希腊字母',
     keys: [
-      { label: 'alpha', insert: '\\alpha ' },
-      { label: 'beta', insert: '\\beta ' },
-      { label: 'gamma', insert: '\\gamma ' },
-      { label: 'theta', insert: '\\theta ' },
-      { label: 'lambda', insert: '\\lambda ' },
-      { label: 'pi', insert: '\\pi ' },
+      { label: 'α', insert: '\\alpha ' },
+      { label: 'β', insert: '\\beta ' },
+      { label: 'γ', insert: '\\gamma ' },
+      { label: 'θ', insert: '\\theta ' },
+      { label: 'λ', insert: '\\lambda ' },
+      { label: 'π', insert: '\\pi ' },
     ],
   },
 ];
@@ -101,10 +101,10 @@ export function FormulaInput({
   value,
   onChange,
   palette = DEFAULT_FORMULA_PALETTE,
-  placeholder = 'Enter LaTeX such as \\frac{1}{2}',
+  placeholder = '输入 LaTeX，例如 \\frac{1}{2}',
   rows = 3,
-  textareaLabel = 'Formula source',
-  previewLabel = 'Preview',
+  textareaLabel = '公式源码',
+  previewLabel = '预览',
   hidePreview = false,
   disabled = false,
   validationMode = 'latex',
@@ -142,7 +142,7 @@ export function FormulaInput({
 
   return (
     <div className={className ? `mre-formula-input ${className}` : 'mre-formula-input'}>
-      <div className="mre-formula-input__palette" role="toolbar" aria-label="Formula palette">
+      <div className="mre-formula-input__palette" role="toolbar" aria-label="公式面板">
         {palette.map((group) => (
           <div className="mre-formula-input__group" key={group.label} aria-label={group.label}>
             {group.keys.map((key) => (
@@ -179,13 +179,13 @@ export function FormulaInput({
           {trimmed ? (
             <MathFormula display expression={value} />
           ) : (
-            <span className="mre-formula-input__empty">No formula yet.</span>
+            <span className="mre-formula-input__empty">暂无公式。</span>
           )}
         </div>
       )}
       {validation && !validation.ok && (
         <div className="mre-formula-input__error" role="status">
-          {validation.issues[0]?.message ?? 'The formula could not be parsed.'}
+          {validation.issues[0]?.message ?? '无法解析该公式。'}
         </div>
       )}
     </div>
