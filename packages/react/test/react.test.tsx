@@ -17,7 +17,7 @@ import {
   validateLatexExpression,
 } from '../src/index.js';
 
-describe('@math-rich-editor/react', () => {
+describe('@equakit/react', () => {
   it('安全渲染 KaTeX 并保留可供复制适配器读取的源码表达式', () => {
     const html = renderToStaticMarkup(<MathFormula expression={'\\frac{1}{2}'} />);
     expect(html).toContain('katex');

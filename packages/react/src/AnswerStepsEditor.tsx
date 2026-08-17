@@ -7,7 +7,7 @@ import {
   stepBoundaryDeletionAction,
   type StepBoundaryDeletionAction,
   type StepBoundaryDeletionKey,
-} from '@math-rich-editor/core';
+} from '@equakit/core';
 
 export type StepBoundaryKey = StepBoundaryDeletionKey;
 export type StepBoundaryAction = StepBoundaryDeletionAction;

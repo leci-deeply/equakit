@@ -35,7 +35,7 @@ importers:
 
   examples/basic:
     dependencies:
-      '@math-rich-editor/react':
+      '@equakit/react':
         specifier: workspace:*
         version: link:../../packages/react
       katex:
@@ -63,7 +63,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@math-rich-editor/core':
+      '@equakit/core':
         specifier: workspace:^
         version: link:../core
       katex:

@@ -7,7 +7,7 @@ import {
   MarkdownMath,
   MathCopyBoundary,
   MathFormula,
-} from '@math-rich-editor/react';
+} from '@equakit/react';
 
 const explanation = String.raw`
 ## 安全的数学富文本工作流
@@ -34,7 +34,7 @@ export function App() {
     <main className="demo-shell">
       <header className="demo-hero">
         <p className="demo-eyebrow">框架安全的数学内容编写</p>
-        <h1>Math Rich Editor Kit</h1>
+        <h1>EquaKit</h1>
         <p>一个中性的示例，展示数学渲染、公式编写、可访问答案和规范化复制行为。</p>
       </header>
 

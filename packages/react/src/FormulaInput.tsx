@@ -4,7 +4,7 @@ import {
   validateLatexExpression,
   validateMarkdownMath,
   type MathValidationResult,
-} from '@math-rich-editor/core';
+} from '@equakit/core';
 import { MathFormula } from './MathFormula.js';
 
 export interface FormulaPaletteKey {

@@ -38,5 +38,5 @@ export {
   stripMathDelimiters,
   validateLatexExpression,
   validateMarkdownMath,
-} from '@math-rich-editor/core';
-export type { MathToken, MathValidationIssue, MathValidationResult } from '@math-rich-editor/core';
+} from '@equakit/core';
+export type { MathToken, MathValidationIssue, MathValidationResult } from '@equakit/core';

@@ -1,18 +1,18 @@
-# @math-rich-editor/react
+# @equakit/react
 
 用于渲染、编辑、选择和复制数学富文本答案内容的无品牌 React 组件。
 
 ## 安装
 
 ```sh
-pnpm add @math-rich-editor/react katex
+pnpm add @equakit/react katex
 ```
 
 请在应用入口同时引入包样式和 KaTeX CSS：
 
 ```ts
 import 'katex/dist/katex.min.css';
-import '@math-rich-editor/react/styles.css';
+import '@equakit/react/styles.css';
 ```
 
 ## 组件
@@ -27,7 +27,7 @@ import '@math-rich-editor/react/styles.css';
 ## 示例
 
 ```tsx
-import { AnswerStepsEditor, MarkdownMath, MathCopyBoundary } from '@math-rich-editor/react';
+import { AnswerStepsEditor, MarkdownMath, MathCopyBoundary } from '@equakit/react';
 import { useState } from 'react';
 
 export function SolutionEditor() {
@@ -44,11 +44,11 @@ export function SolutionEditor() {
 
 ## 核心剪贴板适配
 
-如果 `@math-rich-editor/core` 提供了 DOM 序列化器，就可以通过结构化适配器直接传进去：
+如果 `@equakit/core` 提供了 DOM 序列化器，就可以通过结构化适配器直接传进去：
 
 ```tsx
-import * as core from '@math-rich-editor/core';
-import { MathCopyBoundary } from '@math-rich-editor/react';
+import * as core from '@equakit/core';
+import { MathCopyBoundary } from '@equakit/react';
 
 <MathCopyBoundary core={core}>...</MathCopyBoundary>;
 ```

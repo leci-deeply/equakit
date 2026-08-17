@@ -1,4 +1,4 @@
-# @math-rich-editor/core
+# @equakit/core
 
 面向数学富文本编辑器的无框架 TypeScript 工具集。
 
@@ -19,7 +19,7 @@
 ## 安装
 
 ```sh
-pnpm add @math-rich-editor/core katex
+pnpm add @equakit/core katex
 ```
 
 KaTeX 是默认校验函数的运行时依赖。
@@ -27,7 +27,7 @@ KaTeX 是默认校验函数的运行时依赖。
 ## 数学归一化
 
 ```ts
-import { normalizeMarkdownMath, validateMarkdownMath } from '@math-rich-editor/core';
+import { normalizeMarkdownMath, validateMarkdownMath } from '@equakit/core';
 
 const markdown = normalizeMarkdownMath(String.raw`
 面积为 \(a^2\)。
@@ -51,7 +51,7 @@ if (!result.ok) {
 然后就可以从复制的 HTML 或当前选区中恢复可编辑的 Markdown / LaTeX：
 
 ```ts
-import { richHtmlToMarkdown, richSelectionToMarkdown } from '@math-rich-editor/core';
+import { richHtmlToMarkdown, richSelectionToMarkdown } from '@equakit/core';
 
 const markdown = richHtmlToMarkdown(
   event.clipboardData.getData('text/html'),
@@ -70,11 +70,7 @@ const selected = richSelectionToMarkdown(range, editorRoot, selection.toString()
 ## 分步答案辅助
 
 ```ts
-import {
-  formatStepAnswer,
-  stepBoundaryDeletionAction,
-  stepTextToLines,
-} from '@math-rich-editor/core';
+import { formatStepAnswer, stepBoundaryDeletionAction, stepTextToLines } from '@equakit/core';
 
 const lines = stepTextToLines('1. 令 x = 1\n2. 因此 x^2 = 1');
 const text = formatStepAnswer({ steps: lines });
@@ -97,7 +93,7 @@ const action = stepBoundaryDeletionAction({
 ## 选择题判分
 
 ```ts
-import { gradeChoiceAnswer, parseChoiceAnswer } from '@math-rich-editor/core';
+import { gradeChoiceAnswer, parseChoiceAnswer } from '@equakit/core';
 
 const expected = parseChoiceAnswer('正确答案：A、C');
 if (expected) {
@@ -111,7 +107,7 @@ if (expected) {
 ## 异步过期保护
 
 ```ts
-import { StaleResponseGuard } from '@math-rich-editor/core';
+import { StaleResponseGuard } from '@equakit/core';
 
 const guard = new StaleResponseGuard<string>();
 

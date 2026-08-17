@@ -2,7 +2,7 @@ import katex from 'katex';
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 
-import { stripMathDelimiters } from '@math-rich-editor/core';
+import { stripMathDelimiters } from '@equakit/core';
 
 export interface MathFormulaProps {
   expression: string;

@@ -1,41 +1,88 @@
-# Math Rich Editor Kit
+# EquaKit
 
-一个与框架无关的 TypeScript 核心层，加上一个可选的 React 层，用于数学富文本的复制、粘贴、编辑、校验、渲染和答案交互。
+> 面向数学富文本渲染、复制与答案编辑的 TypeScript 工具集。
 
-> 发布状态：本地整理稿。当前尚未获得再发布许可，因此各包仍保持 `private: true`，直到权利人批准许可证并完成发布清单。
+EquaKit 提供一个与框架无关的核心包，以及一个可选的 React 组件包。它专注于数学内容在
+“源码 → 渲染 → 复制 → 再编辑”链路中的可靠性，同时提供分步答案编辑、选择题判分和异步过期响应保护。
+
+项目由 **leci** 维护。
+
+> **当前状态：公开发布候选稿。** 工程验证已经完成，但尚未获得代码权利人的再发布许可，
+> 因此所有包仍保持 `private: true`，且仓库暂未添加 `LICENSE`。在授权和许可证确定前，
+> 请勿将本仓库视为已获开源许可的软件。
+
+## 为什么需要 EquaKit
+
+数学内容在普通富文本工具中经常遇到这些问题：
+
+- 从 KaTeX 或 MathML 页面复制公式时，只得到视觉字符，无法恢复规范 LaTeX；
+- LLM、OCR 和历史内容产生的 `\(...\)`、`\[...\]`、`$$...$$` 分隔符不稳定；
+- 不完整公式在编辑阶段容易导致预览崩溃或空白；
+- 分步答案在 Backspace/Delete 边界操作时容易误合并、误删除；
+- 单选、多选和展示型答案的判分口径容易不一致；
+- 异步保存或判分结果可能覆盖已经切换后的新状态。
+
+EquaKit 将这些问题拆成纯函数、受控组件和明确的安全边界，而不是绑定到某个业务系统或后端接口。
+
+## 核心能力
+
+### 数学源码处理
+
+- 归一化 Markdown 和 LaTeX 数学分隔符；
+- 修复常见的块级公式换行问题；
+- 避免把普通中英文文本误识别成整段公式；
+- 使用 KaTeX 返回结构化校验结果；
+- 提取行内和块级数学 token 及源码位置。
+
+### 数学富文本复制
+
+- 从渲染后的 DOM、HTML 或当前选区恢复 Markdown + LaTeX；
+- 默认读取 `data-math-source`，也支持自定义属性和 decoder；
+- 无标记时回退读取 MathML 的 `application/x-tex` annotation；
+- 保留粗体、斜体、列表和块级换行；
+- 默认排除脚本、样式和视觉层 KaTeX MathML 副本。
+
+### 答案编辑
+
+- 将 OCR、上传答案或自由文本转换为稳定步骤；
+- 支持步骤拆分、前向合并、后向合并；
+- 第一次边界删除进入待确认状态，第二次才执行合并；
+- 提供受控的 React 分步答案编辑器。
+
+### 选择题判分
+
+- 支持 A-H 单选和多选；
+- 兼容大小写、括号、顿号、逗号、空格和展示型 LaTeX；
+- 多选答案顺序无关；
+- 返回 `missing`、`extra`、`selected`、`expected` 等结构化结果。
+
+### 异步安全
+
+- 按资源键维护 mutation version；
+- 支持作用域快照；
+- 拒绝旧请求、旧页面或旧资源返回的异步结果；
+- `clear()` 使用 tombstone 递增，不会让旧版本重新变成有效版本。
 
 ## 包结构
 
-| 包名                      | 职责                                                                                             |
-| ------------------------- | ------------------------------------------------------------------------------------------------ |
-| `@math-rich-editor/core`  | LaTeX 归一化与校验、渲染后数学内容的剪贴板恢复、分步答案编辑规则、选择题判分、异步过期响应保护。 |
-| `@math-rich-editor/react` | 安全的 KaTeX 与 Markdown 渲染、公式输入、可访问的选择题、分步答案编辑、数学感知复制辅助。        |
+| 包               | 职责                                                                  |
+| ---------------- | --------------------------------------------------------------------- |
+| `@equakit/core`  | 数学归一化、校验、剪贴板恢复、答案步骤、选择题判分、异步过期保护。    |
+| `@equakit/react` | KaTeX/Markdown 渲染、公式输入、可访问选择题、分步答案编辑和复制边界。 |
+| `@equakit/demo`  | 使用合成数据展示完整交互链路的 Vite 示例。                            |
 
-核心包不包含产品、账号、课程、数据库或网络概念。React 包只依赖核心包和公开渲染库。
+```text
+EquaKit
+├── packages/core        # 与框架无关的 TypeScript 核心
+├── packages/react       # 受控 React 组件
+├── examples/basic       # 交互示例
+├── docs                 # 设计、脱敏、安全和发布文档
+└── scripts              # 发布包与 ESM 入口验证
+```
 
-## 设计目标
+## 快速开始
 
-- 用户复制渲染后的 KaTeX 或 MathML 时，保留规范化的 LaTeX。
-- 在不改写普通文本的前提下，归一化常见的错误数学分隔符。
-- 让不完整公式仍然可编辑，并提供可读的降级结果，而不是直接崩溃。
-- 把过期的异步结果和乐观更新显式化，而不是依赖时序运气。
-- 提供可控、可访问的 React 组件，不强迫宿主应用接管状态管理。
-- Markdown 渲染默认关闭原始 HTML。
-
-## 公开项目参考后的可优化点
-
-以下方向来自对当前公开项目官方仓库和文档的对标：
-
-1. 参考 [MathLive](https://github.com/arnog/mathlive)，为 `FormulaInput` 增加按需加载的高级输入适配器，支持虚拟键盘、MathML、AsciiMath 和 MathJSON；当前 textarea + palette 继续保留为轻量默认实现。
-2. 参考 [TipTap Mathematics](https://tiptap.dev/docs/editor/extensions/nodes/mathematics)，增加可选的 inline/block math node 适配器和旧数学字符串迁移工具，而不是把完整富文本编辑器塞入核心包。
-3. 参考 [unified-latex](https://github.com/siefkenj/unified-latex)，把 AST 解析与重写做成独立可选包，并补自动 API 文档、playground 和真实 tarball 安装测试。
-4. 参考 [MathLive 的无障碍能力](https://github.com/arnog/mathlive)与 [KaTeX](https://github.com/KaTeX/KaTeX) 的 HTML + MathML 输出，补可朗读文本、屏幕阅读器策略和浏览器级无障碍测试。
-5. 参考 [remark-math](https://github.com/remarkjs/remark-math) 的解析/渲染分层，把 `MarkdownMath` 的插件链开放为安全 preset；只有明确启用 HTML 扩展时才引入 `rehype-sanitize`。
-6. 当前运行时仍使用 KaTeX `^0.17.0`；正式发布前应对照 [KaTeX 官方仓库](https://github.com/KaTeX/KaTeX)评估升级到 `0.18.x`，并执行视觉快照和兼容性回归。
-
-## 开发
-
-要求：Node.js 22+ 和 pnpm 10。
+### 当前仓库内使用
 
 ```bash
 pnpm install
@@ -45,30 +92,271 @@ pnpm check
 单独构建某个包：
 
 ```bash
-pnpm --filter @math-rich-editor/core build
-pnpm --filter @math-rich-editor/react build
+pnpm --filter @equakit/core build
+pnpm --filter @equakit/react build
+pnpm --filter @equakit/demo build
 ```
 
-`examples/basic` 下提供了一个交互式合成数据示例，并包含在工作区构建中。
+> npm 包尚未公开发布。许可证和 registry scope 确认后，安装命令预计为
+> `pnpm add @equakit/core` 或 `pnpm add @equakit/react`。
+
+## Core 使用示例
+
+### 归一化与校验数学内容
+
+```ts
+import { normalizeMarkdownMath, validateMarkdownMath } from '@equakit/core';
+
+const source = String.raw`
+函数值为 \(f(x)=x^2+1\)。
+
+\[\int_0^1 x^2\,\mathrm{d}x=\frac{1}{3}\]
+`;
+
+const normalized = normalizeMarkdownMath(source);
+const result = validateMarkdownMath(normalized);
+
+if (!result.ok) {
+  console.error(result.issues);
+}
+```
+
+### 从渲染内容恢复 LaTeX
+
+渲染公式时，把规范化源码放在中性属性中：
+
+```html
+<span class="katex" data-math-source="\frac{a}{b}">...</span>
+```
+
+复制或框选后恢复为可编辑 Markdown：
+
+```ts
+import { richDomToMarkdown, richSelectionToMarkdown } from '@equakit/core';
+
+const all = richDomToMarkdown(editorRoot, editorRoot.textContent ?? '');
+
+const selected = richSelectionToMarkdown(selection.getRangeAt(0), editorRoot, selection.toString());
+```
+
+如果宿主使用了不同的属性名：
+
+```ts
+const markdown = richDomToMarkdown(root, plainText, {
+  mathSourceAttribute: 'data-latex',
+  decodeMathSource: decodeURIComponent,
+});
+```
+
+### 分步答案
+
+```ts
+import {
+  formatStepAnswer,
+  mergeStepWithPrevious,
+  stepBoundaryDeletionAction,
+  stepTextToLines,
+} from '@equakit/core';
+
+const steps = stepTextToLines('1. 设 x = 1\n2. 所以 x^2 = 1');
+const text = formatStepAnswer({ steps });
+
+const action = stepBoundaryDeletionAction({
+  key: 'Backspace',
+  selectionCollapsed: true,
+  atStepBoundary: true,
+  targetAlreadyArmed: false,
+});
+
+const merged = action === 'merge' ? mergeStepWithPrevious(steps, 1) : steps;
+```
+
+### 选择题判分
+
+```ts
+import { gradeChoiceAnswer, parseChoiceAnswer } from '@equakit/core';
+
+const expected = parseChoiceAnswer('正确答案：A、C');
+
+if (expected) {
+  const result = gradeChoiceAnswer([2, 0], expected);
+  console.log(result.correct); // true
+  console.log(result.missing); // []
+  console.log(result.extra); // []
+}
+```
+
+### 防止旧异步结果覆盖新状态
+
+```ts
+import { StaleResponseGuard } from '@equakit/core';
+
+const guard = new StaleResponseGuard<string>();
+
+guard.setScope('question-1');
+const snapshot = guard.begin('grade-answer');
+const response = await gradeAnswer();
+
+if (guard.isCurrent(snapshot)) {
+  applyGrade(response);
+}
+```
+
+## React 使用示例
+
+先引入 KaTeX 和组件样式：
+
+```ts
+import 'katex/dist/katex.min.css';
+import '@equakit/react/styles.css';
+```
+
+### 安全渲染 Markdown 数学内容
+
+```tsx
+import { MarkdownMath, MathCopyBoundary } from '@equakit/react';
+
+export function Article() {
+  return (
+    <MathCopyBoundary>
+      <MarkdownMath>{'当 $f(x)=x^2$ 时，$f(2)=4$。'}</MarkdownMath>
+    </MathCopyBoundary>
+  );
+}
+```
+
+`MarkdownMath` 默认不启用原始 HTML，并拒绝不安全 URL 协议。
+
+### 公式输入
+
+```tsx
+import { useState } from 'react';
+import { FormulaInput } from '@equakit/react';
+
+export function FormulaEditor() {
+  const [value, setValue] = useState(String.raw`\frac{1}{2}`);
+
+  return <FormulaInput value={value} onChange={setValue} />;
+}
+```
+
+### 分步答案编辑
+
+```tsx
+import { useState } from 'react';
+import { AnswerStepsEditor } from '@equakit/react';
+
+export function SolutionEditor() {
+  const [steps, setSteps] = useState(['展开多项式。', '合并同类项。']);
+
+  return <AnswerStepsEditor steps={steps} onChange={setSteps} />;
+}
+```
+
+### 可访问选择题
+
+```tsx
+import { useState } from 'react';
+import { InteractiveChoices } from '@equakit/react';
+
+export function ChoiceExample() {
+  const [selected, setSelected] = useState<string[]>([]);
+
+  return (
+    <InteractiveChoices
+      choices={['$x=1$', '$x=2$', '$x=3$']}
+      selected={selected}
+      onChange={setSelected}
+      correct={['1']}
+      reveal={selected.length > 0}
+    />
+  );
+}
+```
+
+## 安全设计
+
+- `MarkdownMath` 不启用 `rehype-raw`；
+- KaTeX 使用 `trust: false`；
+- `dangerouslySetInnerHTML` 只接收 KaTeX 生成结果；
+- URL 只允许明确协议；
+- 自定义剪贴板 selector 无效时回退到默认安全规则；
+- 自定义数学源码属性名必须符合安全属性名格式；
+- 发布检查会真实打包 tarball，并验证 ESM 入口和 workspace 协议转换；
+- `pnpm audit --audit-level moderate` 当前无已知漏洞。
+
+详见 [SECURITY.md](SECURITY.md) 和 [docs/DESIGN.md](docs/DESIGN.md)。
+
+## 与现有开源项目的关系
+
+EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的基础能力：
+
+- 使用 [KaTeX](https://github.com/KaTeX/KaTeX) 作为默认渲染和校验基础；
+- 使用 [react-markdown](https://github.com/remarkjs/react-markdown)、
+  [remark-math](https://github.com/remarkjs/remark-math) 和
+  [rehype-katex](https://github.com/remarkjs/remark-math) 作为 Markdown 数学管线；
+- 计划以可选 adapter 方式接入 [MathLive](https://github.com/arnog/mathlive)，而不是增加默认包体积；
+- 计划为 [TipTap Mathematics](https://tiptap.dev/docs/editor/extensions/nodes/mathematics)
+  提供 inline/block math node 适配；
+- AST 级处理将作为可选的 [unified-latex](https://github.com/siefkenj/unified-latex) 集成，
+  不进入默认运行时。
+
+## 工程质量
+
+当前校验覆盖：
+
+- Prettier 格式检查；
+- ESLint 静态检查；
+- TypeScript 类型检查；
+- 42 个 Vitest 测试；
+- core、React 和 Demo 构建；
+- 构建后 ESM 入口动态导入；
+- npm tarball 文件白名单与 workspace 协议检查；
+- 生产依赖许可证清单；
+- 依赖漏洞、敏感名称、凭据、域名和 IP 扫描。
+
+运行完整校验：
+
+```bash
+pnpm check
+```
 
 ## 兼容性
 
-- 发布后的 JavaScript 目标是 ES2022 模块。
-- 开发工具链要求 Node.js 22 或更高版本。
-- React 组件支持 React 18，并可在 SSR 场景下安全渲染。
-- 富文本选区恢复在可用时使用 `DOMParser`、`Selection` 和 `Range`；在浏览器外则回退到规范化纯文本。
+- 发布目标：ES2022 ESM；
+- 开发环境：Node.js 22+、pnpm 10；
+- React：18；
+- 支持 SSR；
+- 富文本选区恢复依赖浏览器的 `DOMParser`、`Selection` 和 `Range`；
+- 浏览器 API 不可用时自动回退为规范化纯文本。
 
-## 安全默认值
+## 路线图
 
-- Markdown 不启用原始 HTML。
-- KaTeX 渲染时关闭不可信 HTML 命令。
-- 剪贴板序列化会遍历已有 DOM 树，不会把剪贴板 HTML 注入到当前文档。
-- 宿主应用仍需在自己的 DOM API 之前，对 URL 和外部提供的 HTML 做清理。
+- [ ] 确认代码权利人授权和开源许可证；
+- [ ] 确认 GitHub 与 npm scope 元数据；
+- [ ] 增加真实浏览器复制、光标、IME 和无障碍测试；
+- [ ] 为 `FormulaInput` 增加可选 MathLive adapter；
+- [ ] 提供 TipTap inline/block math node adapter；
+- [ ] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
+- [ ] 增加自动 API 文档和在线 playground；
+- [ ] 评估升级到 KaTeX `0.18.x` 并执行视觉回归。
 
-详见 [docs/DESIGN.md](docs/DESIGN.md)、[SECURITY.md](SECURITY.md) 和
-[docs/PUBLICATION_CHECKLIST.md](docs/PUBLICATION_CHECKLIST.md)。生产依赖许可证记录在
-[docs/DEPENDENCIES.md](docs/DEPENDENCIES.md)。
+## 文档
+
+- [设计与包边界](docs/DESIGN.md)
+- [安全策略](SECURITY.md)
+- [脱敏记录](docs/REDACTION.md)
+- [生产依赖许可证](docs/DEPENDENCIES.md)
+- [发布检查清单](docs/PUBLICATION_CHECKLIST.md)
+- [贡献指南](CONTRIBUTING.md)
+
+## 作者
+
+**leci**
+
+GitHub：<https://github.com/leci-deeply>
 
 ## 许可证
 
-许可证选择仍在等待权利人批准。只要仓库里还没有 `LICENSE` 文件，就不应当把这里视为可再发布的软件。
+许可证仍在等待代码权利人批准。在仓库加入正式 `LICENSE` 文件之前，本项目不授予复制、修改、
+再发布或商业使用许可。

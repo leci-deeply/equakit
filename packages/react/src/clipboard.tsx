@@ -6,7 +6,7 @@ import {
   richDomToMarkdown,
   richSelectionToMarkdown,
   type RichClipboardOptions,
-} from '@math-rich-editor/core';
+} from '@equakit/core';
 
 export interface MathClipboardSerializerInput {
   root: ParentNode;

@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const packages = ['core', 'react'];
-const temp = mkdtempSync(resolve(tmpdir(), 'math-rich-editor-pack-'));
+const temp = mkdtempSync(resolve(tmpdir(), 'equakit-pack-'));
 
 try {
   for (const packageName of packages) {

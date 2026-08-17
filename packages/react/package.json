@@ -1,5 +1,5 @@
 {
-  "name": "@math-rich-editor/react",
+  "name": "@equakit/react",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -24,7 +24,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@math-rich-editor/core": "workspace:^",
+    "@equakit/core": "workspace:^",
     "katex": "^0.17.0",
     "react-markdown": "^10.1.0",
     "rehype-katex": "^7.0.1",

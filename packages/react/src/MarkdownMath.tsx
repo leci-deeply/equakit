@@ -3,7 +3,7 @@ import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 
-import { normalizeMarkdownMath } from '@math-rich-editor/core';
+import { normalizeMarkdownMath } from '@equakit/core';
 
 export interface MarkdownMathProps {
   children: string;
