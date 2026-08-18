@@ -23,3 +23,164 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm check
+
+  node-compat:
+    name: Node ${{ matrix.node-version }} 轻量兼容
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  react-compat:
+    name: React ${{ matrix.react-version }} 兼容
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - react-version: 18.3.1
+            react-dom-version: 18.3.1
+            types-react-version: 18.3.x
+            types-react-dom-version: 18.3.x
+          - react-version: 19.2.x
+            react-dom-version: 19.2.x
+            types-react-version: 19.2.x
+            types-react-dom-version: 19.2.x
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: 准备临时兼容工作区
+        run: |
+          mkdir -p "${RUNNER_TEMP}/react-compat"
+          rsync -a --delete \
+            --exclude ".git" \
+            --exclude "node_modules" \
+            --exclude "**/node_modules" \
+            "${GITHUB_WORKSPACE}/" "${RUNNER_TEMP}/react-compat/"
+      - name: 临时切换 React 版本
+        working-directory: ${{ runner.temp }}/react-compat
+        env:
+          REACT_VERSION: ${{ matrix.react-version }}
+          REACT_DOM_VERSION: ${{ matrix.react-dom-version }}
+          TYPES_REACT_VERSION: ${{ matrix.types-react-version }}
+          TYPES_REACT_DOM_VERSION: ${{ matrix.types-react-dom-version }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+          import { join } from 'node:path';
+
+          const replacements = new Map([
+            ['react', process.env.REACT_VERSION],
+            ['react-dom', process.env.REACT_DOM_VERSION],
+            ['@types/react', process.env.TYPES_REACT_VERSION],
+            ['@types/react-dom', process.env.TYPES_REACT_DOM_VERSION],
+          ]);
+
+          function updateDependencyBlock(block) {
+            if (!block) return false;
+            let changed = false;
+            for (const [name, version] of replacements) {
+              if (block[name] && block[name] !== version) {
+                block[name] = version;
+                changed = true;
+              }
+            }
+            return changed;
+          }
+
+          function visit(dir) {
+            for (const entry of readdirSync(dir)) {
+              if (entry === '.git' || entry === 'node_modules') continue;
+              const path = join(dir, entry);
+              const stats = statSync(path);
+              if (stats.isDirectory()) {
+                visit(path);
+                continue;
+              }
+              if (entry !== 'package.json') continue;
+
+              const manifest = JSON.parse(readFileSync(path, 'utf8'));
+              let changed = false;
+              for (const field of [
+                'dependencies',
+                'devDependencies',
+                'peerDependencies',
+                'optionalDependencies',
+              ]) {
+                changed = updateDependencyBlock(manifest[field]) || changed;
+              }
+
+              if (changed) {
+                writeFileSync(path, `${JSON.stringify(manifest, null, 2)}\n`);
+              }
+            }
+          }
+
+          visit(process.cwd());
+          NODE
+          pnpm install --lockfile=false --no-frozen-lockfile
+      - name: 验证 React 解析版本
+        working-directory: ${{ runner.temp }}/react-compat
+        run: pnpm --filter @equakit/react-katex exec node -e "console.log('react', require('react/package.json').version); console.log('react-dom', require('react-dom/package.json').version)"
+      - name: React 包类型检查
+        working-directory: ${{ runner.temp }}/react-compat
+        run: >
+          pnpm
+          --filter @equakit/react
+          --filter @equakit/react-katex
+          --filter @equakit/react-markdown-math
+          --filter @equakit/react-formula-input
+          --filter @equakit/react-clipboard
+          --filter @equakit/react-answer-steps
+          --filter @equakit/react-choice
+          --filter @equakit/mathlive-editor
+          --filter @equakit/adapter-mathlive
+          typecheck
+      - name: React 包测试
+        working-directory: ${{ runner.temp }}/react-compat
+        run: >
+          pnpm
+          --filter @equakit/react-katex
+          --filter @equakit/react-markdown-math
+          --filter @equakit/react-formula-input
+          --filter @equakit/react-clipboard
+          --filter @equakit/react-answer-steps
+          --filter @equakit/react-choice
+          --filter @equakit/mathlive-editor
+          test
+
+  browser-compat:
+    name: Firefox / WebKit 兼容
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps firefox webkit
+      - run: pnpm test:browser:compat

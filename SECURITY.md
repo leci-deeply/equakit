@@ -3,11 +3,21 @@
 EquaKit 是公开仓库。请不要在公开 Issue 中粘贴凭据、未公开漏洞利用代码、个人数据或生产内容。
 
 普通安全加固建议可以提交 GitHub Issue；可能造成代码执行、数据泄漏或供应链风险的漏洞，
-请先通过维护者 [leci](https://github.com/leci-deeply) 的 GitHub 主页建立私密联系，再提供完整细节。
+请优先使用
+[GitHub Private Vulnerability Reporting](https://github.com/leci-deeply/equakit/security/advisories/new)
+提交私密报告。若该入口在你的账号或仓库视图中不可用，请先通过维护者
+[leci](https://github.com/leci-deeply) 的 GitHub 主页建立私密联系，再提供完整细节。
+
+## 响应预期
+
+- 维护者会尽量在 3 个工作日内确认收到私密漏洞报告。
+- 初步分级和是否纳入修复范围通常会在 7 个工作日内反馈。
+- 高危问题会优先协调修复和披露；公开披露前请不要在 Issue、PR 或社交平台发布细节。
+- 若报告需要更多复现信息，维护者会在私密报告线程中继续沟通。
 
 ## 受支持版本
 
-项目尚未发布稳定 npm 版本。当前只维护 `main` 分支的最新提交。
+项目尚未发布稳定 npm 版本，`0.1.0` 仍处于未发布状态。当前只维护 `main` 分支的最新提交。
 
 ## 范围
 

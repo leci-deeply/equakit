@@ -142,6 +142,8 @@ pnpm --filter @equakit/tiptap-math build
 
 > 当前仓库内 20 个 package 都仍是 `private: true`，尚未发布到 npm。仓库外集成时，请按需引入
 > atomic packages；旧包只用于迁移兼容。
+>
+> `0.1.0` 仍是未发布版本；npm 发布流程暂缓，仓库不会在准备完成前启用 npm publish workflow。
 
 ## 原子包使用示例
 
@@ -392,6 +394,10 @@ export function ChoiceExample() {
 - 自定义数学源码属性名必须符合安全属性名格式；
 - 发布检查会真实打包 tarball，并验证 ESM 入口和 workspace 协议转换；
 - `pnpm audit --audit-level moderate` 当前无已知漏洞。
+- GitHub CI 保留 Node.js 22 完整 `check` 状态上下文，并额外验证 Node.js 22 / 24 的
+  `install`、`typecheck`、`test`、`build` 轻量矩阵。
+- GitHub CI 在临时工作区切换 React 18.3.1 / 19.2.x，验证 React 相关包的类型检查和测试；
+  该过程不会持久修改仓库 lockfile。
 
 详见 [SECURITY.md](SECURITY.md) 和 [docs/DESIGN.md](docs/DESIGN.md)。
 
@@ -419,10 +425,12 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - ESLint 静态检查；
 - TypeScript 类型检查；
 - 65 个 Vitest 测试；
-- 11 个 Playwright Chromium 测试，覆盖 KaTeX 截图回归、站点导航、多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描，且视觉截图回归完全一致；
+- 12 个 Playwright Chromium 测试，覆盖 KaTeX 截图回归、站点导航、多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描，且视觉截图回归完全一致；
+- Firefox / WebKit 兼容矩阵共通过 28 项、按能力边界跳过 8 项；系统剪贴板读取、CDP IME 和截图基线继续限定 Chromium；
 - TypeDoc 多入口 API 校验；
 - Playground + API 静态站点构建、相对路径和脱敏验证；
 - 原子包、兼容包和 Demo 构建；
+- Demo JavaScript 总量、最大 chunk、CSS 总量和 MathLive 独立分块预算；
 - 构建后 ESM 入口动态导入；
 - npm tarball 文件白名单与 workspace 协议检查；
 - 生产依赖许可证清单；
@@ -437,8 +445,9 @@ pnpm check
 ## 兼容性
 
 - 发布目标：ES2022 ESM；
-- 开发环境：Node.js 22+、pnpm 10；
-- React：18；
+- 开发环境：Node.js 22 / 24、pnpm 10；
+- React：已验证兼容 18.3.1 和 19.2.x；
+- 浏览器：Chromium、Firefox、WebKit；系统剪贴板读取、CDP IME 与视觉基线属于 Chromium 专项；
 - KaTeX：`0.18.4`，通过 workspace override 保证 rehype/TipTap 使用同一版本；
 - 支持 SSR；
 - 富文本选区恢复依赖浏览器的 `DOMParser`、`Selection` 和 `Range`；
@@ -454,6 +463,7 @@ pnpm check
 - [x] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
 - [x] 增加自动 API 文档和在线 playground；
 - [x] 升级到 KaTeX `0.18.4` 并执行持续视觉回归。
+- [ ] 发布 `0.1.0` 到 npm；当前仍保持 private 并暂缓发布。
 
 ## 文档
 

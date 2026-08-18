@@ -1,0 +1,55 @@
+name: 问题报告
+description: 报告可复现的 EquaKit 问题。
+title: '[问题]: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请不要提交凭据、生产内容、个人数据、内部域名或未公开漏洞利用细节。安全漏洞请优先使用 GitHub Private Vulnerability Reporting。
+  - type: textarea
+    id: summary
+    attributes:
+      label: 问题概述
+      description: 简要说明发生了什么，以及你期望发生什么。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤
+      description: 请给出最小复现步骤、输入内容或代码片段。
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+      description: 包括错误信息、截图或测试输出摘要。
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境
+      description: 请填写相关运行环境。
+      value: |
+        - Node.js:
+        - pnpm:
+        - React:
+        - 浏览器:
+        - 使用的 EquaKit 包:
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我已确认这个 Issue 不包含凭据、生产内容、个人数据或未公开漏洞利用细节。
+          required: true

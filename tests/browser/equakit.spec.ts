@@ -18,7 +18,12 @@ test('Playground 提供 API 文档和 GitHub 导航', async ({ page }) => {
   );
 });
 
-test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ page }) => {
+test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ page, browserName }) => {
+  test.skip(
+    browserName !== 'chromium',
+    'Firefox 和 WebKit 在 Playwright 中没有稳定开放系统剪贴板 readText() 权限。',
+  );
+
   const card = page.locator('article').filter({
     has: page.getByRole('heading', { name: 'Markdown 与复制恢复' }),
   });
@@ -121,7 +126,9 @@ test('公式面板在当前选区插入片段并把光标放进占位符', async
   await expect(textarea).toHaveValue('a\\frac{1}{}b');
 });
 
-test('Chromium IME composition 期间保持受控输入值并正常提交中文', async ({ page }) => {
+test('Chromium IME composition 期间保持受控输入值并正常提交中文', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'CDP Input.imeSetComposition 只适用于 Chromium。');
+
   const textarea = page.getByRole('textbox', { name: '公式源码', exact: true });
   await textarea.fill('');
   await textarea.focus();
@@ -217,7 +224,7 @@ test('MathLive adapter 按需加载并使用结构化占位符插入公式', asy
   expect(failedAssets).toEqual([]);
 });
 
-test('TipTap adapter 渲染并插入 inline/block 数学节点且支持 EquaKit 复制', async ({ page }) => {
+test('TipTap adapter 渲染并插入 inline/block 数学节点', async ({ page }) => {
   const card = page.locator('article').filter({
     has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
   });
@@ -245,6 +252,21 @@ test('TipTap adapter 渲染并插入 inline/block 数学节点且支持 EquaKit 
       blockMath.evaluateAll((elements) => elements.map((element) => element.dataset.latex)),
     )
     .toContain('\\sum_{i=1}^{n} i');
+});
+
+test('TipTap adapter 支持 EquaKit 剪贴板复制', async ({ page, browserName }) => {
+  test.skip(
+    browserName !== 'chromium',
+    'Firefox 和 WebKit 在 Playwright 中没有稳定开放系统剪贴板 readText() 权限。',
+  );
+
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
+  });
+  const editor = card.getByRole('textbox', { name: 'TipTap 数学编辑器' });
+
+  await card.getByRole('button', { name: '插入块级公式' }).click();
+  await expect(editor.locator('[data-type="block-math"]')).toHaveCount(2);
 
   await editor.focus();
   await page.keyboard.press('ControlOrMeta+A');

@@ -430,8 +430,10 @@ format:check
 → lint
 → typecheck
 → 65 个 Vitest 测试
-→ 11 个 Playwright Chromium 测试
+→ 12 个 Playwright Chromium 测试
+→ Firefox / WebKit 兼容矩阵（独立 CI）
 → 原子包/兼容包/demo build
+→ Demo bundle budget
 → verify-package-boundaries
 → 真实 pnpm pack
 → 20 个 package 的临时消费者安装/导入
@@ -612,6 +614,7 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 ### 测试
 
 - Playwright Chromium 已覆盖 Selection、Range、ClipboardEvent 和系统剪贴板读取；
+- Firefox / WebKit 已覆盖导航、公式输入、MathLive、TipTap、迁移、选择题和 axe 无障碍扫描；
 - 公式片段插入后的 selectionStart/selectionEnd 已在浏览器中验证；
 - Chromium DevTools Protocol 已覆盖 compositionstart/update/end 与中文提交；
 - MathLive 已覆盖动态加载、受控值、调色板 placeholder、键盘输入和静态资源失败检查；
@@ -619,7 +622,8 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 - Chromium 已覆盖 copy 事件中的 LaTeX、MathML、AsciiMath、MathJSON 自定义 MIME；
 - KaTeX 已覆盖固定公式矩阵的持续 Playwright 截图回归；
 - axe 已覆盖自动无障碍规则，原生键盘单选行为也已验证；
-- Firefox、WebKit、真实输入法候选窗和 VoiceOver/NVDA 矩阵尚未覆盖。
+- Firefox / WebKit 不提供稳定的系统剪贴板读取权限，CDP IME 和 KaTeX 截图基线继续限定 Chromium；
+- 真实输入法候选窗和 VoiceOver/NVDA 矩阵尚未覆盖。
 
 ### 无障碍
 
@@ -631,7 +635,7 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 ### 工程
 
 - Demo 同时打包所有能力，chunk 偏大；
-- 尚未提供浏览器兼容矩阵和 bundle budget；
+- 已提供 Chromium、Firefox、WebKit 兼容矩阵，以及 Demo JavaScript/CSS 和 MathLive 独立分块预算；
 - npm `equakit` 组织与 `@equakit` scope 已创建；package 已补齐 GitHub、作者和公开发布
   策略元数据，但在首次发布准备完成前仍保持 private。
 
@@ -641,12 +645,12 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 
 - 确认贡献者署名；
 - 首次发布前通过 npm CLI 或可信发布再次验证 `@equakit` 写权限；
-- 更新公开安全联系渠道；
-- 启用 Dependabot 和 CodeQL。
+- 已启用 GitHub Private Vulnerability Reporting 并更新公开安全联系渠道；
+- 已启用 Dependabot、密钥扫描、push protection 和 CodeQL JavaScript/TypeScript 扫描。
 
 ### P1：真实浏览器和无障碍
 
-- 已加入 Playwright Chromium 与 axe 测试；
+- 已加入 Playwright Chromium、Firefox、WebKit 与 axe 测试；
 - 已覆盖 Selection/Range/ClipboardEvent、系统剪贴板、光标和 IME composition；
 - 已补 fieldset legend、math role、toolbar group 和 preview region；
 - aria-live；
@@ -675,26 +679,26 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 
 - TypeDoc（已实现）；
 - 在线 playground（已实现）；
-- CHANGELOG；
+- CHANGELOG（已实现）；
 - Changesets/semantic-release；
-- bundle size CI；
+- bundle size CI（已实现 Demo 产物预算）；
 - subpath exports。
 
 ## 24. 技术决策总结
 
-| 领域     | 当前选择                                    | 原因                      | 未来增强                        |
-| -------- | ------------------------------------------- | ------------------------- | ------------------------------- |
-| 语言     | TypeScript                                  | 浏览器/npm/类型共享       | Rust/WASM parser adapter        |
-| 渲染     | KaTeX 0.18.4                                | 轻量、同步、SSR           | MathJax adapter                 |
-| 输入     | textarea + 可选 `@equakit/mathlive-editor`  | 默认轻量、富输入按需加载  | 更多框架 editor adapter         |
-| UI       | React 原子包                                | 受控组件和生态            | Vue/Web Components              |
-| 富文本   | TipTap Mathematics + `@equakit/tiptap-math` | 官方节点、命令和 NodeView | 自定义 React NodeView 按需提供  |
-| 剪贴板   | 同步 converter + 多 MIME                    | 原生 copy 事件内可靠写入  | Async Clipboard web custom 格式 |
-| Markdown | remark/rehype                               | AST 分层和安全默认        | 可配置 preset                   |
-| 解析     | 保守启发式                                  | 轻量和可预测              | unified-latex adapter           |
-| 包管理   | pnpm                                        | workspace 和严格依赖      | 暂无迁移动机                    |
-| 测试     | Vitest + Playwright + axe                   | 单元、浏览器与无障碍规则  | Firefox/WebKit 与屏幕阅读器矩阵 |
-| 构建     | tsc + Vite Demo                             | 保留模块边界              | tsup/Rollup 按需引入            |
+| 领域     | 当前选择                                    | 原因                       | 未来增强                        |
+| -------- | ------------------------------------------- | -------------------------- | ------------------------------- |
+| 语言     | TypeScript                                  | 浏览器/npm/类型共享        | Rust/WASM parser adapter        |
+| 渲染     | KaTeX 0.18.4                                | 轻量、同步、SSR            | MathJax adapter                 |
+| 输入     | textarea + 可选 `@equakit/mathlive-editor`  | 默认轻量、富输入按需加载   | 更多框架 editor adapter         |
+| UI       | React 原子包                                | 受控组件和生态             | Vue/Web Components              |
+| 富文本   | TipTap Mathematics + `@equakit/tiptap-math` | 官方节点、命令和 NodeView  | 自定义 React NodeView 按需提供  |
+| 剪贴板   | 同步 converter + 多 MIME                    | 原生 copy 事件内可靠写入   | Async Clipboard web custom 格式 |
+| Markdown | remark/rehype                               | AST 分层和安全默认         | 可配置 preset                   |
+| 解析     | 保守启发式                                  | 轻量和可预测               | unified-latex adapter           |
+| 包管理   | pnpm                                        | workspace 和严格依赖       | 暂无迁移动机                    |
+| 测试     | Vitest + Playwright + axe                   | 单元、三浏览器与无障碍规则 | 屏幕阅读器和真实输入法矩阵      |
+| 构建     | tsc + Vite Demo                             | 保留模块边界               | tsup/Rollup 按需引入            |
 
 ## 25. 结论
 
