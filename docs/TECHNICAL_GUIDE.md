@@ -29,24 +29,28 @@ EquaKit 不是完整的 WYSIWYG 文档编辑器，也不负责 OCR、协同编�
 
 ```text
 equakit
-├── packages/core
-│   ├── math.ts
-│   ├── clipboard.ts
-│   ├── answerSteps.ts
-│   ├── choiceGrading.ts
-│   └── mutationGuard.ts
-├── packages/react
-│   ├── MathFormula.tsx
-│   ├── MarkdownMath.tsx
-│   ├── FormulaInput.tsx
-│   ├── InteractiveChoices.tsx
-│   ├── AnswerStepsEditor.tsx
-│   └── clipboard.tsx
-├── packages/adapter-mathlive
-│   └── MathLiveFormulaEditor.tsx
-├── packages/adapter-tiptap
-│   └── index.ts
+├── packages/answer-steps
+├── packages/async-guard
+├── packages/choice
+├── packages/math-text
+├── packages/katex-engine
+├── packages/clipboard-restore
+├── packages/clipboard-formats
+├── packages/react-katex
+├── packages/react-markdown-math
+├── packages/react-formula-input
+├── packages/react-clipboard
+├── packages/react-answer-steps
+├── packages/react-choice
+├── packages/mathlive-editor
+├── packages/mathlive-formats
+├── packages/tiptap-math
+├── packages/core             # 兼容重导出
+├── packages/react            # 兼容重导出
+├── packages/adapter-mathlive # 兼容重导出
+├── packages/adapter-tiptap   # 兼容重导出
 ├── examples/basic
+├── scripts/verify-package-boundaries.mjs
 ├── scripts/verify-packages.mjs
 └── .github/workflows/ci.yml
 ```
@@ -55,33 +59,38 @@ equakit
 
 ```mermaid
 flowchart LR
-    Demo[Demo] --> MathLiveAdapter[@equakit/adapter-mathlive]
-    Demo --> TipTapAdapter[@equakit/adapter-tiptap]
-    Demo --> React[@equakit/react]
-    Demo --> Core[@equakit/core]
-    React --> Core
-    React --> KaTeX
-    React --> Markdown[react-markdown]
-    MathLiveAdapter --> React
-    MathLiveAdapter --> MathLive
-    TipTapAdapter --> Core
-    TipTapAdapter --> TipTap
-    Markdown --> RemarkMath[remark-math]
-    Markdown --> RehypeKatex[rehype-katex]
-    Core --> KaTeX
+    Demo[Demo] --> ReactMath[@equakit/react-markdown-math]
+    Demo --> FormulaInput[@equakit/react-formula-input]
+    Demo --> CopyBoundary[@equakit/react-clipboard]
+    Demo --> MathLiveEditor[@equakit/mathlive-editor]
+    Demo --> TipTapMath[@equakit/tiptap-math]
+    Demo --> Compat[compatibility re-exports]
+    ReactMath --> MathText[@equakit/math-text]
+    ReactMath --> KaTeX
+    FormulaInput --> KaTeXEngine[@equakit/katex-engine]
+    CopyBoundary --> ClipboardRestore[@equakit/clipboard-restore]
+    CopyBoundary --> ClipboardFormats[@equakit/clipboard-formats]
+    MathLiveEditor --> FormulaInput
+    TipTapMath --> ClipboardFormats
+    Compat -.-> MathText
+    Compat -.-> ReactMath
+    Compat -.-> MathLiveEditor
+    Compat -.-> TipTapMath
 ```
 
 ### 边界原则
 
-- `core` 不依赖 React、API、数据库或用户模型；
-- `react` 只提供受控组件，不主动发请求；
-- `demo` 只使用公开导出；
+- `math-text`、`katex-engine`、`clipboard-restore`、`clipboard-formats`、`answer-steps`、`choice`
+  和 `async-guard` 不依赖 React、API、数据库或用户模型；
+- `react-*` 只提供受控组件，不主动发请求；
+- `demo` 直接使用 atomic packages；
+- 兼容包只做重导出，不应引入新逻辑；
 - 测试环境可映射源码，但生产构建必须使用真实 package exports；
-- 高级编辑器和 AST 能力通过 adapter 扩展，不进入默认运行时。
+- 高级编辑器和 AST 能力通过 atomic packages 扩展，不进入默认运行时。
 
-## 3. Core：数学归一化与校验
+## 3. 原子包：数学归一化与校验
 
-实现文件：[`packages/core/src/math.ts`](../packages/core/src/math.ts)
+实现文件：[`packages/math-text/src/index.ts`](../packages/math-text/src/index.ts)、[`packages/katex-engine/src/index.ts`](../packages/katex-engine/src/index.ts)
 
 ### 3.1 分隔符剥离
 
@@ -146,9 +155,9 @@ interface MathValidationResult {
 
 这样用户在输入尚未完成的公式时仍能继续编辑。
 
-## 4. Core：数学富文本复制恢复
+## 4. 原子包：数学富文本复制恢复
 
-实现文件：[`packages/core/src/clipboard.ts`](../packages/core/src/clipboard.ts)
+实现文件：[`packages/clipboard-restore/src/index.ts`](../packages/clipboard-restore/src/index.ts)
 
 ### 4.1 三种入口
 
@@ -183,9 +192,9 @@ DOM 不可用或解析失败时，回退到规范化后的纯文本。
 
 复制 clone 可能只包含 KaTeX 视觉节点的一部分，丢失外层源码标记。`richSelectionToMarkdown()` 使用原始 DOM 和 `Range.intersectsNode()`，即使选区终点位于公式内部，也能向上恢复规范源码。
 
-## 5. Core：分步答案
+## 5. 原子包：分步答案
 
-实现文件：[`packages/core/src/answerSteps.ts`](../packages/core/src/answerSteps.ts)
+实现文件：[`packages/answer-steps/src/index.ts`](../packages/answer-steps/src/index.ts)
 
 ### 5.1 文本转换
 
@@ -209,9 +218,9 @@ stateDiagram-v2
 
 第一次按 Backspace/Delete 只进入待确认状态，第二次才合并，减少误删除步骤结构。
 
-## 6. Core：选择题判分
+## 6. 原子包：选择题判分
 
-实现文件：[`packages/core/src/choiceGrading.ts`](../packages/core/src/choiceGrading.ts)
+实现文件：[`packages/choice/src/index.ts`](../packages/choice/src/index.ts)
 
 支持：
 
@@ -237,9 +246,9 @@ interface ChoiceGradeResult {
 }
 ```
 
-## 7. Core：异步过期保护
+## 7. 原子包：异步过期保护
 
-实现文件：[`packages/core/src/mutationGuard.ts`](../packages/core/src/mutationGuard.ts)
+实现文件：[`packages/async-guard/src/index.ts`](../packages/async-guard/src/index.ts)
 
 `KeyedMutationVersion` 为每个资源维护独立版本号。新请求开始时递增版本，响应返回时只有版本仍然相同才能被采用。
 
@@ -254,13 +263,13 @@ const snapshot = guard.begin('grade');
 
 用户切换资源后，即使 key 或 version 意外相同，scope 也会拒绝旧响应。
 
-## 8. React：公式渲染
+## 8. React 原子包：公式渲染
 
-实现文件：[`packages/react/src/MathFormula.tsx`](../packages/react/src/MathFormula.tsx)
+实现文件：[`packages/react-katex/src/MathFormula.tsx`](../packages/react-katex/src/MathFormula.tsx)
 
 执行过程：
 
-1. 调用 core 剥离分隔符；
+1. 调用 `math-text` 剥离分隔符；
 2. 使用 `useMemo()` 缓存 KaTeX HTML；
 3. 设置 `throwOnError: true`、`strict: 'ignore'`、`trust: false`；
 4. 失败时显示源码或自定义 fallback；
@@ -268,13 +277,13 @@ const snapshot = guard.begin('grade');
 
 组件使用 `dangerouslySetInnerHTML`，但 HTML 仅来自 `trust: false` 的 KaTeX 输出，不直接使用用户 HTML。
 
-## 9. React：Markdown 数学管线
+## 9. React 原子包：Markdown 数学管线
 
-实现文件：[`packages/react/src/MarkdownMath.tsx`](../packages/react/src/MarkdownMath.tsx)
+实现文件：[`packages/react-markdown-math/src/MarkdownMath.tsx`](../packages/react-markdown-math/src/MarkdownMath.tsx)
 
 ```mermaid
 flowchart LR
-    Source[Markdown] --> Normalize[core 归一化]
+    Source[Markdown] --> Normalize[math-text 归一化]
     Normalize --> ReactMarkdown[react-markdown]
     ReactMarkdown --> GFM[remark-gfm]
     ReactMarkdown --> Math[remark-math]
@@ -290,9 +299,9 @@ flowchart LR
 - 拒绝 `javascript:`；
 - protocol-relative URL 也必须经过协议校验。
 
-## 10. React：公式输入
+## 10. React 原子包：公式输入
 
-实现文件：[`packages/react/src/FormulaInput.tsx`](../packages/react/src/FormulaInput.tsx)
+实现文件：[`packages/react-formula-input/src/FormulaInput.tsx`](../packages/react-formula-input/src/FormulaInput.tsx)
 
 `FormulaInput` 默认是轻量 textarea + palette，并通过 `FormulaInputEditorComponent` 接口
 接受可选编辑器。这个接口只暴露受控值、可访问名称、禁用状态，以及 `focus()` 和
@@ -309,15 +318,15 @@ flowchart LR
 
 校验结果通过 `useMemo()` 缓存，避免重复触发 `onValidationChange`。
 
-`@equakit/adapter-mathlive` 实现同一接口：服务端只输出加载宿主，浏览器挂载后动态导入
+`@equakit/mathlive-editor` 实现同一接口：服务端只输出加载宿主，浏览器挂载后动态导入
 MathLive；MathLive 的 `input` 事件同步外部值，外部值真正变化时才调用 `setValue()`，避免
 重置结构化选区。调色板通过 `insert()` 的 `replaceSelection` 和 `placeholder` 模式工作。
 
 ### 10.1 TipTap inline/block 数学节点
 
-实现文件：[`packages/adapter-tiptap/src/index.ts`](../packages/adapter-tiptap/src/index.ts)
+实现文件：[`packages/tiptap-math/src/index.ts`](../packages/tiptap-math/src/index.ts)
 
-Adapter 直接配置 TipTap 官方 `InlineMath` 和 `BlockMath`，不另建 ProseMirror schema：
+`@equakit/tiptap-math` 直接配置 TipTap 官方 `InlineMath` 和 `BlockMath`，不另建 ProseMirror schema：
 
 - JSON 节点名保持 `inlineMath` / `blockMath`；
 - LaTeX 保存在 `attrs.latex`；
@@ -327,10 +336,10 @@ Adapter 直接配置 TipTap 官方 `InlineMath` 和 `BlockMath`，不另建 Pros
 - KaTeX 固定 `trust: false`、`throwOnError: false` 和 `strict: 'ignore'`；
 - `TIPTAP_MATH_CLIPBOARD_OPTIONS` 让 EquaKit 复制边界读取 `data-latex`。
 
-TipTap adapter 同时设置 `displayMathSelector`：inline 节点复制为 `\\(...\\)`，block 节点
+TipTap atomic package 同时设置 `displayMathSelector`：inline 节点复制为 `\\(...\\)`，block 节点
 复制为独立一行的 `\\[...\\]`，保留节点的展示语义。
 
-官方迁移正则在价格和公式连续出现时可能跨越两个 `$` 边界。Adapter 提供更保守的
+官方迁移正则在价格和公式连续出现时可能跨越两个 `$` 边界。`tiptap-math` 提供更保守的
 `EQUAKIT_MATH_MIGRATION_REGEX` 和 `migrateEquaKitMathStrings()`，避免把 `$100$` 识别成
 数学节点，同时保留官方迁移函数的重新导出。
 
@@ -351,22 +360,22 @@ TipTap adapter 同时设置 `displayMathSelector`：inline 节点复制为 `\\(.
 - 调用 core 状态机处理边界删除；
 - 第一次边界按键只进入待确认，第二次才合并。
 
-## 12. React：复制边界
+## 12. React 原子包：复制边界
 
-实现文件：[`packages/react/src/clipboard.tsx`](../packages/react/src/clipboard.tsx)
+实现文件：[`packages/react-clipboard/src/clipboard.tsx`](../packages/react-clipboard/src/clipboard.tsx)
 
 `MathCopyBoundary` 在 `onCopy` 中：
 
 1. 获取 Selection；
 2. clone 当前 Range；
-3. 调用 core serializer；
+3. 调用 `clipboard-restore` serializer；
 4. 阻止浏览器默认复制；
 5. 调用同步 converter 构建 MIME payload；
 6. 逐项写入 `clipboardData`，单个自定义格式失败不影响其他格式。
 
 ### 12.1 多格式数学剪贴板
 
-实现文件：[`packages/core/src/clipboardFormats.ts`](../packages/core/src/clipboardFormats.ts)
+实现文件：[`packages/clipboard-formats/src/index.ts`](../packages/clipboard-formats/src/index.ts)、[`packages/mathlive-formats/src/index.ts`](../packages/mathlive-formats/src/index.ts)
 
 core 先把选区归一化并确认它只包含一个数学 token。单公式可生成以下 payload：
 
@@ -381,19 +390,15 @@ core 先把选区归一化并确认它只包含一个数学 token。单公式可
 混合正文和多公式只输出 `text/plain`。这是为了避免把一整段富文本误表示成单个 MathJSON 或
 MathML 表达式。自定义 MIME 主要用于浏览器内和已知集成方，不能假定操作系统原生应用会保留。
 
-MathLive `./clipboard` 子入口使用 `mathlive/ssr` 同步生成完整 MathML 和 AsciiMath，并用
+`@equakit/mathlive-formats` 使用 `mathlive/ssr` 同步生成完整 MathML 和 AsciiMath，并用
 Cortex Compute Engine 生成 raw 或 canonical MathJSON。转换器保持独立 opt-in，默认 React
-和 core 包不引入 Compute Engine。
+和 atomic packages 不引入 Compute Engine。兼容重导出 `@equakit/adapter-mathlive/clipboard`
+仍可用于旧代码迁移。
 
-Demo 将该子入口构建为独立动态 chunk；默认主路径不包含 Compute Engine。转换器加载完成前
-仍可使用 `text/plain`/LaTeX 基础复制。
-
-当前只写 `text/plain`。未来可增加：
-
-- `text/markdown`；
-- `application/x-latex`；
-- `application/mathml+xml`；
-- MathJSON。
+Demo 将该转换器构建为独立动态 chunk；默认主路径不包含 Compute Engine。转换器加载完成前
+仍可使用 `text/plain`/LaTeX 基础复制。当前已输出 `text/plain`、`application/x-latex`、
+`application/mathml+xml`、`text/asciimath` 和 `application/vnd.equakit.mathjson+json`；混合正文
+和多公式仅保留 `text/plain`。
 
 ## 13. 构建和 CI
 
@@ -414,7 +419,7 @@ Demo 将该子入口构建为独立动态 chunk；默认主路径不包含 Compu
 React 构建与 typecheck 使用不同配置：
 
 - build 消费真实 package exports；
-- typecheck 在无 `dist` 的干净检出中映射到 core 源码；
+- typecheck 在无 `dist` 的干净检出中映射到原子包源码；
 - Vitest 使用测试专用 alias；
 - 正式 package build 不使用测试 alias。
 
@@ -424,10 +429,12 @@ React 构建与 typecheck 使用不同配置：
 format:check
 → lint
 → typecheck
-→ 55 个 Vitest 测试
+→ 65 个 Vitest 测试
 → 11 个 Playwright Chromium 测试
-→ core/react/adapters/demo build
+→ 原子包/兼容包/demo build
+→ verify-package-boundaries
 → 真实 pnpm pack
+→ 20 个 package 的临时消费者安装/导入
 → tarball 文件白名单
 → ESM 动态导入
 ```
@@ -489,9 +496,9 @@ MathJax 的 TeX/MathML 覆盖更广，但运行时和配置更重。当前轻量
 ### 相比 MathLive
 
 MathLive 的结构化输入、虚拟键盘、多格式和无障碍能力更强，但它更像完整输入引擎。EquaKit
-继续保留 KaTeX 和 textarea 作为轻量默认层，并通过 `@equakit/adapter-mathlive` 在浏览器挂载后
-动态加载 MathLive。Adapter 使用受控值、`input` 事件和 `insert()` 的结构化 placeholder，
-不会让 MathLive 进入 React 主包。
+继续保留 KaTeX 和 textarea 作为轻量默认层，并通过 `@equakit/mathlive-editor` 在浏览器挂载后
+动态加载 MathLive。该 atomic package 使用受控值、`input` 事件和 `insert()` 的结构化 placeholder，
+不会让 MathLive 进入 React 主包。兼容重导出 `@equakit/adapter-mathlive` 仍保留用于旧代码迁移。
 
 当前固定 MathLive `^0.110.0`，因为该版本修复了 `GHSA-fm7p-gw32-828p` 记录的 HTML
 转义问题。字体通过 `mathlive/fonts.css` 进入示例资产管线，可选按键音默认关闭。
@@ -555,8 +562,9 @@ Vitest 与 Vite/ESM/TypeScript 共享转换模型，配置比 Jest + Babel 更�
 
 ### 20.1 TypeDoc 与在线 Playground
 
-TypeDoc 从 core、React、MathLive、MathLive clipboard 和 TipTap 五个公开入口生成 HTML API
-文档。`pnpm docs:check` 使用 `--emit none` 在常规 CI 中验证类型和文档模型，不写生成物。
+TypeDoc 从 21 个入口生成 HTML API 文档：16 个原子包、4 个兼容包，以及
+`@equakit/adapter-mathlive/clipboard` 子入口。`pnpm docs:check` 使用 `--emit none` 在常规 CI
+中验证类型和文档模型，不写生成物。
 
 `pnpm build:site` 执行以下步骤：
 
@@ -594,7 +602,7 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 ### 功能
 
 - 不是完整数学 WYSIWYG；
-- 默认 textarea 没有虚拟键盘；可选 MathLive adapter 提供结构化输入和虚拟键盘；
+- 默认 textarea 没有虚拟键盘；可选 `@equakit/mathlive-editor` 提供结构化输入和虚拟键盘；
 - 多格式数学 MIME 只适用于单公式选区，混合正文仍回退 `text/plain`；
 - 自定义 MIME 可能被操作系统或非 Web 应用过滤；
 - 没有 AST round-trip；
@@ -647,8 +655,9 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 ### P2：可选 adapter
 
 ```text
-@equakit/adapter-mathlive（已实现）
-@equakit/adapter-tiptap（已实现）
+@equakit/mathlive-editor（已实现）
+@equakit/mathlive-formats（已实现）
+@equakit/tiptap-math（已实现）
 @equakit/adapter-unified-latex
 @equakit/adapter-mathjax
 ```
@@ -673,19 +682,19 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 
 ## 24. 技术决策总结
 
-| 领域     | 当前选择                  | 原因                      | 未来增强                        |
-| -------- | ------------------------- | ------------------------- | ------------------------------- |
-| 语言     | TypeScript                | 浏览器/npm/类型共享       | Rust/WASM parser adapter        |
-| 渲染     | KaTeX 0.18.4              | 轻量、同步、SSR           | MathJax adapter                 |
-| 输入     | textarea + 可选 MathLive  | 默认轻量、富输入按需加载  | 更多框架 editor adapter         |
-| UI       | React 可选层              | 受控组件和生态            | Vue/Web Components              |
-| 富文本   | TipTap Mathematics        | 官方节点、命令和 NodeView | 自定义 React NodeView 按需提供  |
-| 剪贴板   | 同步 converter + 多 MIME  | 原生 copy 事件内可靠写入  | Async Clipboard web custom 格式 |
-| Markdown | remark/rehype             | AST 分层和安全默认        | 可配置 preset                   |
-| 解析     | 保守启发式                | 轻量和可预测              | unified-latex adapter           |
-| 包管理   | pnpm                      | workspace 和严格依赖      | 暂无迁移动机                    |
-| 测试     | Vitest + Playwright + axe | 单元、浏览器与无障碍规则  | Firefox/WebKit 与屏幕阅读器矩阵 |
-| 构建     | tsc + Vite Demo           | 保留模块边界              | tsup/Rollup 按需引入            |
+| 领域     | 当前选择                                    | 原因                      | 未来增强                        |
+| -------- | ------------------------------------------- | ------------------------- | ------------------------------- |
+| 语言     | TypeScript                                  | 浏览器/npm/类型共享       | Rust/WASM parser adapter        |
+| 渲染     | KaTeX 0.18.4                                | 轻量、同步、SSR           | MathJax adapter                 |
+| 输入     | textarea + 可选 `@equakit/mathlive-editor`  | 默认轻量、富输入按需加载  | 更多框架 editor adapter         |
+| UI       | React 原子包                                | 受控组件和生态            | Vue/Web Components              |
+| 富文本   | TipTap Mathematics + `@equakit/tiptap-math` | 官方节点、命令和 NodeView | 自定义 React NodeView 按需提供  |
+| 剪贴板   | 同步 converter + 多 MIME                    | 原生 copy 事件内可靠写入  | Async Clipboard web custom 格式 |
+| Markdown | remark/rehype                               | AST 分层和安全默认        | 可配置 preset                   |
+| 解析     | 保守启发式                                  | 轻量和可预测              | unified-latex adapter           |
+| 包管理   | pnpm                                        | workspace 和严格依赖      | 暂无迁移动机                    |
+| 测试     | Vitest + Playwright + axe                   | 单元、浏览器与无障碍规则  | Firefox/WebKit 与屏幕阅读器矩阵 |
+| 构建     | tsc + Vite Demo                             | 保留模块边界              | tsup/Rollup 按需引入            |
 
 ## 25. 结论
 

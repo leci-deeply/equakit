@@ -1,5 +1,10 @@
 # @equakit/core
 
+> 兼容聚合包：当前包不再保存业务实现，只显式重导出七个无框架原子技能。新项目建议按需安装
+> `@equakit/math-text`、`@equakit/katex-engine`、`@equakit/clipboard-restore`、
+> `@equakit/clipboard-formats`、`@equakit/answer-steps`、`@equakit/choice` 或
+> `@equakit/async-guard`；旧导入路径继续兼容。
+
 面向数学富文本编辑器的无框架 TypeScript 工具集。
 
 这个包保持通用：不包含产品名、后端 API、特定学习场景概念或私有标记约定。它可以作为 React、Vue、Svelte、ProseMirror、Slate、Lexical 或纯 `contenteditable` 集成的核心层。

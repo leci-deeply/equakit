@@ -38,13 +38,15 @@
     "verify:site": "node scripts/verify-site.mjs",
     "test": "vitest run",
     "test:visual": "playwright test tests/browser/katex.visual.spec.ts",
-    "pretest:browser": "pnpm --filter @equakit/adapter-mathlive... --filter @equakit/adapter-tiptap... build",
+    "pretest:browser": "pnpm --filter @equakit/demo... build",
     "test:browser": "playwright test",
+    "verify:boundaries": "node scripts/verify-package-boundaries.mjs",
+    "preverify:packages": "pnpm build",
     "verify:packages": "node scripts/verify-packages.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm docs:check && pnpm test && pnpm test:browser && pnpm build && pnpm verify:packages"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm docs:check && pnpm verify:boundaries && pnpm test && pnpm test:browser && pnpm build && node scripts/verify-packages.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

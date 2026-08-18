@@ -1,0 +1,9 @@
+.mre-math-formula {
+  display: inline;
+}
+
+.mre-math-formula--display {
+  display: block;
+  margin: 0.75rem 0;
+  overflow-x: auto;
+}

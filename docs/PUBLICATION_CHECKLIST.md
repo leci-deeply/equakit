@@ -1,5 +1,8 @@
 # 发布清单
 
+当前状态：仓库内 20 个 package 全部仍是 `private: true`，尚未发布到 npm。`core`、`react`、
+`adapter-mathlive` 和 `adapter-tiptap` 只保留兼容重导出，新的集成应直接面向 16 个原子包。
+
 ## 法律与所有权
 
 - [x] 项目维护者已选择以 MIT License 对外授权。
@@ -19,12 +22,12 @@
 ## 工程质量
 
 - [x] `pnpm check` 在干净检出上通过。
-- [x] 包 tarball 只包含预期文件（`npm pack --dry-run --json`）。
-- [x] core、React、MathLive adapter 和 TipTap adapter 都具备独立 LICENSE 与发布元数据。
+- [x] 使用 `pnpm pack` 生成真实 tarball，并确认只包含预期文件。
+- [x] 16 个原子包和 4 个兼容重导出包都具备独立 LICENSE 与发布元数据。
 - [x] 公共 API 具备 README 示例和声明文件。
 - [x] 已记录浏览器支持和 Node.js 支持。
 - [x] 已为 Markdown、URL、HTML 和剪贴板这些敏感路径准备测试。
-- [x] 已加入 Chromium 复制、光标、IME、MathLive、TipTap、键盘语义和 axe 无障碍测试。
+- [x] 已加入 Chromium 复制、光标、IME、MathLive、TipTap、键盘语义和 axe 无障碍测试，单测 65 个、浏览器测试 11 个，视觉截图回归完全一致。
 - [x] 已验证单公式五种 MIME 输出和混合正文降级策略。
 - [x] TypeDoc API 转换、Playground/API 站点组合与静态脱敏检查通过。
 - [x] KaTeX 0.18.4 单版本解析、0.17/0.18 像素一致性和持续截图回归通过。

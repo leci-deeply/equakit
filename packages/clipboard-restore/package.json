@@ -1,0 +1,53 @@
+{
+  "name": "@equakit/clipboard-restore",
+  "version": "0.1.0",
+  "description": "EquaKit 从富数学 HTML、DOM 和选区恢复 Markdown/LaTeX 的剪贴板工具",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "leci",
+    "url": "https://github.com/leci-deeply"
+  },
+  "homepage": "https://github.com/leci-deeply/equakit/tree/main/packages/clipboard-restore#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leci-deeply/equakit.git",
+    "directory": "packages/clipboard-restore"
+  },
+  "bugs": {
+    "url": "https://github.com/leci-deeply/equakit/issues"
+  },
+  "keywords": [
+    "math",
+    "latex",
+    "clipboard",
+    "markdown",
+    "typescript"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@equakit/math-text": "workspace:^"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "name": "@equakit/mathlive-editor",
+  "version": "0.1.0",
+  "description": "为 EquaKit FormulaInput 契约提供可选 MathLive 数学输入器",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "leci",
+    "url": "https://github.com/leci-deeply"
+  },
+  "homepage": "https://github.com/leci-deeply/equakit/tree/main/packages/mathlive-editor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leci-deeply/equakit.git",
+    "directory": "packages/mathlive-editor"
+  },
+  "bugs": {
+    "url": "https://github.com/leci-deeply/equakit/issues"
+  },
+  "keywords": [
+    "math",
+    "latex",
+    "mathlive",
+    "react",
+    "editor",
+    "adapter"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run --root ../.. packages/mathlive-editor/test"
+  },
+  "peerDependencies": {
+    "@equakit/react-formula-input": "^0.1.0",
+    "mathlive": "^0.110.0",
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@equakit/react-formula-input": "workspace:^",
+    "mathlive": "^0.110.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

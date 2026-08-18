@@ -5,7 +5,20 @@
     "rootDir": "../..",
     "baseUrl": "../..",
     "paths": {
-      "@equakit/core": ["packages/core/src/index.ts"]
+      "@equakit/answer-steps": ["packages/answer-steps/src/index.ts"],
+      "@equakit/async-guard": ["packages/async-guard/src/index.ts"],
+      "@equakit/choice": ["packages/choice/src/index.ts"],
+      "@equakit/clipboard-formats": ["packages/clipboard-formats/src/index.ts"],
+      "@equakit/clipboard-restore": ["packages/clipboard-restore/src/index.ts"],
+      "@equakit/core": ["packages/core/src/index.ts"],
+      "@equakit/katex-engine": ["packages/katex-engine/src/index.ts"],
+      "@equakit/math-text": ["packages/math-text/src/index.ts"],
+      "@equakit/react-answer-steps": ["packages/react-answer-steps/src/index.ts"],
+      "@equakit/react-choice": ["packages/react-choice/src/index.ts"],
+      "@equakit/react-clipboard": ["packages/react-clipboard/src/index.ts"],
+      "@equakit/react-formula-input": ["packages/react-formula-input/src/index.ts"],
+      "@equakit/react-katex": ["packages/react-katex/src/index.ts"],
+      "@equakit/react-markdown-math": ["packages/react-markdown-math/src/index.ts"]
     }
   }
 }

@@ -1,5 +1,10 @@
 # @equakit/react
 
+> 兼容聚合包：当前包只重导出六个 React 原子技能，并在构建时聚合它们的 CSS。新项目建议按需
+> 安装 `@equakit/react-katex`、`@equakit/react-markdown-math`、
+> `@equakit/react-formula-input`、`@equakit/react-clipboard`、
+> `@equakit/react-answer-steps` 或 `@equakit/react-choice`；旧导入和 `styles.css` 继续兼容。
+
 用于渲染、编辑、选择和复制数学富文本答案内容的无品牌 React 组件。
 
 ## 安装
