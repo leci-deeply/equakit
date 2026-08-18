@@ -51,20 +51,6 @@ test('单公式复制写入 LaTeX、MathML、AsciiMath 和 MathJSON MIME', async
   await expect(card.getByRole('status')).toHaveText('多格式转换器已加载。');
   const formula = card.getByRole('math', { name: '二分之一' });
 
-  await page.evaluate(() => {
-    document.addEventListener(
-      'copy',
-      (event) => {
-        if (!(event instanceof ClipboardEvent) || !event.clipboardData) return;
-        const payload: Record<string, string> = {};
-        for (const mimeType of event.clipboardData.types) {
-          payload[mimeType] = event.clipboardData.getData(mimeType);
-        }
-        Object.assign(globalThis, { __equakitClipboardPayload: payload });
-      },
-      { once: true },
-    );
-  });
   await formula.evaluate((element) => {
     const selection = document.getSelection();
     const range = document.createRange();
@@ -72,29 +58,21 @@ test('单公式复制写入 LaTeX、MathML、AsciiMath 和 MathJSON MIME', async
     selection?.removeAllRanges();
     selection?.addRange(range);
   });
-  await page.keyboard.press('ControlOrMeta+C');
+  const captured = await formula.evaluate((element) => {
+    const clipboardData = new DataTransfer();
+    const event = new Event('copy', {
+      bubbles: true,
+      cancelable: true,
+    }) as ClipboardEvent;
+    Object.defineProperty(event, 'clipboardData', { value: clipboardData });
+    element.dispatchEvent(event);
 
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () =>
-          (
-            globalThis as typeof globalThis & {
-              __equakitClipboardPayload?: Record<string, string>;
-            }
-          ).__equakitClipboardPayload,
-      ),
-    )
-    .not.toBeUndefined();
-
-  const captured = await page.evaluate(
-    () =>
-      (
-        globalThis as typeof globalThis & {
-          __equakitClipboardPayload?: Record<string, string>;
-        }
-      ).__equakitClipboardPayload ?? {},
-  );
+    const payload: Record<string, string> = {};
+    for (const mimeType of clipboardData.types) {
+      payload[mimeType] = clipboardData.getData(mimeType);
+    }
+    return payload;
+  });
   expect(captured['text/plain']).toBe('\\(\\frac{1}{2}\\)');
   expect(captured['application/x-latex']).toBe('\\frac{1}{2}');
   expect(captured['application/mathml+xml']).toContain('<math');
