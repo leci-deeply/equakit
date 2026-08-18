@@ -30,6 +30,8 @@ $$
 选中并复制这段内容时，复制边界会保留规范化的 LaTeX，而不是视觉字形。
 `;
 
+const heroSpecimen = String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`;
+
 export function App() {
   const [formula, setFormula] = useState(String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`);
   const [mathLiveFormula, setMathLiveFormula] = useState(String.raw`x^2+1`);
@@ -41,83 +43,189 @@ export function App() {
   const correct = useMemo(() => ['1'], []);
 
   return (
-    <main className="demo-shell">
-      <header className="demo-hero">
-        <p className="demo-eyebrow">框架安全的数学内容编写</p>
-        <h1>EquaKit</h1>
-        <p>一个中性的示例，展示数学渲染、公式编写、可访问答案和规范化复制行为。</p>
+    <main className="demo-shell" id="main-content" tabIndex={-1}>
+      <a className="demo-skip-link" href="#demo-collection">
+        跳到功能矩阵
+      </a>
+
+      <header className="demo-topbar">
+        <a className="demo-brand" href="#main-content" aria-label="返回页面顶部">
+          <span className="demo-brand__mark">EQK</span>
+          <span className="demo-brand__name">EquaKit Playground</span>
+        </a>
+
         <nav className="demo-links" aria-label="项目链接">
           <a href={`${import.meta.env.BASE_URL}api/`}>API 文档</a>
           <a href="https://github.com/leci-deeply/equakit">GitHub</a>
         </nav>
       </header>
 
-      <section className="demo-grid">
-        <article className="demo-card demo-card--wide">
-          <h2>Markdown 与复制恢复</h2>
-          <MathCopyBoundary>
-            <MarkdownMath>{explanation}</MarkdownMath>
-          </MathCopyBoundary>
-        </article>
-
-        <article className="demo-card demo-card--wide">
-          <h2>多格式公式复制</h2>
-          <p>选中公式后复制，同时提供 LaTeX、MathML、AsciiMath 和 MathJSON。</p>
-          <MultiFormatCopyDemo />
-        </article>
-
-        <article className="demo-card demo-card--wide">
-          <h2>KaTeX 视觉回归矩阵</h2>
-          <p>覆盖分式、根式、定界符、矩阵、极限、积分、字体和上下标布局。</p>
-          <KaTeXVisualMatrix />
-        </article>
-
-        <article className="demo-card">
-          <h2>公式输入</h2>
-          <FormulaInput onChange={setFormula} value={formula} />
-          <div className="demo-result">
-            <MathFormula display expression={formula} />
-          </div>
-        </article>
-
-        <article className="demo-card">
-          <h2>MathLive 可选输入</h2>
-          <p>主包保持轻量，按需安装 adapter 后可以切换为结构化数学输入器。</p>
-          <FormulaInput
-            editor={MathLiveFormulaEditor}
-            onChange={setMathLiveFormula}
-            previewLabel="MathLive 预览"
-            textareaLabel="MathLive 公式源码"
-            value={mathLiveFormula}
-          />
-        </article>
-
-        <article className="demo-card demo-card--wide">
-          <h2>TipTap inline/block 数学节点</h2>
-          <p>节点保存 LaTeX 属性，使用官方命令编辑，并接入 EquaKit 数学剪贴板。</p>
-          <TipTapMathDemo />
-        </article>
-
-        <article className="demo-card">
-          <h2>可访问的选择题</h2>
-          <InteractiveChoices
-            choices={['$x=1$', '$x=2$', '$x=3$']}
-            correct={correct}
-            onChange={setSelected}
-            reveal={selected.length > 0}
-            selected={selected}
-          />
-        </article>
-
-        <article className="demo-card demo-card--wide">
-          <h2>分步答案编辑器</h2>
-          <p>
-            在分步边界处，第一次按 Backspace/Delete
-            会进入合并待确认状态，第二次才真正合并，从而避免误删。
+      <section className="demo-hero" aria-labelledby="demo-title">
+        <div className="demo-hero__copy">
+          <p className="demo-eyebrow">数学工具 / Playground / 文档同构</p>
+          <h1 id="demo-title">EquaKit</h1>
+          <p className="demo-hero__lede">
+            从 LaTeX 规范化到编辑器接入，让数学内容始终保持为可渲染、可复制、
+            可继续编辑的结构化文本。
           </p>
-          <AnswerStepsEditor onChange={setSteps} steps={steps} />
-        </article>
+          <div className="demo-hero__chips" aria-label="页面特征">
+            <span className="demo-chip">16 个原子包</span>
+            <span className="demo-chip">5 种剪贴板格式</span>
+            <span className="demo-chip">SSR 安全</span>
+            <span className="demo-chip">无障碍优先</span>
+          </div>
+        </div>
+
+        <aside className="demo-hero__panel" aria-label="示例仪表板">
+          <div className="demo-specimen">
+            <div className="demo-specimen__top">
+              <span className="demo-specimen__label">首屏样本</span>
+              <span className="demo-specimen__badge">LaTeX / Markdown</span>
+            </div>
+            <div className="demo-specimen__formula">
+              <MathFormula display expression={heroSpecimen} />
+            </div>
+            <p className="demo-specimen__caption">
+              同一份 LaTeX 数据贯穿输入、渲染、复制与编辑流程，不被视觉字形取代。
+            </p>
+          </div>
+
+          <ul className="demo-hero__facts" aria-label="关键规格">
+            <li>
+              <strong>16</strong>
+              <span>个原子能力包</span>
+            </li>
+            <li>
+              <strong>3</strong>
+              <span>种浏览器验证</span>
+            </li>
+            <li>
+              <strong>65</strong>
+              <span>项单元验证</span>
+            </li>
+          </ul>
+        </aside>
       </section>
+
+      <section
+        className="demo-collection"
+        id="demo-collection"
+        aria-labelledby="demo-collection-title"
+      >
+        <div className="demo-collection__head">
+          <p className="demo-collection__eyebrow">功能矩阵</p>
+          <h2 id="demo-collection-title" className="demo-collection__title">
+            安全默认的数学富文本工作台
+          </h2>
+          <p className="demo-collection__lede">
+            按渲染、复制、输入、编辑与作答能力拆分，每个示例都可直接操作并对应独立的软件包。
+          </p>
+        </div>
+
+        <div className="demo-grid">
+          <article className="demo-card demo-card--span-7">
+            <header className="demo-card__header">
+              <span className="demo-card__index">01</span>
+              <span className="demo-card__spec">复制 / Markdown</span>
+            </header>
+            <h2>Markdown 与复制恢复</h2>
+            <MathCopyBoundary>
+              <MarkdownMath>{explanation}</MarkdownMath>
+            </MathCopyBoundary>
+          </article>
+
+          <article className="demo-card demo-card--span-5">
+            <header className="demo-card__header">
+              <span className="demo-card__index">02</span>
+              <span className="demo-card__spec">多 MIME / 剪贴板</span>
+            </header>
+            <h2>多格式公式复制</h2>
+            <p>选中公式后复制，同时提供 LaTeX、MathML、AsciiMath 和 MathJSON。</p>
+            <MultiFormatCopyDemo />
+          </article>
+
+          <article className="demo-card demo-card--span-12">
+            <header className="demo-card__header">
+              <span className="demo-card__index">03</span>
+              <span className="demo-card__spec">视觉回归 / KaTeX</span>
+            </header>
+            <h2>KaTeX 视觉回归矩阵</h2>
+            <p>覆盖分式、根式、定界符、矩阵、极限、积分、字体和上下标布局。</p>
+            <KaTeXVisualMatrix />
+          </article>
+
+          <article className="demo-card demo-card--span-4">
+            <header className="demo-card__header">
+              <span className="demo-card__index">04</span>
+              <span className="demo-card__spec">输入 / 预览</span>
+            </header>
+            <h2>公式输入</h2>
+            <FormulaInput onChange={setFormula} value={formula} />
+            <div className="demo-result">
+              <MathFormula display expression={formula} />
+            </div>
+          </article>
+
+          <article className="demo-card demo-card--span-4">
+            <header className="demo-card__header">
+              <span className="demo-card__index">05</span>
+              <span className="demo-card__spec">MathLive / 可选</span>
+            </header>
+            <h2>MathLive 可选输入</h2>
+            <p>主包保持轻量，按需安装 adapter 后可以切换为结构化数学输入器。</p>
+            <FormulaInput
+              editor={MathLiveFormulaEditor}
+              onChange={setMathLiveFormula}
+              previewLabel="MathLive 预览"
+              textareaLabel="MathLive 公式源码"
+              value={mathLiveFormula}
+            />
+          </article>
+
+          <article className="demo-card demo-card--span-4">
+            <header className="demo-card__header">
+              <span className="demo-card__index">06</span>
+              <span className="demo-card__spec">TipTap / 节点</span>
+            </header>
+            <h2>TipTap inline/block 数学节点</h2>
+            <p>节点保存 LaTeX 属性，使用官方命令编辑，并接入 EquaKit 数学剪贴板。</p>
+            <TipTapMathDemo />
+          </article>
+
+          <article className="demo-card demo-card--span-5">
+            <header className="demo-card__header">
+              <span className="demo-card__index">07</span>
+              <span className="demo-card__spec">练习 / 交互</span>
+            </header>
+            <h2>可访问的选择题</h2>
+            <InteractiveChoices
+              choices={['$x=1$', '$x=2$', '$x=3$']}
+              correct={correct}
+              onChange={setSelected}
+              reveal={selected.length > 0}
+              selected={selected}
+            />
+          </article>
+
+          <article className="demo-card demo-card--span-7">
+            <header className="demo-card__header">
+              <span className="demo-card__index">08</span>
+              <span className="demo-card__spec">步骤 / 合并</span>
+            </header>
+            <h2>分步答案编辑器</h2>
+            <p>
+              在分步边界处，第一次按 Backspace/Delete 会进入合并待确认状态，第二次才真正合并，
+              从而避免误删。
+            </p>
+            <AnswerStepsEditor onChange={setSteps} steps={steps} />
+          </article>
+        </div>
+      </section>
+
+      <footer className="demo-footer">
+        <p>EquaKit · 数学富文本复制、渲染与答案编辑工具集。</p>
+        <p>查看 API 文档了解接口，或前往 GitHub 阅读源码与集成示例。</p>
+      </footer>
     </main>
   );
 }
