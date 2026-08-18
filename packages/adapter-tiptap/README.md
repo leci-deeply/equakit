@@ -1,5 +1,8 @@
 # @equakit/adapter-tiptap
 
+> 兼容聚合包：实现已经迁移到 `@equakit/tiptap-math`。本包只保留旧 API 的显式重导出，新项目
+> 建议直接安装原子技能包。
+
 为 TipTap 3 提供 EquaKit 风格的 inline/block 数学节点配置、剪贴板集成和旧内容迁移。
 
 本包复用官方 `@tiptap/extension-mathematics`，不会复制另一套 ProseMirror schema 或

@@ -1,0 +1,66 @@
+{
+  "name": "@equakit/react-formula-input",
+  "version": "0.1.0",
+  "description": "用于受控公式输入、公式面板、预览与校验的 React 组件",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "leci",
+    "url": "https://github.com/leci-deeply"
+  },
+  "homepage": "https://github.com/leci-deeply/equakit/tree/main/packages/react-formula-input#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leci-deeply/equakit.git",
+    "directory": "packages/react-formula-input"
+  },
+  "bugs": {
+    "url": "https://github.com/leci-deeply/equakit/issues"
+  },
+  "keywords": [
+    "math",
+    "latex",
+    "formula",
+    "editor",
+    "react"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && cp src/styles.css dist/styles.css",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@equakit/katex-engine": "workspace:^",
+    "@equakit/react-katex": "workspace:^"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vitest": "^3.2.6"
+  }
+}

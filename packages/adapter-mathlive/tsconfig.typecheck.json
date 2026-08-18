@@ -5,8 +5,13 @@
     "rootDir": "../..",
     "baseUrl": "../..",
     "paths": {
-      "@equakit/core": ["packages/core/src/index.ts"],
-      "@equakit/react": ["packages/react/src/index.ts"]
+      "@equakit/clipboard-formats": ["packages/clipboard-formats/src/index.ts"],
+      "@equakit/katex-engine": ["packages/katex-engine/src/index.ts"],
+      "@equakit/math-text": ["packages/math-text/src/index.ts"],
+      "@equakit/mathlive-editor": ["packages/mathlive-editor/src/index.ts"],
+      "@equakit/mathlive-formats": ["packages/mathlive-formats/src/index.ts"],
+      "@equakit/react-formula-input": ["packages/react-formula-input/src/index.ts"],
+      "@equakit/react-katex": ["packages/react-katex/src/index.ts"]
     }
   }
 }

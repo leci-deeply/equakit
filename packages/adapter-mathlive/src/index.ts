@@ -1,2 +1,2 @@
-export { createMathLiveFormulaEditor, MathLiveFormulaEditor } from './MathLiveFormulaEditor.js';
-export type { MathLiveEditorAdapterOptions } from './MathLiveFormulaEditor.js';
+export { createMathLiveFormulaEditor, MathLiveFormulaEditor } from '@equakit/mathlive-editor';
+export type { MathLiveEditorAdapterOptions } from '@equakit/mathlive-editor';

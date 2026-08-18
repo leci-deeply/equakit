@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "../..",
+    "paths": {
+      "@equakit/katex-engine": ["packages/katex-engine/src/index.ts"],
+      "@equakit/math-text": ["packages/math-text/src/index.ts"],
+      "@equakit/react-katex": ["packages/react-katex/src/index.ts"]
+    }
+  }
+}

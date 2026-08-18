@@ -1,6 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "rootDir": "../..",
+    "baseUrl": "../..",
+    "paths": {
+      "@equakit/tiptap-math": ["packages/tiptap-math/src/index.ts"]
+    }
   }
 }

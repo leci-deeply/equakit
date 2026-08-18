@@ -13,6 +13,7 @@ pnpm check
 
 ```bash
 pnpm docs:check
+pnpm verify:boundaries
 pnpm build:site
 ```
 
@@ -31,3 +32,6 @@ pnpm test:visual
 - 不要启用原始 HTML，也不要放宽 KaTeX 的广泛信任回调。
 - 不要引入应用层 DTO、API 客户端、埋点、账号状态。
 - 对外 API 的变更要同步更新包级 README。
+- 原子技能只能依赖更底层的窄能力，禁止依赖 `@equakit/core`、`@equakit/react` 或旧 adapter 聚合包。
+- 新增原子技能时必须同步更新 `scripts/package-catalog.mjs`、TypeDoc 入口、依赖边界校验和真实 tarball 消费验证。
+- 兼容聚合包只允许显式重导出，不得重新加入业务实现。

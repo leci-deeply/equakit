@@ -1,20 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { MathLiveFormulaEditor } from '@equakit/adapter-mathlive';
+import type { MathClipboardFormatConverter } from '@equakit/clipboard-formats';
+import { MathLiveFormulaEditor } from '@equakit/mathlive-editor';
+import { AnswerStepsEditor } from '@equakit/react-answer-steps';
+import { InteractiveChoices } from '@equakit/react-choice';
+import { MathCopyBoundary } from '@equakit/react-clipboard';
+import { FormulaInput } from '@equakit/react-formula-input';
+import { MathFormula } from '@equakit/react-katex';
+import { MarkdownMath } from '@equakit/react-markdown-math';
 import {
   TIPTAP_MATH_CLIPBOARD_OPTIONS,
   createTipTapMathExtensions,
   migrateEquaKitMathStrings,
-} from '@equakit/adapter-tiptap';
-import {
-  AnswerStepsEditor,
-  FormulaInput,
-  InteractiveChoices,
-  MarkdownMath,
-  MathCopyBoundary,
-  MathFormula,
-  type MathClipboardFormatConverter,
-} from '@equakit/react';
+} from '@equakit/tiptap-math';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
@@ -152,7 +150,7 @@ function MultiFormatCopyDemo() {
 
   useEffect(() => {
     let disposed = false;
-    void import('@equakit/adapter-mathlive/clipboard')
+    void import('@equakit/mathlive-formats')
       .then(({ mathLiveClipboardConverter }) => {
         if (!disposed) setConverter(mathLiveClipboardConverter);
       })

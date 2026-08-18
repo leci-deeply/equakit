@@ -50,15 +50,36 @@ importers:
       '@cortex-js/compute-engine':
         specifier: ^0.58.0
         version: 0.58.0
-      '@equakit/adapter-mathlive':
+      '@equakit/clipboard-formats':
         specifier: workspace:*
-        version: link:../../packages/adapter-mathlive
-      '@equakit/adapter-tiptap':
+        version: link:../../packages/clipboard-formats
+      '@equakit/mathlive-editor':
         specifier: workspace:*
-        version: link:../../packages/adapter-tiptap
-      '@equakit/react':
+        version: link:../../packages/mathlive-editor
+      '@equakit/mathlive-formats':
         specifier: workspace:*
-        version: link:../../packages/react
+        version: link:../../packages/mathlive-formats
+      '@equakit/react-answer-steps':
+        specifier: workspace:*
+        version: link:../../packages/react-answer-steps
+      '@equakit/react-choice':
+        specifier: workspace:*
+        version: link:../../packages/react-choice
+      '@equakit/react-clipboard':
+        specifier: workspace:*
+        version: link:../../packages/react-clipboard
+      '@equakit/react-formula-input':
+        specifier: workspace:*
+        version: link:../../packages/react-formula-input
+      '@equakit/react-katex':
+        specifier: workspace:*
+        version: link:../../packages/react-katex
+      '@equakit/react-markdown-math':
+        specifier: workspace:*
+        version: link:../../packages/react-markdown-math
+      '@equakit/tiptap-math':
+        specifier: workspace:*
+        version: link:../../packages/tiptap-math
       '@tiptap/core':
         specifier: ^3.30.1
         version: 3.30.1(@tiptap/pm@3.30.1)
@@ -95,6 +116,16 @@ importers:
         version: 6.4.3(yaml@2.9.0)
 
   packages/adapter-mathlive:
+    dependencies:
+      '@equakit/mathlive-editor':
+        specifier: workspace:^
+        version: link:../mathlive-editor
+      '@equakit/mathlive-formats':
+        specifier: workspace:^
+        version: link:../mathlive-formats
+      '@equakit/react-formula-input':
+        specifier: workspace:^
+        version: link:../react-formula-input
     devDependencies:
       '@cortex-js/compute-engine':
         specifier: ^0.58.0
@@ -113,6 +144,10 @@ importers:
         version: 18.3.1(react@18.3.1)
 
   packages/adapter-tiptap:
+    dependencies:
+      '@equakit/tiptap-math':
+        specifier: workspace:^
+        version: link:../tiptap-math
     devDependencies:
       '@tiptap/core':
         specifier: ^3.30.1
@@ -130,20 +165,215 @@ importers:
         specifier: ^0.18.4
         version: 0.18.4
 
+  packages/answer-steps: {}
+
+  packages/async-guard: {}
+
+  packages/choice: {}
+
+  packages/clipboard-formats:
+    dependencies:
+      '@equakit/math-text':
+        specifier: workspace:^
+        version: link:../math-text
+
+  packages/clipboard-restore:
+    dependencies:
+      '@equakit/math-text':
+        specifier: workspace:^
+        version: link:../math-text
+
   packages/core:
     dependencies:
+      '@equakit/answer-steps':
+        specifier: workspace:^
+        version: link:../answer-steps
+      '@equakit/async-guard':
+        specifier: workspace:^
+        version: link:../async-guard
+      '@equakit/choice':
+        specifier: workspace:^
+        version: link:../choice
+      '@equakit/clipboard-formats':
+        specifier: workspace:^
+        version: link:../clipboard-formats
+      '@equakit/clipboard-restore':
+        specifier: workspace:^
+        version: link:../clipboard-restore
+      '@equakit/katex-engine':
+        specifier: workspace:^
+        version: link:../katex-engine
+      '@equakit/math-text':
+        specifier: workspace:^
+        version: link:../math-text
+
+  packages/katex-engine:
+    dependencies:
+      '@equakit/math-text':
+        specifier: workspace:^
+        version: link:../math-text
       katex:
         specifier: ^0.18.4
         version: 0.18.4
+
+  packages/math-text: {}
+
+  packages/mathlive-editor:
+    devDependencies:
+      '@equakit/react-formula-input':
+        specifier: workspace:^
+        version: link:../react-formula-input
+      mathlive:
+        specifier: ^0.110.0
+        version: 0.110.0
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+
+  packages/mathlive-formats:
+    dependencies:
+      '@equakit/clipboard-formats':
+        specifier: workspace:^
+        version: link:../clipboard-formats
+    devDependencies:
+      '@cortex-js/compute-engine':
+        specifier: ^0.58.0
+        version: 0.58.0
+      mathlive:
+        specifier: ^0.110.0
+        version: 0.110.0
 
   packages/react:
     dependencies:
       '@equakit/core':
         specifier: workspace:^
         version: link:../core
+      '@equakit/react-answer-steps':
+        specifier: workspace:^
+        version: link:../react-answer-steps
+      '@equakit/react-choice':
+        specifier: workspace:^
+        version: link:../react-choice
+      '@equakit/react-clipboard':
+        specifier: workspace:^
+        version: link:../react-clipboard
+      '@equakit/react-formula-input':
+        specifier: workspace:^
+        version: link:../react-formula-input
+      '@equakit/react-katex':
+        specifier: workspace:^
+        version: link:../react-katex
+      '@equakit/react-markdown-math':
+        specifier: workspace:^
+        version: link:../react-markdown-math
+    devDependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+
+  packages/react-answer-steps:
+    dependencies:
+      '@equakit/answer-steps':
+        specifier: workspace:^
+        version: link:../answer-steps
+    devDependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.7(@types/debug@4.1.13)(yaml@2.9.0)
+
+  packages/react-choice:
+    dependencies:
+      '@equakit/react-markdown-math':
+        specifier: workspace:^
+        version: link:../react-markdown-math
+    devDependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.7(@types/debug@4.1.13)(yaml@2.9.0)
+
+  packages/react-clipboard:
+    dependencies:
+      '@equakit/clipboard-formats':
+        specifier: workspace:^
+        version: link:../clipboard-formats
+      '@equakit/clipboard-restore':
+        specifier: workspace:^
+        version: link:../clipboard-restore
+    devDependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.7(@types/debug@4.1.13)(yaml@2.9.0)
+
+  packages/react-formula-input:
+    dependencies:
+      '@equakit/katex-engine':
+        specifier: workspace:^
+        version: link:../katex-engine
+      '@equakit/react-katex':
+        specifier: workspace:^
+        version: link:../react-katex
+    devDependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.7(@types/debug@4.1.13)(yaml@2.9.0)
+
+  packages/react-katex:
+    dependencies:
+      '@equakit/katex-engine':
+        specifier: workspace:^
+        version: link:../katex-engine
+      '@equakit/math-text':
+        specifier: workspace:^
+        version: link:../math-text
+    devDependencies:
       katex:
         specifier: ^0.18.4
         version: 0.18.4
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.7(@types/debug@4.1.13)(yaml@2.9.0)
+
+  packages/react-markdown-math:
+    dependencies:
+      '@equakit/math-text':
+        specifier: workspace:^
+        version: link:../math-text
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@18.3.31)(react@18.3.1)
@@ -163,6 +393,27 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      vitest:
+        specifier: ^3.2.6
+        version: 3.2.7(@types/debug@4.1.13)(yaml@2.9.0)
+
+  packages/tiptap-math:
+    devDependencies:
+      '@tiptap/core':
+        specifier: ^3.30.1
+        version: 3.30.1(@tiptap/pm@3.30.1)
+      '@tiptap/extension-mathematics':
+        specifier: ^3.30.1
+        version: 3.30.1(@tiptap/core@3.30.1(@tiptap/pm@3.30.1))(@tiptap/pm@3.30.1)(katex@0.18.4)
+      '@tiptap/pm':
+        specifier: ^3.30.1
+        version: 3.30.1
+      '@tiptap/starter-kit':
+        specifier: ^3.30.1
+        version: 3.30.1
+      katex:
+        specifier: ^0.18.4
+        version: 0.18.4
 
 packages:
 

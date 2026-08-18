@@ -1,0 +1,71 @@
+.mre-formula-input {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.mre-formula-input__palette {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.mre-formula-input__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.mre-formula-input__key {
+  border: 1px solid #c9d1d9;
+  border-radius: 6px;
+  background: #fff;
+  color: #24292f;
+  cursor: pointer;
+  font: inherit;
+  min-height: 2rem;
+  padding: 0.3rem 0.55rem;
+}
+
+.mre-formula-input__key:hover {
+  background: #f6f8fa;
+}
+
+.mre-formula-input__key:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mre-formula-input__textarea {
+  border: 1px solid #c9d1d9;
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: #24292f;
+  font: inherit;
+  line-height: 1.5;
+  min-width: 0;
+  padding: 0.6rem 0.7rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.mre-formula-input__preview {
+  border: 1px solid #d8dee4;
+  border-radius: 6px;
+  min-height: 2.5rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.mre-formula-input__preview-label {
+  color: #57606a;
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.mre-formula-input__empty,
+.mre-formula-input__error {
+  color: #6e7781;
+}
+
+.mre-formula-input__error {
+  color: #b42318;
+}

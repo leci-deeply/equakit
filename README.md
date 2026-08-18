@@ -6,8 +6,9 @@
 [API 文档](https://leci-deeply.github.io/equakit/api/) ·
 [GitHub](https://github.com/leci-deeply/equakit)
 
-EquaKit 提供一个与框架无关的核心包，以及一个可选的 React 组件包。它专注于数学内容在
-“源码 → 渲染 → 复制 → 再编辑”链路中的可靠性，同时提供分步答案编辑、选择题判分和异步过期响应保护。
+EquaKit 现在由 16 个原子包和 4 个兼容重导出包组成。文档和示例默认直接面向原子包，
+旧的 `@equakit/core`、`@equakit/react`、`@equakit/adapter-mathlive`、`@equakit/adapter-tiptap`
+只保留兼容重导出，方便迁移，不再作为新的能力边界。
 
 ## 为什么需要 EquaKit
 
@@ -63,23 +64,61 @@ EquaKit 将这些问题拆成纯函数、受控组件和明确的安全边界，
 
 ## 包结构
 
-| 包                          | 职责                                                                  |
-| --------------------------- | --------------------------------------------------------------------- |
-| `@equakit/core`             | 数学归一化、校验、剪贴板恢复、答案步骤、选择题判分、异步过期保护。    |
-| `@equakit/react`            | KaTeX/Markdown 渲染、公式输入、可访问选择题、分步答案编辑和复制边界。 |
-| `@equakit/adapter-mathlive` | 按需加载的 MathLive 结构化数学输入器。                                |
-| `@equakit/adapter-tiptap`   | TipTap inline/block 数学节点、迁移与剪贴板适配。                      |
-| `@equakit/demo`             | 使用合成数据展示完整交互链路的 Vite 示例。                            |
+### 原子包
+
+| 包                             | 职责                                                   |
+| ------------------------------ | ------------------------------------------------------ |
+| `@equakit/answer-steps`        | 分步答案文本解析、格式化与边界删除状态机。             |
+| `@equakit/async-guard`         | 按资源键和 scope 拒绝过期异步结果。                    |
+| `@equakit/choice`              | A-H 选择题答案解析、转换与判分。                       |
+| `@equakit/math-text`           | 数学分隔符归一化、启发式识别和 token 提取。            |
+| `@equakit/katex-engine`        | 基于 KaTeX 的 LaTeX 校验和结构化问题输出。             |
+| `@equakit/clipboard-restore`   | 从富数学 HTML、DOM 和选区恢复 Markdown/LaTeX。         |
+| `@equakit/clipboard-formats`   | 生成多格式数学剪贴板 payload。                         |
+| `@equakit/react-katex`         | 安全渲染单个 LaTeX 公式。                              |
+| `@equakit/react-markdown-math` | 安全渲染 GFM + 数学内容。                              |
+| `@equakit/react-formula-input` | 受控公式输入、公式面板、预览与校验。                   |
+| `@equakit/react-clipboard`     | 数学内容复制、选区序列化和多 MIME 写入。               |
+| `@equakit/react-answer-steps`  | 分步答案编辑和键盘边界交互。                           |
+| `@equakit/react-choice`        | 可访问单选和多选数学选项。                             |
+| `@equakit/mathlive-editor`     | 可选 MathLive 数学输入器。                             |
+| `@equakit/mathlive-formats`    | 基于 MathLive 与 Compute Engine 的多格式剪贴板转换器。 |
+| `@equakit/tiptap-math`         | TipTap 3 数学节点配置、剪贴板选项和迁移。              |
+
+### 兼容包
+
+| 包                          | 说明                                                                                                                                |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `@equakit/core`             | 兼容重导出 `math-text`、`katex-engine`、`clipboard-restore`、`clipboard-formats`、`answer-steps`、`choice` 和 `async-guard`。       |
+| `@equakit/react`            | 兼容重导出 `react-katex`、`react-markdown-math`、`react-formula-input`、`react-clipboard`、`react-answer-steps` 和 `react-choice`。 |
+| `@equakit/adapter-mathlive` | 兼容重导出 `mathlive-editor`，并保留 `./clipboard` 子入口。                                                                         |
+| `@equakit/adapter-tiptap`   | 兼容重导出 `tiptap-math`。                                                                                                          |
 
 ```text
 EquaKit
-├── packages/core        # 与框架无关的 TypeScript 核心
-├── packages/react       # 受控 React 组件
-├── packages/adapter-mathlive # 可选 MathLive 输入 adapter
-├── packages/adapter-tiptap # TipTap 数学节点 adapter
-├── examples/basic       # 交互示例
-├── docs                 # 设计、脱敏、安全和发布文档
-└── scripts              # 发布包与 ESM 入口验证
+├── packages/answer-steps
+├── packages/async-guard
+├── packages/choice
+├── packages/math-text
+├── packages/katex-engine
+├── packages/clipboard-restore
+├── packages/clipboard-formats
+├── packages/react-katex
+├── packages/react-markdown-math
+├── packages/react-formula-input
+├── packages/react-clipboard
+├── packages/react-answer-steps
+├── packages/react-choice
+├── packages/mathlive-editor
+├── packages/mathlive-formats
+├── packages/tiptap-math
+├── packages/core                # 兼容重导出
+├── packages/react               # 兼容重导出
+├── packages/adapter-mathlive    # 兼容重导出
+├── packages/adapter-tiptap      # 兼容重导出
+├── examples/basic               # 直接使用 atomic packages 的演示
+├── docs                         # 设计、技术、依赖和发布文档
+└── scripts                      # 边界、pack 和站点校验
 ```
 
 ## 快速开始
@@ -95,22 +134,22 @@ pnpm check
 单独构建某个包：
 
 ```bash
-pnpm --filter @equakit/core build
-pnpm --filter @equakit/react build
-pnpm --filter @equakit/adapter-mathlive build
-pnpm --filter @equakit/adapter-tiptap build
-pnpm --filter @equakit/demo build
+pnpm --filter @equakit/math-text build
+pnpm --filter @equakit/react-katex build
+pnpm --filter @equakit/mathlive-editor build
+pnpm --filter @equakit/tiptap-math build
 ```
 
-> npm 包尚未公开发布。首次发布完成后，可安装 `@equakit/core`、`@equakit/react` 和按需的
-> MathLive/TipTap adapter。
+> 当前仓库内 20 个 package 都仍是 `private: true`，尚未发布到 npm。仓库外集成时，请按需引入
+> atomic packages；旧包只用于迁移兼容。
 
-## Core 使用示例
+## 原子包使用示例
 
-### 归一化与校验数学内容
+### 数学文本归一化与校验
 
 ```ts
-import { normalizeMarkdownMath, validateMarkdownMath } from '@equakit/core';
+import { normalizeMarkdownMath } from '@equakit/math-text';
+import { validateMarkdownMath } from '@equakit/katex-engine';
 
 const source = String.raw`
 函数值为 \(f(x)=x^2+1\)。
@@ -137,7 +176,7 @@ if (!result.ok) {
 复制或框选后恢复为可编辑 Markdown：
 
 ```ts
-import { richDomToMarkdown, richSelectionToMarkdown } from '@equakit/core';
+import { richDomToMarkdown, richSelectionToMarkdown } from '@equakit/clipboard-restore';
 
 const all = richDomToMarkdown(editorRoot, editorRoot.textContent ?? '');
 
@@ -161,7 +200,7 @@ import {
   mergeStepWithPrevious,
   stepBoundaryDeletionAction,
   stepTextToLines,
-} from '@equakit/core';
+} from '@equakit/answer-steps';
 
 const steps = stepTextToLines('1. 设 x = 1\n2. 所以 x^2 = 1');
 const text = formatStepAnswer({ steps });
@@ -179,7 +218,7 @@ const merged = action === 'merge' ? mergeStepWithPrevious(steps, 1) : steps;
 ### 选择题判分
 
 ```ts
-import { gradeChoiceAnswer, parseChoiceAnswer } from '@equakit/core';
+import { gradeChoiceAnswer, parseChoiceAnswer } from '@equakit/choice';
 
 const expected = parseChoiceAnswer('正确答案：A、C');
 
@@ -194,7 +233,7 @@ if (expected) {
 ### 防止旧异步结果覆盖新状态
 
 ```ts
-import { StaleResponseGuard } from '@equakit/core';
+import { StaleResponseGuard } from '@equakit/async-guard';
 
 const guard = new StaleResponseGuard<string>();
 
@@ -209,17 +248,23 @@ if (guard.isCurrent(snapshot)) {
 
 ## React 使用示例
 
-先引入 KaTeX 和组件样式：
+按需引入对应样式：
 
 ```ts
 import 'katex/dist/katex.min.css';
-import '@equakit/react/styles.css';
+import '@equakit/react-katex/styles.css';
+import '@equakit/react-markdown-math/styles.css';
+import '@equakit/react-formula-input/styles.css';
+import '@equakit/react-clipboard/styles.css';
+import '@equakit/react-answer-steps/styles.css';
+import '@equakit/react-choice/styles.css';
 ```
 
 ### 安全渲染 Markdown 数学内容
 
 ```tsx
-import { MarkdownMath, MathCopyBoundary } from '@equakit/react';
+import { MathCopyBoundary } from '@equakit/react-clipboard';
+import { MarkdownMath } from '@equakit/react-markdown-math';
 
 export function Article() {
   return (
@@ -236,7 +281,7 @@ export function Article() {
 
 ```tsx
 import { useState } from 'react';
-import { FormulaInput } from '@equakit/react';
+import { FormulaInput } from '@equakit/react-formula-input';
 
 export function FormulaEditor() {
   const [value, setValue] = useState(String.raw`\frac{1}{2}`);
@@ -251,8 +296,8 @@ export function FormulaEditor() {
 import 'mathlive/fonts.css';
 
 import { useState } from 'react';
-import { MathLiveFormulaEditor } from '@equakit/adapter-mathlive';
-import { FormulaInput } from '@equakit/react';
+import { MathLiveFormulaEditor } from '@equakit/mathlive-editor';
+import { FormulaInput } from '@equakit/react-formula-input';
 
 export function RichFormulaEditor() {
   const [value, setValue] = useState(String.raw`\frac{1}{2}`);
@@ -261,29 +306,33 @@ export function RichFormulaEditor() {
 }
 ```
 
-MathLive 不进入 React 主包，只有导入 adapter 后才会在浏览器动态加载。高级配置、字体资源
-和安全版本要求见 [`@equakit/adapter-mathlive`](packages/adapter-mathlive/README.md)。
+MathLive 不进入主包，只有导入 `@equakit/mathlive-editor` 后才会在浏览器动态加载。兼容重导出
+`@equakit/adapter-mathlive` 仍可用于旧代码迁移。高级配置、字体资源和安全版本要求见
+[`packages/mathlive-editor/README.md`](packages/mathlive-editor/README.md)。
 
 ### TipTap inline/block 数学节点
 
 ```ts
 import StarterKit from '@tiptap/starter-kit';
-import { createTipTapMathExtensions } from '@equakit/adapter-tiptap';
+import { createTipTapMathExtensions } from '@equakit/tiptap-math';
 
 const extensions = [StarterKit, ...createTipTapMathExtensions()];
 ```
 
-Adapter 复用 TipTap 官方 `inlineMath`/`blockMath` schema 和命令，固定安全 KaTeX 默认值，
-并通过 `TIPTAP_MATH_CLIPBOARD_OPTIONS` 接入 EquaKit 数学复制。完整用法见
-[`@equakit/adapter-tiptap`](packages/adapter-tiptap/README.md)。
+`@equakit/tiptap-math` 复用 TipTap 官方 `inlineMath` / `blockMath` schema 和命令，固定安全 KaTeX
+默认值，并通过 `TIPTAP_MATH_CLIPBOARD_OPTIONS` 接入 EquaKit 数学复制。兼容重导出
+`@equakit/adapter-tiptap` 仍可用于旧代码迁移。
 
 ### 多格式公式复制
 
 ```tsx
-import { mathLiveClipboardConverter } from '@equakit/adapter-mathlive/clipboard';
-import { MathCopyBoundary, MathFormula } from '@equakit/react';
+import { MathCopyBoundary } from '@equakit/react-clipboard';
+import { MathFormula } from '@equakit/react-katex';
+import { createMathLiveClipboardConverter } from '@equakit/mathlive-formats';
 
-<MathCopyBoundary converter={mathLiveClipboardConverter}>
+const converter = createMathLiveClipboardConverter();
+
+<MathCopyBoundary converter={converter}>
   <MathFormula expression={'\\frac{1}{2}'} />
 </MathCopyBoundary>;
 ```
@@ -296,14 +345,14 @@ import { MathCopyBoundary, MathFormula } from '@equakit/react';
 - `text/asciimath`：AsciiMath；
 - `application/vnd.equakit.mathjson+json`：MathJSON。
 
-混合正文或多个公式时只写入 `text/plain`，不会把整段内容错误转换成单个表达式。
-MathML 是 IANA 注册类型；其余数学 MIME 是兼容或 EquaKit 私有格式，可能被原生应用过滤。
+混合正文或多个公式时只写入 `text/plain`，不会把整段内容错误转换成单个表达式。MathML 是
+IANA 注册类型；其余数学 MIME 是兼容或 EquaKit 私有格式，可能被原生应用过滤。
 
 ### 分步答案编辑
 
 ```tsx
 import { useState } from 'react';
-import { AnswerStepsEditor } from '@equakit/react';
+import { AnswerStepsEditor } from '@equakit/react-answer-steps';
 
 export function SolutionEditor() {
   const [steps, setSteps] = useState(['展开多项式。', '合并同类项。']);
@@ -316,7 +365,7 @@ export function SolutionEditor() {
 
 ```tsx
 import { useState } from 'react';
-import { InteractiveChoices } from '@equakit/react';
+import { InteractiveChoices } from '@equakit/react-choice';
 
 export function ChoiceExample() {
   const [selected, setSelected] = useState<string[]>([]);
@@ -354,9 +403,11 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - 使用 [react-markdown](https://github.com/remarkjs/react-markdown)、
   [remark-math](https://github.com/remarkjs/remark-math) 和
   [rehype-katex](https://github.com/remarkjs/remark-math) 作为 Markdown 数学管线；
-- 已用独立可选 adapter 接入 [MathLive](https://github.com/arnog/mathlive)，不增加 React 主包体积；
+- 已用独立可选的 `@equakit/mathlive-editor` 接入 [MathLive](https://github.com/arnog/mathlive)，
+  不增加 React 主包体积；兼容重导出 `@equakit/adapter-mathlive` 仍保留用于旧代码迁移；
 - 已为 [TipTap Mathematics](https://tiptap.dev/docs/editor/extensions/nodes/mathematics)
-  提供 inline/block math node、迁移和剪贴板适配；
+  提供 `@equakit/tiptap-math` 的 inline/block math node、迁移和剪贴板适配；兼容重导出
+  `@equakit/adapter-tiptap` 仍保留用于旧代码迁移；
 - AST 级处理将作为可选的 [unified-latex](https://github.com/siefkenj/unified-latex) 集成，
   不进入默认运行时。
 
@@ -367,11 +418,11 @@ EquaKit 不试图替代完整数学编辑器，而是提供轻量、可组合的
 - Prettier 格式检查；
 - ESLint 静态检查；
 - TypeScript 类型检查；
-- 55 个 Vitest 测试；
-- 11 个 Playwright Chromium 测试，覆盖 KaTeX 截图回归、站点导航、多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描；
+- 65 个 Vitest 测试；
+- 11 个 Playwright Chromium 测试，覆盖 KaTeX 截图回归、站点导航、多 MIME 复制、光标、IME、MathLive、TipTap、键盘和 axe 无障碍扫描，且视觉截图回归完全一致；
 - TypeDoc 多入口 API 校验；
 - Playground + API 静态站点构建、相对路径和脱敏验证；
-- core、React 和 Demo 构建；
+- 原子包、兼容包和 Demo 构建；
 - 构建后 ESM 入口动态导入；
 - npm tarball 文件白名单与 workspace 协议检查；
 - 生产依赖许可证清单；
@@ -398,8 +449,8 @@ pnpm check
 - [x] 添加 MIT License；
 - [x] 创建 npm `equakit` 组织并校准 GitHub 与包清单元数据；
 - [x] 增加真实浏览器复制、光标、IME 和无障碍测试；
-- [x] 为 `FormulaInput` 增加可选 MathLive adapter；
-- [x] 提供 TipTap inline/block math node adapter；
+- [x] 为 `FormulaInput` 增加可选 MathLive editor；
+- [x] 提供 TipTap inline/block math package；
 - [x] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
 - [x] 增加自动 API 文档和在线 playground；
 - [x] 升级到 KaTeX `0.18.4` 并执行持续视觉回归。

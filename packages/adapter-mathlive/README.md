@@ -1,5 +1,8 @@
 # @equakit/adapter-mathlive
 
+> 兼容聚合包：编辑器实现已经迁移到 `@equakit/mathlive-editor`，多格式转换已经迁移到
+> `@equakit/mathlive-formats`。本包仅保留旧入口和 `./clipboard` 子路径的重导出。
+
 为 `@equakit/react` 的 `FormulaInput` 提供可选 MathLive 数学输入器。
 
 这个包不会改变 `FormulaInput` 的受控 `value/onChange` 模型，也不会让 MathLive 进入

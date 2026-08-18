@@ -1,0 +1,55 @@
+{
+  "name": "@equakit/clipboard-formats",
+  "version": "0.1.0",
+  "description": "EquaKit 多格式数学剪贴板 payload 工具",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "leci",
+    "url": "https://github.com/leci-deeply"
+  },
+  "homepage": "https://github.com/leci-deeply/equakit/tree/main/packages/clipboard-formats#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leci-deeply/equakit.git",
+    "directory": "packages/clipboard-formats"
+  },
+  "bugs": {
+    "url": "https://github.com/leci-deeply/equakit/issues"
+  },
+  "keywords": [
+    "math",
+    "latex",
+    "clipboard",
+    "mathml",
+    "asciimath",
+    "mathjson",
+    "typescript"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@equakit/math-text": "workspace:^"
+  }
+}

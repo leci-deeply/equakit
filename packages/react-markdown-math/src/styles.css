@@ -1,0 +1,19 @@
+.mre-markdown-math {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.mre-markdown-math :where(p, ul, ol, blockquote, pre, table) {
+  margin: 0.65rem 0;
+}
+
+.mre-markdown-math :where(table) {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.mre-markdown-math :where(th, td) {
+  border: 1px solid #d8dee4;
+  padding: 0.4rem 0.55rem;
+  vertical-align: top;
+}

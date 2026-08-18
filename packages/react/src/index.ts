@@ -2,28 +2,32 @@ export {
   AnswerStepsEditor,
   getStepBoundaryAction,
   mergeStepAtBoundary,
-} from './AnswerStepsEditor.js';
+} from '@equakit/react-answer-steps';
 export type {
   AnswerStepsEditorProps,
   StepBoundaryAction,
   StepBoundaryKey,
   StepBoundaryState,
-} from './AnswerStepsEditor.js';
+} from '@equakit/react-answer-steps';
 export {
   createCoreMathClipboardSerializer,
   MathCopyBoundary,
   normalizeClipboardText,
   serializeRenderedMath,
   useMathClipboard,
-} from './clipboard.js';
+} from '@equakit/react-clipboard';
 export type {
   CoreMathSerializationModule,
   MathClipboardSerializer,
   MathClipboardSerializerInput,
   MathCopyBoundaryProps,
   UseMathClipboardOptions,
-} from './clipboard.js';
-export { DEFAULT_FORMULA_PALETTE, FormulaInput, insertFormulaSnippet } from './FormulaInput.js';
+} from '@equakit/react-clipboard';
+export {
+  DEFAULT_FORMULA_PALETTE,
+  FormulaInput,
+  insertFormulaSnippet,
+} from '@equakit/react-formula-input';
 export type {
   FormulaInputEditorComponent,
   FormulaInputEditorHandle,
@@ -31,13 +35,13 @@ export type {
   FormulaInputProps,
   FormulaPaletteGroup,
   FormulaPaletteKey,
-} from './FormulaInput.js';
-export { InteractiveChoices } from './InteractiveChoices.js';
-export type { InteractiveChoice, InteractiveChoicesProps } from './InteractiveChoices.js';
-export { MarkdownMath, safeUrlTransform } from './MarkdownMath.js';
-export type { MarkdownMathProps } from './MarkdownMath.js';
-export { MathFormula } from './MathFormula.js';
-export type { MathFormulaProps } from './MathFormula.js';
+} from '@equakit/react-formula-input';
+export { InteractiveChoices } from '@equakit/react-choice';
+export type { InteractiveChoice, InteractiveChoicesProps } from '@equakit/react-choice';
+export { MarkdownMath, safeUrlTransform } from '@equakit/react-markdown-math';
+export type { MarkdownMathProps } from '@equakit/react-markdown-math';
+export { MathFormula } from '@equakit/react-katex';
+export type { MathFormulaProps } from '@equakit/react-katex';
 export {
   createMathClipboardPayload,
   extractMathTokens,
