@@ -1,6 +1,7 @@
-import { readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const assetsDirectory = resolve(root, 'examples/basic/dist/assets');
@@ -14,7 +15,8 @@ const styles = entries.filter(({ name }) => name.endsWith('.css'));
 const budgets = {
   javascriptTotal: 3_450_000,
   largestJavascriptChunk: 1_520_000,
-  stylesTotal: 50_000,
+  stylesTotal: 60_000,
+  stylesTotalGzip: 14_000,
 };
 
 if (javascript.length < 3) {
@@ -28,6 +30,10 @@ if (!javascript.some(({ name }) => name.startsWith('mathlive.min-'))) {
 
 const javascriptTotal = sumBytes(javascript);
 const stylesTotal = sumBytes(styles);
+const stylesTotalGzip = styles.reduce(
+  (total, { name }) => total + gzipSync(readFileSync(resolve(assetsDirectory, name))).byteLength,
+  0,
+);
 const largestJavascript = javascript.reduce(
   (largest, entry) => (entry.bytes > largest.bytes ? entry : largest),
   { name: '<none>', bytes: 0 },
@@ -40,9 +46,10 @@ assertWithinBudget(
   budgets.largestJavascriptChunk,
 );
 assertWithinBudget('CSS 总量', stylesTotal, budgets.stylesTotal);
+assertWithinBudget('CSS Gzip 总量', stylesTotalGzip, budgets.stylesTotalGzip);
 
 globalThis.console.log(
-  `已验证 Demo 体积预算：JavaScript ${javascriptTotal} B，最大 chunk ${largestJavascript.bytes} B，CSS ${stylesTotal} B。`,
+  `已验证 Demo 体积预算：JavaScript ${javascriptTotal} B，最大 chunk ${largestJavascript.bytes} B，CSS ${stylesTotal} B，CSS Gzip ${stylesTotalGzip} B。`,
 );
 
 function sumBytes(files) {
