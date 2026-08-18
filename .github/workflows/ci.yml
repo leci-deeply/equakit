@@ -158,16 +158,7 @@ jobs:
           typecheck
       - name: React 包测试
         working-directory: ${{ runner.temp }}/react-compat
-        run: >
-          pnpm
-          --filter @equakit/react-katex
-          --filter @equakit/react-markdown-math
-          --filter @equakit/react-formula-input
-          --filter @equakit/react-clipboard
-          --filter @equakit/react-answer-steps
-          --filter @equakit/react-choice
-          --filter @equakit/mathlive-editor
-          test
+        run: pnpm test
 
   browser-compat:
     name: Firefox / WebKit 兼容
