@@ -453,18 +453,6 @@ pnpm check
 - 富文本选区恢复依赖浏览器的 `DOMParser`、`Selection` 和 `Range`；
 - 浏览器 API 不可用时自动回退为规范化纯文本。
 
-## 路线图
-
-- [x] 添加 MIT License；
-- [x] 创建 npm `equakit` 组织并校准 GitHub 与包清单元数据；
-- [x] 增加真实浏览器复制、光标、IME 和无障碍测试；
-- [x] 为 `FormulaInput` 增加可选 MathLive editor；
-- [x] 提供 TipTap inline/block math package；
-- [x] 增加 LaTeX、MathML、AsciiMath、MathJSON 多格式剪贴板输出；
-- [x] 增加自动 API 文档和在线 playground；
-- [x] 升级到 KaTeX `0.18.4` 并执行持续视觉回归。
-- [ ] 发布 `0.1.0` 到 npm；当前仍保持 private 并暂缓发布。
-
 ## 文档
 
 - [技术实现与技术选型说明](docs/TECHNICAL_GUIDE.md)
