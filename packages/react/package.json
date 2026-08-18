@@ -47,7 +47,7 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && node ../../scripts/build-react-compat-styles.mjs",
+    "build": "node ../../scripts/clean-package-dist.mjs && tsc -p tsconfig.json && node ../../scripts/build-react-compat-styles.mjs",
     "typecheck": "tsc -p tsconfig.typecheck.json"
   },
   "dependencies": {
@@ -60,11 +60,14 @@
     "@equakit/react-markdown-math": "workspace:^"
   },
   "peerDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
   },
   "devDependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

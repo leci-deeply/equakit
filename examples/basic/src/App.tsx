@@ -202,18 +202,29 @@ function TipTapMathDemo() {
       <div className="demo-actions" role="toolbar" aria-label="TipTap 数学节点操作">
         <button
           disabled={!editor}
-          onClick={() =>
-            editor?.chain().focus('end').insertInlineMath({ latex: '\\sqrt{x}' }).run()
-          }
+          onClick={() => {
+            if (!editor) return;
+            const paragraphEnd = Math.max(1, (editor.state.doc.firstChild?.nodeSize ?? 2) - 1);
+            const inserted = editor.commands.insertInlineMath({
+              latex: '\\sqrt{x}',
+              pos: paragraphEnd,
+            });
+            if (inserted) editor.commands.focus();
+          }}
           type="button"
         >
           插入行内公式
         </button>
         <button
           disabled={!editor}
-          onClick={() =>
-            editor?.chain().focus('end').insertBlockMath({ latex: '\\sum_{i=1}^{n} i' }).run()
-          }
+          onClick={() => {
+            if (!editor) return;
+            const inserted = editor.commands.insertBlockMath({
+              latex: '\\sum_{i=1}^{n} i',
+              pos: editor.state.doc.content.size,
+            });
+            if (inserted) editor.commands.focus();
+          }}
           type="button"
         >
           插入块级公式

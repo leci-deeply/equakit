@@ -18,7 +18,12 @@ test('Playground 提供 API 文档和 GitHub 导航', async ({ page }) => {
   );
 });
 
-test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ page }) => {
+test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ page, browserName }) => {
+  test.skip(
+    browserName !== 'chromium',
+    'Firefox 和 WebKit 在 Playwright 中没有稳定开放系统剪贴板 readText() 权限。',
+  );
+
   const card = page.locator('article').filter({
     has: page.getByRole('heading', { name: 'Markdown 与复制恢复' }),
   });
@@ -46,20 +51,6 @@ test('单公式复制写入 LaTeX、MathML、AsciiMath 和 MathJSON MIME', async
   await expect(card.getByRole('status')).toHaveText('多格式转换器已加载。');
   const formula = card.getByRole('math', { name: '二分之一' });
 
-  await page.evaluate(() => {
-    document.addEventListener(
-      'copy',
-      (event) => {
-        if (!(event instanceof ClipboardEvent) || !event.clipboardData) return;
-        const payload: Record<string, string> = {};
-        for (const mimeType of event.clipboardData.types) {
-          payload[mimeType] = event.clipboardData.getData(mimeType);
-        }
-        Object.assign(globalThis, { __equakitClipboardPayload: payload });
-      },
-      { once: true },
-    );
-  });
   await formula.evaluate((element) => {
     const selection = document.getSelection();
     const range = document.createRange();
@@ -67,29 +58,21 @@ test('单公式复制写入 LaTeX、MathML、AsciiMath 和 MathJSON MIME', async
     selection?.removeAllRanges();
     selection?.addRange(range);
   });
-  await page.keyboard.press('ControlOrMeta+C');
+  const captured = await formula.evaluate((element) => {
+    const clipboardData = new DataTransfer();
+    const event = new Event('copy', {
+      bubbles: true,
+      cancelable: true,
+    }) as ClipboardEvent;
+    Object.defineProperty(event, 'clipboardData', { value: clipboardData });
+    element.dispatchEvent(event);
 
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () =>
-          (
-            globalThis as typeof globalThis & {
-              __equakitClipboardPayload?: Record<string, string>;
-            }
-          ).__equakitClipboardPayload,
-      ),
-    )
-    .not.toBeUndefined();
-
-  const captured = await page.evaluate(
-    () =>
-      (
-        globalThis as typeof globalThis & {
-          __equakitClipboardPayload?: Record<string, string>;
-        }
-      ).__equakitClipboardPayload ?? {},
-  );
+    const payload: Record<string, string> = {};
+    for (const mimeType of clipboardData.types) {
+      payload[mimeType] = clipboardData.getData(mimeType);
+    }
+    return payload;
+  });
   expect(captured['text/plain']).toBe('\\(\\frac{1}{2}\\)');
   expect(captured['application/x-latex']).toBe('\\frac{1}{2}');
   expect(captured['application/mathml+xml']).toContain('<math');
@@ -121,7 +104,9 @@ test('公式面板在当前选区插入片段并把光标放进占位符', async
   await expect(textarea).toHaveValue('a\\frac{1}{}b');
 });
 
-test('Chromium IME composition 期间保持受控输入值并正常提交中文', async ({ page }) => {
+test('Chromium IME composition 期间保持受控输入值并正常提交中文', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'CDP Input.imeSetComposition 只适用于 Chromium。');
+
   const textarea = page.getByRole('textbox', { name: '公式源码', exact: true });
   await textarea.fill('');
   await textarea.focus();
@@ -217,7 +202,7 @@ test('MathLive adapter 按需加载并使用结构化占位符插入公式', asy
   expect(failedAssets).toEqual([]);
 });
 
-test('TipTap adapter 渲染并插入 inline/block 数学节点且支持 EquaKit 复制', async ({ page }) => {
+test('TipTap adapter 渲染并插入 inline/block 数学节点', async ({ page }) => {
   const card = page.locator('article').filter({
     has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
   });
@@ -245,6 +230,21 @@ test('TipTap adapter 渲染并插入 inline/block 数学节点且支持 EquaKit 
       blockMath.evaluateAll((elements) => elements.map((element) => element.dataset.latex)),
     )
     .toContain('\\sum_{i=1}^{n} i');
+});
+
+test('TipTap adapter 支持 EquaKit 剪贴板复制', async ({ page, browserName }) => {
+  test.skip(
+    browserName !== 'chromium',
+    'Firefox 和 WebKit 在 Playwright 中没有稳定开放系统剪贴板 readText() 权限。',
+  );
+
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
+  });
+  const editor = card.getByRole('textbox', { name: 'TipTap 数学编辑器' });
+
+  await card.getByRole('button', { name: '插入块级公式' }).click();
+  await expect(editor.locator('[data-type="block-math"]')).toHaveCount(2);
 
   await editor.focus();
   await page.keyboard.press('ControlOrMeta+A');

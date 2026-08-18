@@ -1,0 +1,44 @@
+name: 功能建议
+description: 提议新的 EquaKit 能力或改进。
+title: '[功能]: '
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 使用场景
+      description: 说明你正在解决的真实问题或工作流。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案
+      description: 描述你希望 EquaKit 提供的 API、组件或行为。
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 已考虑的替代方案
+      description: 如果已有临时方案或替代库，请说明限制。
+  - type: dropdown
+    id: surface
+    attributes:
+      label: 影响范围
+      options:
+        - 纯函数包
+        - React 组件
+        - 剪贴板 / 浏览器能力
+        - 文档 / 示例
+        - 不确定
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我理解当前 0.1.0 尚未发布到 npm，所有 workspace package 仍保持 private。
+          required: true

@@ -44,19 +44,22 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node ../../scripts/clean-package-dist.mjs && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.typecheck.json",
     "test": "vitest run --root ../.. packages/mathlive-editor/test"
   },
   "peerDependencies": {
     "@equakit/react-formula-input": "^0.1.0",
     "mathlive": "^0.110.0",
-    "react": "^18.3.1"
+    "react": "^18.3.1 || ^19.0.0"
   },
   "devDependencies": {
     "@equakit/react-formula-input": "workspace:^",
     "mathlive": "^0.110.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
