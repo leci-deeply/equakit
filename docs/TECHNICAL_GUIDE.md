@@ -1,7 +1,7 @@
 # EquaKit 技术实现与技术选型说明
 
 > 面向希望理解、集成或贡献 EquaKit 的开发者。<br>
-> 本文只描述当前代码已经实现的能力；路线图功能会明确标注为“尚未实现”。
+> 本文只描述当前代码已经实现的能力和已知局限。
 
 ## 1. 项目解决的问题
 
@@ -639,52 +639,7 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 - npm `equakit` 组织与 `@equakit` scope 已创建；package 已补齐 GitHub、作者和公开发布
   策略元数据，但在首次发布准备完成前仍保持 private。
 
-## 23. 演进路线
-
-### P0：开源治理
-
-- 确认贡献者署名；
-- 首次发布前通过 npm CLI 或可信发布再次验证 `@equakit` 写权限；
-- 已启用 GitHub Private Vulnerability Reporting 并更新公开安全联系渠道；
-- 已启用 Dependabot、密钥扫描、push protection 和 CodeQL JavaScript/TypeScript 扫描。
-
-### P1：真实浏览器和无障碍
-
-- 已加入 Playwright Chromium、Firefox、WebKit 与 axe 测试；
-- 已覆盖 Selection/Range/ClipboardEvent、系统剪贴板、光标和 IME composition；
-- 已补 fieldset legend、math role、toolbar group 和 preview region；
-- aria-live；
-- VoiceOver/NVDA 测试。
-
-### P2：可选 adapter
-
-```text
-@equakit/mathlive-editor（已实现）
-@equakit/mathlive-formats（已实现）
-@equakit/tiptap-math（已实现）
-@equakit/adapter-unified-latex
-@equakit/adapter-mathjax
-```
-
-### P3：多格式
-
-- LaTeX（已实现）；
-- Markdown preset；
-- MathML（已实现）；
-- AsciiMath（已实现）；
-- MathJSON（已实现）；
-- 多 MIME clipboard（已实现）。
-
-### P4：开发者体验
-
-- TypeDoc（已实现）；
-- 在线 playground（已实现）；
-- CHANGELOG（已实现）；
-- Changesets/semantic-release；
-- bundle size CI（已实现 Demo 产物预算）；
-- subpath exports。
-
-## 24. 技术决策总结
+## 23. 技术决策总结
 
 | 领域     | 当前选择                                    | 原因                       | 未来增强                        |
 | -------- | ------------------------------------------- | -------------------------- | ------------------------------- |
@@ -700,7 +655,7 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 | 测试     | Vitest + Playwright + axe                   | 单元、三浏览器与无障碍规则 | 屏幕阅读器和真实输入法矩阵      |
 | 构建     | tsc + Vite Demo                             | 保留模块边界               | tsup/Rollup 按需引入            |
 
-## 25. 结论
+## 24. 结论
 
 EquaKit 当前的技术路线不是为了比 MathLive、MathJax、TipTap 或 unified-latex 更完整，而是为了提供轻量、可组合、安全默认的数学内容基础能力。
 
