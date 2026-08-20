@@ -23,4 +23,14 @@ describe('@equakit/react-markdown-math', () => {
     expect(safeUrlTransform('/docs')).toBe('/docs');
     expect(safeUrlTransform('./local')).toBe('./local');
   });
+
+  it('按需启用公式溢出提示且默认不改变根容器模式', () => {
+    const enabled = renderToStaticMarkup(
+      <MarkdownMath overflowIndicator="hover-scrollbar">{'$x^2$'}</MarkdownMath>,
+    );
+    const disabled = renderToStaticMarkup(<MarkdownMath>{'$x^2$'}</MarkdownMath>);
+
+    expect(enabled).toContain('mre-markdown-math--overflow-aware');
+    expect(disabled).not.toContain('mre-markdown-math--overflow-aware');
+  });
 });

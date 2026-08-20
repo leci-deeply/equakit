@@ -707,6 +707,46 @@ button {
   text-align: center;
 }
 
+.demo-formula-layout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.demo-formula-layout__sample {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--soft);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.demo-formula-layout__sample h3,
+.demo-formula-layout__sample p {
+  margin: 0;
+}
+
+.demo-formula-layout__sample h3 {
+  margin-bottom: 0.5rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+
+.demo-formula-layout__sample .mre-math-formula--display {
+  margin: 0;
+}
+
+.demo-formula-layout__sample .mre-markdown-math p {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .demo-formula-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;
