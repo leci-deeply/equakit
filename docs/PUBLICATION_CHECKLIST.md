@@ -43,7 +43,7 @@
 - [x] npm maintainer 已确认为 `leci0099`；存在真实赞助入口时再补 funding。
 - [x] 已创建 npm `equakit` 组织并取得 `@equakit` package scope。
 - [x] 已通过 npm CLI 验证 `leci0099` 是 `equakit` organization owner。
-- [ ] npm maintainer 账号启用发布所需的 2FA；当前 CLI 检查结果为 `tfa: false`。
+- [x] npm maintainer 账号已启用 `auth-and-writes` 2FA。
 - [x] `pnpm release:formula:dry-run` 已验证 4 个公开包的最终 tarball 和 public access。
 - [x] 已启用 `main` 分支保护、必需 `check`、管理员约束、密钥扫描和 push protection。
 - [x] 已加入 Dependabot npm 和 GitHub Actions 更新配置。
