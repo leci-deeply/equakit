@@ -385,6 +385,78 @@ button {
   color: var(--muted);
 }
 
+.demo-formula-workbench {
+  display: grid;
+  grid-template-areas:
+    'editor keyboard'
+    'error keyboard';
+  grid-template-columns: minmax(0, 7fr) minmax(18rem, 5fr);
+  gap: 0.75rem 1rem;
+  align-items: stretch;
+}
+
+.demo-formula-workbench > [data-equakit-mathlive-host='true'] {
+  display: flex;
+  grid-area: editor;
+  min-width: 0;
+}
+
+.demo-formula-workbench .mre-formula-input__textarea {
+  width: 100%;
+  min-height: 15rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid var(--soft-strong);
+  border-radius: 10px;
+  background: #fff;
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+}
+
+.demo-formula-workbench .mre-formula-input__textarea:focus-within {
+  border-color: var(--accent);
+  outline: 2px solid rgba(139, 94, 52, 0.22);
+  outline-offset: 2px;
+}
+
+.demo-formula-workbench .mre-formula-input__palette {
+  grid-area: keyboard;
+  align-content: start;
+  padding: 0.85rem;
+  border: 1px solid var(--soft);
+  border-radius: 10px;
+  background: #faf9f6;
+}
+
+.demo-formula-workbench .mre-formula-input__palette::before {
+  content: '公式键盘';
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.demo-formula-workbench .mre-formula-input__group {
+  gap: 0.4rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--soft);
+}
+
+.demo-formula-workbench .mre-formula-input__group::before {
+  content: attr(aria-label);
+  flex-basis: 100%;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.demo-formula-workbench .mre-formula-input__key {
+  min-width: 2.5rem;
+  min-height: 2.35rem;
+}
+
+.demo-formula-workbench > .mre-formula-input__error {
+  grid-area: error;
+}
+
 .demo-card table {
   width: 100%;
   margin-top: 1rem;
@@ -544,6 +616,18 @@ button {
 @media (max-width: 760px) {
   .demo-formula-layout {
     grid-template-columns: 1fr;
+  }
+
+  .demo-formula-workbench {
+    grid-template-areas:
+      'editor'
+      'keyboard'
+      'error';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .demo-formula-workbench .mre-formula-input__textarea {
+    min-height: 10rem;
   }
 }
 

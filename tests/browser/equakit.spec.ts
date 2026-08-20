@@ -167,72 +167,7 @@ test('单公式复制写入 LaTeX、MathML、AsciiMath 和 MathJSON MIME', async
   expect(JSON.parse(captured['application/vnd.equakit.mathjson+json'] ?? 'null')).toBeTruthy();
 });
 
-test('公式面板在当前选区插入片段并把光标放进占位符', async ({ page }) => {
-  const card = page.locator('article').filter({
-    has: page.getByRole('heading', { name: '公式输入', exact: true }),
-  });
-  const textarea = card.getByRole('textbox', { name: '公式源码' });
-  await textarea.fill('ab');
-  await textarea.evaluate((element) => {
-    (element as HTMLTextAreaElement).setSelectionRange(1, 1);
-  });
-
-  await card.getByRole('button', { name: '分式', exact: true }).click();
-
-  await expect(textarea).toHaveValue('a\\frac{}{}b');
-  await expect(textarea).toHaveJSProperty('selectionStart', 7);
-  await expect(textarea).toHaveJSProperty('selectionEnd', 7);
-
-  await textarea.pressSequentially('1');
-  await expect(textarea).toHaveValue('a\\frac{1}{}b');
-});
-
-test('Chromium IME composition 期间保持受控输入值并正常提交中文', async ({ page, browserName }) => {
-  test.skip(browserName !== 'chromium', 'CDP Input.imeSetComposition 只适用于 Chromium。');
-
-  const textarea = page.getByRole('textbox', { name: '公式源码', exact: true });
-  await textarea.fill('');
-  await textarea.focus();
-  await textarea.evaluate((element) => {
-    const events: string[] = [];
-    for (const type of ['compositionstart', 'compositionupdate', 'compositionend']) {
-      element.addEventListener(type, () => events.push(type));
-    }
-    Object.assign(globalThis, { __equakitImeEvents: events });
-  });
-
-  const session = await page.context().newCDPSession(page);
-  await session.send('Input.imeSetComposition', {
-    replacementEnd: 0,
-    replacementStart: 0,
-    selectionEnd: 2,
-    selectionStart: 2,
-    text: '函数',
-  });
-  await expect(textarea).toHaveValue('函数');
-
-  await session.send('Input.imeSetComposition', {
-    replacementEnd: 2,
-    replacementStart: 0,
-    selectionEnd: 3,
-    selectionStart: 3,
-    text: '函数值',
-  });
-  await expect(textarea).toHaveValue('函数值');
-
-  await session.send('Input.insertText', { text: '函数值' });
-  await expect(textarea).toHaveValue('函数值');
-  const events = await page.evaluate(
-    () =>
-      (globalThis as typeof globalThis & { __equakitImeEvents?: string[] }).__equakitImeEvents ??
-      [],
-  );
-  expect(events[0]).toBe('compositionstart');
-  expect(events.at(-1)).toBe('compositionend');
-  expect(events.filter((event) => event === 'compositionupdate').length).toBeGreaterThanOrEqual(2);
-});
-
-test('MathLive adapter 按需加载并使用结构化占位符插入公式', async ({ page }) => {
+test('可视化输入区与公式键盘左右排列并直接插入公式', async ({ page }) => {
   const failedAssets: string[] = [];
   page.on('response', (response) => {
     if (response.status() >= 400 && /\/(?:fonts|sounds)\//.test(response.url())) {
@@ -242,11 +177,12 @@ test('MathLive adapter 按需加载并使用结构化占位符插入公式', asy
   await page.reload();
 
   const card = page.locator('article').filter({
-    has: page.getByRole('heading', { name: 'MathLive 可选输入' }),
+    has: page.getByRole('heading', { name: '公式键盘输入' }),
   });
   const mathfield = card.locator('math-field');
+  const keyboard = card.getByRole('toolbar', { name: '公式面板' });
 
-  await expect(mathfield).toHaveAttribute('aria-label', 'MathLive 公式源码');
+  await expect(mathfield).toHaveAttribute('aria-label', '可视化公式输入区');
   await expect(mathfield).toHaveAttribute('role', 'group');
   await expect(mathfield).not.toHaveAttribute('contenteditable');
   await expect
@@ -255,10 +191,18 @@ test('MathLive adapter 按需加载并使用结构化占位符插入公式', asy
         element.shadowRoot?.querySelector('[part~="keyboard-sink"]')?.getAttribute('aria-label'),
       ),
     )
-    .toBe('MathLive 公式源码');
+    .toBe('可视化公式输入区');
   await expect
     .poll(() => mathfield.evaluate((element) => (element as BrowserMathfieldElement).value))
     .toBe('\\sum_{k=1}^{n}k=\\frac{n(n+1)}{2}');
+
+  const [inputBox, keyboardBox] = await Promise.all([
+    mathfield.boundingBox(),
+    keyboard.boundingBox(),
+  ]);
+  expect(inputBox).not.toBeNull();
+  expect(keyboardBox).not.toBeNull();
+  expect(inputBox!.x + inputBox!.width).toBeLessThanOrEqual(keyboardBox!.x);
 
   await mathfield.evaluate((element) => {
     (element as BrowserMathfieldElement).setValue('', { silenceNotifications: true });
@@ -281,7 +225,7 @@ test('MathLive adapter 按需加载并使用结构化占位符插入公式', asy
   await expect
     .poll(() => mathfield.evaluate((element) => (element as BrowserMathfieldElement).value))
     .toContain('1');
-  await expect(card.getByRole('region', { name: 'MathLive 预览' })).toContainText('1');
+  await expect(card.getByRole('region', { name: '预览' })).toHaveCount(0);
   expect(failedAssets).toEqual([]);
 });
 
@@ -359,9 +303,9 @@ test('Playground 不展示选择题示例', async ({ page }) => {
 });
 
 test('页面通过自动无障碍规则扫描且关键控件具有可访问名称', async ({ page }) => {
-  await expect(page.getByRole('toolbar', { name: '公式面板' })).toHaveCount(2);
-  await expect(page.getByRole('group', { name: '常用' })).toHaveCount(2);
-  await expect(page.getByRole('region', { name: '预览', exact: true })).toBeVisible();
+  await expect(page.getByRole('toolbar', { name: '公式面板' })).toHaveCount(1);
+  await expect(page.getByRole('group', { name: '常用' })).toHaveCount(1);
+  await expect(page.getByRole('group', { name: '可视化公式输入区' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: '步骤 1' })).toBeVisible();
 
   const results = await new AxeBuilder({ page }).analyze();

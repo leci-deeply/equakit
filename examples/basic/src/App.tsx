@@ -38,10 +38,7 @@ const longFormula = String.raw`\displaystyle \sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\
 const copyFormula = String.raw`\int_0^\infty e^{-x^2}\,\mathrm{d}x=\frac{\sqrt{\pi}}{2}`;
 
 export function App() {
-  const [formula, setFormula] = useState(String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`);
-  const [mathLiveFormula, setMathLiveFormula] = useState(
-    String.raw`\sum_{k=1}^{n}k=\frac{n(n+1)}{2}`,
-  );
+  const [formula, setFormula] = useState(String.raw`\sum_{k=1}^{n}k=\frac{n(n+1)}{2}`);
   const [steps, setSteps] = useState([
     String.raw`将 $x^2-5x+6=0$ 分解为 $(x-2)(x-3)=0$。`,
     String.raw`由零乘积性质得到 $x-2=0$ 或 $x-3=0$。`,
@@ -118,33 +115,25 @@ export function App() {
             <FormulaLayoutDemos />
           </article>
 
-          <article className="demo-card demo-card--span-4">
+          <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
               <span className="demo-card__index">04</span>
-              <span className="demo-card__spec">输入 / 预览</span>
+              <span className="demo-card__spec">可视化输入 / 公式键盘</span>
             </header>
-            <h2>公式输入</h2>
-            <FormulaInput onChange={setFormula} value={formula} />
-          </article>
-
-          <article className="demo-card demo-card--span-4">
-            <header className="demo-card__header">
-              <span className="demo-card__index">05</span>
-              <span className="demo-card__spec">MathLive / 可选</span>
-            </header>
-            <h2>MathLive 可选输入</h2>
+            <h2>公式键盘输入</h2>
             <FormulaInput
+              className="demo-formula-workbench"
               editor={MathLiveFormulaEditor}
-              onChange={setMathLiveFormula}
-              previewLabel="MathLive 预览"
-              textareaLabel="MathLive 公式源码"
-              value={mathLiveFormula}
+              hidePreview
+              onChange={setFormula}
+              textareaLabel="可视化公式输入区"
+              value={formula}
             />
           </article>
 
-          <article className="demo-card demo-card--span-4">
+          <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
-              <span className="demo-card__index">06</span>
+              <span className="demo-card__index">05</span>
               <span className="demo-card__spec">TipTap / 节点</span>
             </header>
             <h2>TipTap inline/block 数学节点</h2>
@@ -153,7 +142,7 @@ export function App() {
 
           <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
-              <span className="demo-card__index">07</span>
+              <span className="demo-card__index">06</span>
               <span className="demo-card__spec">步骤 / 合并</span>
             </header>
             <h2>分步答案编辑器</h2>
