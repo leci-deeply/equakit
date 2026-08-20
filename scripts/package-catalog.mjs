@@ -2,12 +2,12 @@ export const packageCatalog = Object.freeze([
   { directory: 'answer-steps', expectedExport: 'formatStepAnswer' },
   { directory: 'async-guard', expectedExport: 'StaleResponseGuard' },
   { directory: 'choice', expectedExport: 'gradeChoiceAnswer' },
-  { directory: 'math-text', expectedExport: 'normalizeMarkdownMath' },
-  { directory: 'katex-engine', expectedExport: 'validateMarkdownMath' },
+  { directory: 'math-text', expectedExport: 'normalizeMarkdownMath', publishable: true },
+  { directory: 'katex-engine', expectedExport: 'validateMarkdownMath', publishable: true },
   { directory: 'clipboard-restore', expectedExport: 'richDomToMarkdown' },
   { directory: 'clipboard-formats', expectedExport: 'createMathClipboardPayload' },
-  { directory: 'react-katex', expectedExport: 'MathFormula' },
-  { directory: 'react-markdown-math', expectedExport: 'MarkdownMath' },
+  { directory: 'react-katex', expectedExport: 'MathFormula', publishable: true },
+  { directory: 'react-markdown-math', expectedExport: 'MarkdownMath', publishable: true },
   { directory: 'react-formula-input', expectedExport: 'FormulaInput' },
   { directory: 'react-clipboard', expectedExport: 'MathCopyBoundary' },
   { directory: 'react-answer-steps', expectedExport: 'AnswerStepsEditor' },
@@ -27,4 +27,8 @@ export const atomicPackageDirectories = Object.freeze(
 
 export const compatibilityPackageDirectories = Object.freeze(
   packageCatalog.slice(16).map(({ directory }) => directory),
+);
+
+export const publishablePackageDirectories = Object.freeze(
+  packageCatalog.filter(({ publishable }) => publishable).map(({ directory }) => directory),
 );

@@ -2,7 +2,7 @@
   "name": "@equakit/katex-engine",
   "version": "0.1.0",
   "description": "EquaKit 基于 KaTeX 的 LaTeX 结构化校验引擎",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "author": {
     "name": "leci",

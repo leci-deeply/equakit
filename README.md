@@ -140,10 +140,24 @@ pnpm --filter @equakit/mathlive-editor build
 pnpm --filter @equakit/tiptap-math build
 ```
 
-> 当前仓库内 20 个 package 都仍是 `private: true`，尚未发布到 npm。仓库外集成时，请按需引入
-> atomic packages；旧包只用于迁移兼容。
->
-> `0.1.0` 仍是未发布版本；npm 发布流程暂缓，仓库不会在准备完成前启用 npm publish workflow。
+首批 npm `0.1.0` 公开范围聚焦公式渲染链路：
+
+- `@equakit/math-text`
+- `@equakit/katex-engine`
+- `@equakit/react-katex`
+- `@equakit/react-markdown-math`
+
+其余 16 个 package 继续保留 `private: true`。仓库外集成应直接使用已经公开的 atomic packages；
+`core`、`react`、`adapter-mathlive` 和 `adapter-tiptap` 仍只作为仓库内迁移兼容层。
+
+维护者发布前必须先运行完整检查和无副作用的 npm dry-run：
+
+```bash
+pnpm check
+pnpm release:formula:dry-run
+```
+
+只有在 `main` 干净检出、版本和 tag 已确认后，才运行 `pnpm release:formula:publish`。
 
 ## 原子包使用示例
 

@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { packageCatalog } from './package-catalog.mjs';
+import { packageCatalog, publishablePackageDirectories } from './package-catalog.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const temp = mkdtempSync(resolve(tmpdir(), 'equakit-pack-'));
@@ -15,6 +15,7 @@ const buildCleanPrefix = 'node ../../scripts/clean-package-dist.mjs && ';
 const reactPeerRange = '^18.3.1 || ^19.0.0';
 const reactDevRange = '^18.3.1';
 const archives = [];
+const publishablePackages = new Set(publishablePackageDirectories);
 
 assertCatalogMatchesPackageDirectories();
 
@@ -162,8 +163,11 @@ function assertCatalogMatchesPackageDirectories() {
 }
 
 function assertPackageReadiness(manifest, directory, label) {
-  if (manifest.private !== true) {
-    throw new Error(`${directory} 的 ${label} 必须保留 private: true。`);
+  const expectedPrivate = !publishablePackages.has(directory);
+  if (manifest.private !== expectedPrivate) {
+    throw new Error(
+      `${directory} 的 ${label} private 必须是 ${String(expectedPrivate)}，当前是 ${String(manifest.private)}。`,
+    );
   }
   if (manifest.engines?.node !== '>=22') {
     throw new Error(`${directory} 的 ${label} 必须声明 engines.node >=22。`);

@@ -1,7 +1,8 @@
 # 发布清单
 
-当前状态：`0.1.0` 尚未发布到 npm，仓库内 20 个 package 全部仍是 `private: true`。`core`、`react`、
-`adapter-mathlive` 和 `adapter-tiptap` 只保留兼容重导出，新的集成应直接面向 16 个原子包。
+当前状态：首批 npm `0.1.0` 只发布公式链路的 4 个原子包：`math-text`、`katex-engine`、
+`react-katex` 和 `react-markdown-math`。其余 16 个 package 保留 `private: true`；`core`、`react`、
+`adapter-mathlive` 和 `adapter-tiptap` 只保留仓库内兼容重导出。
 
 ## 法律与所有权
 
@@ -29,7 +30,7 @@
 - [x] 公共 API 具备 README 示例和声明文件。
 - [x] 已记录浏览器支持和 Node.js 支持。
 - [x] 已为 Markdown、URL、HTML 和剪贴板这些敏感路径准备测试。
-- [x] 已加入 Chromium、Firefox、WebKit 矩阵；单测 65 个，Chromium 12 项，全浏览器 28 项通过、8 项按能力边界跳过，视觉截图回归完全一致。
+- [x] 已加入 Chromium、Firefox、WebKit 矩阵；单测 67 个，Chromium 15 项，全浏览器 22 项通过、8 项按能力边界跳过，视觉截图回归完全一致。
 - [x] 已验证单公式五种 MIME 输出和混合正文降级策略。
 - [x] TypeDoc API 转换、Playground/API 站点组合与静态脱敏检查通过。
 - [x] KaTeX 0.18.4 单版本解析、0.17/0.18 像素一致性和持续截图回归通过。
@@ -37,11 +38,13 @@
 
 ## 发布
 
-- [ ] 准备发布 npm 时移除 package 的 `private: true`；当前不得添加 npm publish workflow。
+- [x] 首批 4 个公式包设置为 `private: false`，其余 package 继续保留发布保护。
 - [x] 补齐 repository、bugs、homepage、author 和公开发布策略元数据。
-- [ ] npm 身份确定后补充 maintainer；存在真实赞助入口时再补 funding。
+- [x] npm maintainer 已确认为 `leci0099`；存在真实赞助入口时再补 funding。
 - [x] 已创建 npm `equakit` 组织并取得 `@equakit` package scope。
-- [ ] 首次发布前通过 npm CLI 或可信发布再次验证写权限。
+- [x] 已通过 npm CLI 验证 `leci0099` 是 `equakit` organization owner。
+- [x] npm maintainer 账号已启用 `auth-and-writes` 2FA。
+- [x] `pnpm release:formula:dry-run` 已验证 4 个公开包的最终 tarball 和 public access。
 - [x] 已启用 `main` 分支保护、必需 `check`、管理员约束、密钥扫描和 push protection。
 - [x] 已加入 Dependabot npm 和 GitHub Actions 更新配置。
 - [x] 已启用 Dependabot security updates 和 GitHub Private Vulnerability Reporting。

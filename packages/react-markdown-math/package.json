@@ -2,7 +2,7 @@
   "name": "@equakit/react-markdown-math",
   "version": "0.1.0",
   "description": "用于渲染 GFM 与数学内容的安全 React Markdown 组件",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "author": {
     "name": "leci",
