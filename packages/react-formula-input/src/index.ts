@@ -2,6 +2,7 @@ export { DEFAULT_FORMULA_PALETTE, FormulaInput, insertFormulaSnippet } from './F
 export type {
   FormulaInputEditorComponent,
   FormulaInputEditorHandle,
+  FormulaInputEditorKeyDownEvent,
   FormulaInputEditorProps,
   FormulaInputProps,
   FormulaPaletteGroup,

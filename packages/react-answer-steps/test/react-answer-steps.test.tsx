@@ -39,4 +39,20 @@ describe('@equakit/react-answer-steps', () => {
     expect(html).toContain('添加步骤');
     expect(html).toContain('删除步骤');
   });
+
+  it('允许宿主替换步骤输入器而不重复实现步骤结构', () => {
+    const html = renderToStaticMarkup(
+      <AnswerStepsEditor
+        onChange={() => undefined}
+        renderStepEditor={({ ariaLabel, value }) => (
+          <output aria-label={`${ariaLabel}公式`}>{value}</output>
+        )}
+        steps={['x^2=1']}
+      />,
+    );
+
+    expect(html).toContain('aria-label="步骤 1公式"');
+    expect(html).toContain('x^2=1');
+    expect(html).not.toContain('<textarea');
+  });
 });

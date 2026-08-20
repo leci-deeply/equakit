@@ -25,25 +25,40 @@ export interface MathLiveEditorAdapterOptions {
 }
 
 type LoadStatus = 'loading' | 'ready' | 'error';
+const handledKeyDownEvents = new WeakSet<KeyboardEvent>();
 
 export function createMathLiveFormulaEditor(options: MathLiveEditorAdapterOptions = {}) {
   return forwardRef<FormulaInputEditorHandle, FormulaInputEditorProps>(
     function MathLiveFormulaEditor(
-      { value, onChange, ariaLabel, className, disabled, placeholder },
+      { value, onChange, onKeyDown, ariaLabel, className, disabled, placeholder },
       ref,
     ) {
       const hostRef = useRef<HTMLDivElement>(null);
       const mathfieldRef = useRef<MathfieldElement | null>(null);
       const queuedSnippetsRef = useRef<FormulaPaletteKey[]>([]);
-      const propsRef = useRef({ value, onChange, ariaLabel, className, disabled, placeholder });
+      const propsRef = useRef<
+        Pick<
+          FormulaInputEditorProps,
+          'value' | 'onChange' | 'ariaLabel' | 'className' | 'disabled' | 'placeholder'
+        > & { onKeyDown: FormulaInputEditorProps['onKeyDown'] }
+      >({ value, onChange, onKeyDown, ariaLabel, className, disabled, placeholder });
       const [status, setStatus] = useState<LoadStatus>('loading');
-      propsRef.current = { value, onChange, ariaLabel, className, disabled, placeholder };
+      propsRef.current = {
+        value,
+        onChange,
+        onKeyDown,
+        ariaLabel,
+        className,
+        disabled,
+        placeholder,
+      };
 
       useImperativeHandle(
         ref,
         () => ({
           focus() {
-            mathfieldRef.current?.focus();
+            const mathfield = mathfieldRef.current;
+            if (mathfield) focusMathfield(mathfield);
           },
           insertSnippet(key) {
             const mathfield = mathfieldRef.current;
@@ -62,6 +77,8 @@ export function createMathLiveFormulaEditor(options: MathLiveEditorAdapterOption
         let disposed = false;
         let mountedMathfield: MathfieldElement | null = null;
         let removeInputListener: (() => void) | null = null;
+        let removeKeyDownListener: (() => void) | null = null;
+        let removePointerDownListener: (() => void) | null = null;
 
         async function mountMathfield() {
           try {
@@ -83,8 +100,45 @@ export function createMathLiveFormulaEditor(options: MathLiveEditorAdapterOption
             const handleInput = () => {
               propsRef.current.onChange(mathfield.value);
             };
+            const handleKeyDown = (event: KeyboardEvent) => {
+              if (!event.composedPath().includes(mathfield)) return;
+              const onKeyDown = propsRef.current.onKeyDown;
+              if (!onKeyDown) return;
+              if (handledKeyDownEvents.has(event)) return;
+              handledKeyDownEvents.add(event);
+              const range = mathfield.selection.ranges[0] ?? [
+                mathfield.position,
+                mathfield.position,
+              ];
+              const start = Math.min(range[0], range[1]);
+              const end = Math.max(range[0], range[1]);
+              onKeyDown({
+                key: event.key,
+                repeat: event.repeat,
+                selectionCollapsed: start === end,
+                atStart: start === 0,
+                atEnd: end === mathfield.lastOffset,
+                valueBeforeCursor: mathfield.getValue(0, start, 'latex'),
+                valueAfterCursor: mathfield.getValue(end, mathfield.lastOffset, 'latex'),
+                preventDefault() {
+                  event.preventDefault();
+                  event.stopPropagation();
+                },
+              });
+            };
+            const handlePointerDown = () => focusMathfield(mathfield);
             mathfield.addEventListener('input', handleInput);
+            mathfield.addEventListener('pointerdown', handlePointerDown, true);
+            // MathLive consumes some editing keys inside its shadow root. Listen on the
+            // owning document during capture so host applications can intercept Enter
+            // and boundary deletion before MathLive handles them.
+            const keyDownTarget = mathfield.ownerDocument;
+            keyDownTarget.addEventListener('keydown', handleKeyDown, true);
             removeInputListener = () => mathfield.removeEventListener('input', handleInput);
+            removePointerDownListener = () =>
+              mathfield.removeEventListener('pointerdown', handlePointerDown, true);
+            removeKeyDownListener = () =>
+              keyDownTarget.removeEventListener('keydown', handleKeyDown, true);
             hostRef.current.replaceChildren(mathfield);
             repairMathfieldAccessibility(mathfield, propsRef.current.ariaLabel);
 
@@ -109,6 +163,8 @@ export function createMathLiveFormulaEditor(options: MathLiveEditorAdapterOption
         return () => {
           disposed = true;
           removeInputListener?.();
+          removeKeyDownListener?.();
+          removePointerDownListener?.();
           if (mathfieldRef.current === mountedMathfield) mathfieldRef.current = null;
           mountedMathfield?.remove();
         };
@@ -141,6 +197,11 @@ export function createMathLiveFormulaEditor(options: MathLiveEditorAdapterOption
       );
     },
   );
+}
+
+function focusMathfield(mathfield: MathfieldElement) {
+  const keyboardSink = mathfield.shadowRoot?.querySelector<HTMLElement>('[part~="keyboard-sink"]');
+  (keyboardSink ?? mathfield).focus();
 }
 
 function configureMathfield(

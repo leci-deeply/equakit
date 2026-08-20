@@ -2,6 +2,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 interface BrowserMathfieldElement extends HTMLElement {
+  position: number;
+  selection: { ranges: Array<[number, number]> };
   value: string;
   setValue: (value: string, options?: { silenceNotifications?: boolean }) => void;
 }
@@ -22,7 +24,15 @@ test('可视化公式输入是首个交互示例', async ({ page }) => {
   const cards = page.locator('.demo-grid > .demo-card');
 
   await expect(cards.first().getByRole('heading', { name: '可视化公式输入' })).toBeVisible();
-  await expect(cards.locator('.demo-card__index')).toHaveText(['01', '02', '03', '04', '05']);
+  await expect(cards.locator('.demo-card__index')).toHaveText([
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
+  ]);
 });
 
 test('高公式按字形撑开且不会覆盖后续正文', async ({ page }) => {
@@ -261,84 +271,202 @@ test('可视化公式输入区直接编辑且不渲染公式面板', async ({ pa
   expect(failedAssets).toEqual([]);
 });
 
-test('TipTap adapter 渲染并插入 inline/block 数学节点', async ({ page }) => {
-  const card = page.locator('article').filter({
-    has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
-  });
-  const editor = card.getByRole('textbox', { name: 'TipTap 数学编辑器' });
-  const inlineMath = editor.locator('[data-type="inline-math"]');
-  const blockMath = editor.locator('[data-type="block-math"]');
-
-  await expect(inlineMath).toHaveCount(1);
-  await expect(inlineMath).toHaveAttribute('data-latex', 'E=mc^2');
-  await expect(blockMath).toHaveCount(1);
-  await expect(blockMath).toHaveAttribute(
-    'data-latex',
-    '\\int_{-\\infty}^{\\infty}e^{-x^2}\\,\\mathrm{d}x=\\sqrt{\\pi}',
-  );
-
-  await card.getByRole('button', { name: '插入行内公式' }).click();
-  await expect(inlineMath).toHaveCount(2);
-  await expect
-    .poll(() =>
-      inlineMath.evaluateAll((elements) => elements.map((element) => element.dataset.latex)),
-    )
-    .toContain('\\sqrt{x}');
-
-  await card.getByRole('button', { name: '插入块级公式' }).click();
-  await expect(blockMath).toHaveCount(2);
-  await expect
-    .poll(() =>
-      blockMath.evaluateAll((elements) => elements.map((element) => element.dataset.latex)),
-    )
-    .toContain('\\sum_{i=1}^{n} i');
-});
-
-test('TipTap adapter 支持 EquaKit 剪贴板复制', async ({ page, browserName }) => {
-  test.skip(
-    browserName !== 'chromium',
-    'Firefox 和 WebKit 在 Playwright 中没有稳定开放系统剪贴板 readText() 权限。',
-  );
-
-  const card = page.locator('article').filter({
-    has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
-  });
-  const editor = card.getByRole('textbox', { name: 'TipTap 数学编辑器' });
-
-  await card.getByRole('button', { name: '插入块级公式' }).click();
-  await expect(editor.locator('[data-type="block-math"]')).toHaveCount(2);
-
-  await editor.focus();
-  await page.keyboard.press('ControlOrMeta+A');
-  await page.keyboard.press('ControlOrMeta+C');
-  const copied = await page.evaluate(() => navigator.clipboard.readText());
-  expect(copied).toContain('\\(E=mc^2\\)');
-  expect(copied).toContain('\\[\\sum_{i=1}^{n} i\\]');
-});
-
-test('TipTap adapter 迁移旧公式文本时不把价格识别为数学节点', async ({ page }) => {
-  const card = page.locator('article').filter({
-    has: page.getByRole('heading', { name: 'TipTap inline/block 数学节点' }),
-  });
-  const editor = card.getByRole('textbox', { name: 'TipTap 数学编辑器' });
-
-  await card.getByRole('button', { name: '迁移旧公式文本' }).click();
-
-  await expect(editor.locator('[data-type="inline-math"]')).toHaveCount(1);
-  await expect(editor.locator('[data-type="inline-math"]')).toHaveAttribute('data-latex', 'a+b');
-  await expect(editor).toContainText('价格 $100$，旧公式');
-});
-
 test('Playground 不展示选择题示例', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '可访问的选择题' })).toHaveCount(0);
   await expect(page.getByRole('group', { name: '选择答案' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '在正文中插入和编辑公式' })).toHaveCount(0);
+});
+
+test('分步公式使用所见即所得输入并可增删步骤', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: '解题过程转为公式步骤' }),
+  });
+  const mathfields = card.locator('math-field');
+
+  await expect(mathfields).toHaveCount(3);
+  await expect
+    .poll(() =>
+      mathfields.first().evaluate((element) => (element as BrowserMathfieldElement).value),
+    )
+    .toBe('x^2-5x+6=0');
+  await expect(card).not.toContainText('$x^2-5x+6=0$');
+
+  await card.getByRole('button', { name: /添加一步/ }).click();
+  await expect(mathfields).toHaveCount(4);
+  await card.getByRole('button', { name: '删除步骤' }).last().click();
+  await expect(mathfields).toHaveCount(3);
+});
+
+test('多行解题过程可转换为所见即所得公式步骤', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: '解题过程转为公式步骤' }),
+  });
+  const source = card.getByRole('textbox', { name: '粘贴解题过程' });
+  const mathfields = card.locator('math-field');
+
+  await source.fill('1. a+b=3\nA. a-b=1\n- a=2');
+  await card.getByRole('button', { name: '转换为步骤' }).click();
+
+  await expect(mathfields).toHaveCount(3);
+  await expect
+    .poll(() =>
+      mathfields.first().evaluate((element) => (element as BrowserMathfieldElement).value),
+    )
+    .toBe('a+b=3');
+  await expect
+    .poll(() => mathfields.nth(1).evaluate((element) => (element as BrowserMathfieldElement).value))
+    .toBe('a-b=1');
+  await expect(card).not.toContainText('OCR');
+});
+
+test('解题过程转换在桌面保持清晰的左右流程', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: '解题过程转为公式步骤' }),
+  });
+  const panels = card.locator('.demo-step-converter__panel');
+  await expect(panels).toHaveCount(2);
+
+  const [left, right] = await Promise.all([
+    panels.nth(0).boundingBox(),
+    panels.nth(1).boundingBox(),
+  ]);
+  expect(left).not.toBeNull();
+  expect(right).not.toBeNull();
+  expect(Math.abs(left!.height - right!.height)).toBeLessThanOrEqual(1);
+});
+
+test('Markdown 数学分隔符实时归一化并渲染', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: '数学文本转换' }),
+  });
+  const source = card.getByRole('textbox', { name: '公式内容' });
+
+  await source.fill(['面积为 \\(a^2\\)', '', '\\[', '\\frac{1}{2}', '\\]'].join('\n'));
+  await expect(card.locator('.demo-transform-output .katex')).toHaveCount(2);
+  await expect(card.locator('.demo-transform-output__status')).toHaveText(
+    '已识别 1 个行内公式和 1 个块级公式',
+  );
+  await expect(card.getByText('圆的面积为 $S=\\pi r^2$。')).toHaveCount(0);
+});
+
+test('数学文本转换的左右面板保持等高', async ({ page }) => {
+  const grids = page.locator('article .demo-transform-grid');
+  await expect(grids).toHaveCount(2);
+
+  for (let index = 0; index < (await grids.count()); index += 1) {
+    const panels = grids.nth(index).locator(':scope > *');
+    const [left, right] = await Promise.all([
+      panels.nth(0).boundingBox(),
+      panels.nth(1).boundingBox(),
+    ]);
+    expect(left).not.toBeNull();
+    expect(right).not.toBeNull();
+    expect(Math.abs(left!.height - right!.height)).toBeLessThanOrEqual(1);
+  }
+});
+
+test('富文本中的正文、强调、列表和公式可恢复为 Markdown', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: '富文本公式恢复' }),
+  });
+  const source = card.getByTestId('rich-math-source');
+
+  await source.evaluate((element) => {
+    const selection = document.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  });
+  const restored = await source.evaluate((element) => {
+    const clipboardData = new DataTransfer();
+    const event = new Event('copy', {
+      bubbles: true,
+      cancelable: true,
+    }) as ClipboardEvent;
+    Object.defineProperty(event, 'clipboardData', { value: clipboardData });
+    element.dispatchEvent(event);
+    return clipboardData.getData('text/plain');
+  });
+
+  expect(restored).toContain('**配方法**');
+  expect(restored).toContain('- 配方得到');
+  expect(restored).toContain('\\(x^2-6x+5=0\\)');
+  expect(restored).toContain('\\[x=1\\quad\\text{或}\\quad x=5\\]');
+  await card.getByRole('textbox', { name: '粘贴后的 Markdown + LaTeX' }).fill(restored);
+});
+
+test('步骤可在光标处拆分并通过双击边界键合并', async ({ page }) => {
+  const card = page.locator('article').filter({
+    has: page.getByRole('heading', { name: '步骤结构编辑' }),
+  });
+  const steps = card.locator('.demo-step-structure__row');
+  const first = card.locator('math-field[aria-label="结构步骤 1"]');
+
+  await expect(card.locator('math-field')).toHaveCount(3);
+  await expect(card.locator('textarea')).toHaveCount(0);
+  const firstKeyboardSink = first.locator('[part~="keyboard-sink"]');
+  await firstKeyboardSink.waitFor({ state: 'attached' });
+  await first.evaluate((element) => {
+    const mathfield = element as BrowserMathfieldElement & { position: number };
+    mathfield.shadowRoot?.querySelector<HTMLElement>('[part~="keyboard-sink"]')?.focus();
+    mathfield.position = 3;
+  });
+  await page.keyboard.press('Enter');
+  await expect(steps).toHaveCount(4);
+
+  const splitStep = card.locator('math-field[aria-label="结构步骤 2"]');
+  const splitKeyboardSink = splitStep.locator('[part~="keyboard-sink"]');
+  await splitKeyboardSink.waitFor({ state: 'attached' });
+  await splitStep.evaluate((element) => {
+    const mathfield = element as BrowserMathfieldElement;
+    mathfield.shadowRoot?.querySelector<HTMLElement>('[part~="keyboard-sink"]')?.focus();
+    mathfield.position = 0;
+  });
+  await expect
+    .poll(() =>
+      splitStep.evaluate((element) => {
+        const mathfield = element as BrowserMathfieldElement;
+        return {
+          active: document.activeElement === mathfield,
+          position: mathfield.position,
+          range: mathfield.selection.ranges[0],
+        };
+      }),
+    )
+    .toEqual({ active: true, position: 0, range: [0, 0] });
+  await page.keyboard.press('Backspace');
+  await expect(card.locator('.demo-step-structure__status')).toHaveText(
+    '再次按相同按键以合并相邻步骤。',
+  );
+  await expect(steps).toHaveCount(4);
+  await page.waitForTimeout(80);
+  await splitStep.evaluate((element) => {
+    const mathfield = element as BrowserMathfieldElement;
+    mathfield.shadowRoot?.querySelector<HTMLElement>('[part~="keyboard-sink"]')?.focus();
+    mathfield.position = 0;
+  });
+  await expect
+    .poll(() =>
+      splitStep.evaluate((element) => {
+        const mathfield = element as BrowserMathfieldElement;
+        return {
+          active: document.activeElement === mathfield,
+          position: mathfield.position,
+          range: mathfield.selection.ranges[0],
+        };
+      }),
+    )
+    .toEqual({ active: true, position: 0, range: [0, 0] });
+  await page.keyboard.press('Backspace');
+  await expect(steps).toHaveCount(3);
 });
 
 test('页面通过自动无障碍规则扫描且关键控件具有可访问名称', async ({ page }) => {
   await expect(page.getByRole('toolbar', { name: '公式面板' })).toHaveCount(0);
   await expect(page.getByRole('group', { name: '常用' })).toHaveCount(0);
   await expect(page.getByRole('group', { name: '可视化公式输入区' })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: '步骤 1' })).toBeVisible();
+  await expect(page.getByRole('group', { name: '步骤 1公式' })).toBeVisible();
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);

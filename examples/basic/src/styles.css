@@ -50,7 +50,7 @@ button {
 .demo-shell {
   position: relative;
   z-index: 0;
-  width: min(1240px, calc(100vw - 2rem));
+  width: min(1320px, calc(100vw - 3rem));
   margin: 0 auto;
   padding: 0 0 clamp(2rem, 4vw, 3.5rem);
 }
@@ -198,17 +198,19 @@ button {
 
 .demo-hero__formula p {
   margin: 0;
+  align-self: center;
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.6;
+  text-align: center;
 }
 
 .demo-collection {
-  margin-top: clamp(2rem, 5vw, 4rem);
+  margin-top: clamp(3rem, 6vw, 5rem);
 }
 
 .demo-collection__head {
-  margin-bottom: 1.25rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 .demo-collection__title {
@@ -221,14 +223,14 @@ button {
 .demo-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 0.9rem;
+  gap: clamp(1.15rem, 2vw, 1.65rem);
 }
 
 .demo-card {
   position: relative;
   min-width: 0;
   overflow: hidden;
-  padding: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(1.25rem, 2.4vw, 2rem);
   border: 1px solid var(--soft);
   border-radius: 12px;
   background: var(--paper);
@@ -252,7 +254,19 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.demo-card__header--stacked {
+  align-items: flex-start;
+}
+
+.demo-card__meta {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-end;
 }
 
 .demo-card__index,
@@ -273,7 +287,7 @@ button {
 }
 
 .demo-card h2 {
-  margin: 0 0 0.8rem;
+  margin: 0 0 1.15rem;
   font-size: clamp(1.08rem, 1.2vw, 1.28rem);
   line-height: 1.16;
   letter-spacing: -0.03em;
@@ -297,50 +311,6 @@ button {
 
 .demo-card--span-4 {
   grid-column: span 4;
-}
-
-.demo-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-  margin-bottom: 0.8rem;
-}
-
-.demo-actions button {
-  min-height: 2.55rem;
-  padding: 0.45rem 0.85rem;
-  border: 1px solid var(--soft-strong);
-  border-radius: 8px;
-  background: #faf9f6;
-  color: var(--ink);
-  cursor: pointer;
-  font-size: 0.84rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease;
-}
-
-.demo-actions button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  border-color: #aaa397;
-  background: #fff;
-}
-
-.demo-actions button:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.demo-actions button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.demo-actions button:focus-visible {
-  outline: 2px solid rgba(139, 94, 52, 0.8);
-  outline-offset: 2px;
 }
 
 .demo-card :is(textarea, input) {
@@ -383,6 +353,187 @@ button {
 
 .demo-card :is(.mre-formula-input__preview-label, .mre-answer-steps__label) {
   color: var(--muted);
+}
+
+.demo-answer-steps {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--soft);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.demo-step-converter {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) auto minmax(0, 1.2fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.demo-step-converter__panel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.demo-step-converter__panel > textarea {
+  width: 100%;
+  min-height: 14rem;
+  flex: 1;
+  padding: 0.8rem;
+  resize: vertical;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+.demo-step-converter__arrow {
+  align-self: center;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 1.2rem;
+}
+
+.demo-panel-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.demo-panel-heading strong {
+  font-size: 0.82rem;
+}
+
+.demo-panel-heading span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+}
+
+.demo-step-converter .demo-answer-steps {
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.demo-step-converter .demo-answer-steps .mre-answer-steps__row {
+  padding: 0.45rem 0;
+  border-bottom: 0;
+}
+
+.demo-step-converter .demo-answer-step__formula .mre-formula-input__textarea {
+  min-height: 3.6rem;
+}
+
+.demo-step-converter .demo-answer-steps .mre-answer-steps__add {
+  margin: 0.65rem 0 0;
+}
+
+.demo-card .demo-step-converter .mre-answer-steps__delete,
+.demo-card .demo-step-converter .mre-answer-steps__delete:hover {
+  padding-inline: 0.35rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+
+.demo-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.demo-field > span,
+.demo-field__label {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.demo-field textarea {
+  width: 100%;
+  min-height: 7.2rem;
+  padding: 0.75rem;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.demo-action {
+  min-height: 2.65rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.demo-action:hover {
+  background: #654b32;
+}
+
+.demo-action:active {
+  transform: translateY(1px);
+}
+
+.demo-answer-steps .mre-answer-steps__row {
+  align-items: center;
+  padding: 0.85rem;
+  border-bottom: 1px solid var(--soft);
+}
+
+.demo-answer-steps .mre-answer-steps__label {
+  align-items: center;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.85rem;
+}
+
+.demo-answer-steps .mre-answer-steps__label > span {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.demo-answer-step__formula,
+.demo-answer-step__formula > [data-equakit-mathlive-host='true'] {
+  min-width: 0;
+}
+
+.demo-answer-step__formula > [data-equakit-mathlive-host='true'] {
+  display: flex;
+}
+
+.demo-answer-step__formula .mre-formula-input__textarea {
+  width: 100%;
+  min-height: 4.75rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--soft-strong);
+  border-radius: 8px;
+  background: #fff;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+}
+
+.demo-answer-step__formula .mre-formula-input__textarea:focus-within {
+  border-color: var(--accent);
+  outline: 2px solid rgba(139, 94, 52, 0.2);
+  outline-offset: 2px;
+}
+
+.demo-answer-steps .mre-answer-steps__add {
+  margin: 0.75rem;
 }
 
 .demo-formula-workbench {
@@ -439,7 +590,7 @@ button {
 .demo-copy-transfer {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 0.9rem;
+  gap: 1.25rem;
   align-items: stretch;
 }
 
@@ -448,8 +599,8 @@ button {
   min-width: 0;
   min-height: 17rem;
   flex-direction: column;
-  gap: 0.85rem;
-  padding: 1rem;
+  gap: 1rem;
+  padding: 1.25rem;
   border: 1px solid var(--soft);
   border-radius: 10px;
   background: #faf9f6;
@@ -509,29 +660,170 @@ button {
   font-size: clamp(1.1rem, 2vw, 1.5rem);
 }
 
-.demo-tiptap__editor {
-  min-height: 12rem;
-  padding: 0.9rem;
-  border: 1px solid var(--soft-strong);
+.demo-syntax-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.demo-syntax-legend span {
+  white-space: nowrap;
+}
+
+.demo-syntax-legend code {
+  margin-right: 0.25rem;
+  color: inherit;
+  font: inherit;
+}
+
+.demo-transform-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.demo-transform-grid > .demo-field {
+  min-height: 13.5rem;
+}
+
+.demo-transform-grid > .demo-field textarea {
+  flex: 1;
+}
+
+.demo-transform-output,
+.demo-rich-source {
+  min-width: 0;
+  min-height: 13.5rem;
+  padding: 1.1rem;
+  border: 1px solid var(--soft);
   border-radius: 8px;
+  background: #faf9f6;
+}
+
+.demo-transform-output {
+  display: grid;
+  grid-template-rows: auto minmax(5rem, 1fr) auto;
+  gap: 1rem;
+}
+
+.demo-transform-output .mre-markdown-math {
+  align-self: center;
+  min-width: 0;
+}
+
+.demo-transform-output__status {
+  display: block;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--soft);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.demo-rich-source {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.demo-rich-source [data-testid='rich-math-source'] {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 6px;
+  background: #fff;
+  cursor: text;
+  user-select: text;
+}
+
+.demo-rich-source .mre-markdown-math > :first-child {
+  margin-top: 0;
+}
+
+.demo-rich-source .mre-markdown-math > :last-child {
+  margin-bottom: 0;
+}
+
+.demo-step-structure {
+  overflow: hidden;
+  border: 1px solid var(--soft);
+  border-radius: 10px;
   background: #fff;
 }
 
-.demo-tiptap__editor:focus-visible {
-  outline: 2px solid rgba(139, 94, 52, 0.8);
+.demo-step-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--soft);
+  background: #faf9f6;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+}
+
+.demo-step-structure__list {
+  display: grid;
+}
+
+.demo-step-structure__row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid var(--soft);
+}
+
+.demo-step-structure__row > span {
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.demo-step-structure__formula,
+.demo-step-structure__formula > [data-equakit-mathlive-host='true'] {
+  min-width: 0;
+}
+
+.demo-step-structure__formula > [data-equakit-mathlive-host='true'] {
+  display: flex;
+}
+
+.demo-step-structure__formula .mre-formula-input__textarea {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--soft-strong);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1.05rem;
+}
+
+.demo-step-structure__formula .mre-formula-input__textarea:focus-within {
+  border-color: var(--accent);
+  outline: 2px solid rgba(139, 94, 52, 0.2);
   outline-offset: 2px;
 }
 
-.demo-tiptap__editor .tiptap-mathematics-render {
-  padding: 0.1rem 0.28rem;
-  border-radius: 4px;
-}
-
-.demo-tiptap__editor [data-type='block-math'] {
-  display: block;
-  margin: 0.8rem 0;
-  overflow-x: auto;
-  text-align: center;
+.demo-step-structure__status {
+  min-height: 2.6rem;
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
 }
 
 .demo-footer {
@@ -591,13 +883,13 @@ button {
 .demo-formula-layout {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.9rem;
-  margin-top: 1rem;
+  gap: 1.25rem;
+  margin-top: 1.35rem;
 }
 
 .demo-formula-layout__sample {
   min-width: 0;
-  padding: 0.9rem;
+  padding: 1.15rem;
   border: 1px solid var(--soft);
   border-radius: 8px;
   background: #faf9f6;
@@ -700,6 +992,32 @@ button {
   .demo-formula-workbench .mre-formula-input__textarea {
     min-height: 10rem;
   }
+
+  .demo-answer-steps .mre-answer-steps__label {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .demo-step-converter,
+  .demo-transform-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .demo-step-converter__arrow {
+    transform: rotate(90deg);
+  }
+
+  .demo-step-converter__panel > textarea {
+    min-height: 10rem;
+  }
+
+  .demo-action {
+    justify-self: stretch;
+  }
+
+  .demo-syntax-legend {
+    gap: 0.25rem 0.55rem;
+  }
 }
 
 @media (max-width: 980px) {
@@ -778,15 +1096,6 @@ button {
 
   .demo-card {
     border-radius: 10px;
-  }
-
-  .demo-actions {
-    gap: 0.45rem;
-  }
-
-  .demo-actions button {
-    width: 100%;
-    justify-content: center;
   }
 
   .demo-katex-visual {

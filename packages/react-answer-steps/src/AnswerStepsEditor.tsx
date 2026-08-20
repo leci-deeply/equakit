@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 
 import {
   mergeStepWithNext,
@@ -33,6 +33,16 @@ export interface AnswerStepsEditorProps {
   deleteLabel?: string;
   stepLabel?: (index: number) => string;
   placeholder?: (index: number) => string;
+  renderStepEditor?: (props: AnswerStepEditorRenderProps) => ReactNode;
+}
+
+export interface AnswerStepEditorRenderProps {
+  index: number;
+  value: string;
+  onChange: (nextValue: string) => void;
+  ariaLabel: string;
+  disabled: boolean;
+  placeholder: string;
 }
 
 export function getStepBoundaryAction({
@@ -78,6 +88,7 @@ export function AnswerStepsEditor({
   deleteLabel = '删除步骤',
   stepLabel = (index) => `步骤 ${index + 1}`,
   placeholder = (index) => `填写步骤 ${index + 1}`,
+  renderStepEditor,
 }: AnswerStepsEditorProps) {
   const [armedStepIndex, setArmedStepIndex] = useState<number | null>(null);
   const normalizedSteps = steps.length > 0 ? [...steps] : [''];
@@ -135,19 +146,33 @@ export function AnswerStepsEditor({
     <div className={className ? `mre-answer-steps ${className}` : 'mre-answer-steps'}>
       {normalizedSteps.map((step, index) => (
         <div className="mre-answer-steps__row" key={index}>
-          <label className="mre-answer-steps__label">
-            <span>{stepLabel(index)}</span>
-            <textarea
-              aria-label={stepLabel(index)}
-              className="mre-answer-steps__textarea"
-              disabled={disabled}
-              onChange={(event) => updateStep(index, event.target.value)}
-              onKeyDown={(event) => handleBoundaryKey(event, index)}
-              placeholder={placeholder(index)}
-              rows={3}
-              value={step}
-            />
-          </label>
+          {renderStepEditor ? (
+            <div className="mre-answer-steps__label">
+              <span>{stepLabel(index)}</span>
+              {renderStepEditor({
+                index,
+                value: step,
+                onChange: (value) => updateStep(index, value),
+                ariaLabel: stepLabel(index),
+                disabled,
+                placeholder: placeholder(index),
+              })}
+            </div>
+          ) : (
+            <label className="mre-answer-steps__label">
+              <span>{stepLabel(index)}</span>
+              <textarea
+                aria-label={stepLabel(index)}
+                className="mre-answer-steps__textarea"
+                disabled={disabled}
+                onChange={(event) => updateStep(index, event.target.value)}
+                onKeyDown={(event) => handleBoundaryKey(event, index)}
+                placeholder={placeholder(index)}
+                rows={3}
+                value={step}
+              />
+            </label>
+          )}
           <button
             className="mre-answer-steps__delete"
             disabled={disabled || normalizedSteps.length <= minSteps}
