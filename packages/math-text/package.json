@@ -2,7 +2,7 @@
   "name": "@equakit/math-text",
   "version": "0.1.0",
   "description": "EquaKit 纯文本数学启发式、分隔符归一化与 token 提取工具",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "author": {
     "name": "leci",

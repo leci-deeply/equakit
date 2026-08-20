@@ -46,6 +46,8 @@
     "test:browser:compat": "playwright test --project=firefox --project=webkit",
     "verify:bundle": "node scripts/verify-bundle-budget.mjs",
     "verify:boundaries": "node scripts/verify-package-boundaries.mjs",
+    "release:formula:dry-run": "pnpm --filter @equakit/math-text --filter @equakit/katex-engine --filter @equakit/react-katex --filter @equakit/react-markdown-math --recursive publish --access public --dry-run --no-git-checks",
+    "release:formula:publish": "pnpm --filter @equakit/math-text --filter @equakit/katex-engine --filter @equakit/react-katex --filter @equakit/react-markdown-math --recursive publish --access public",
     "preverify:packages": "pnpm build",
     "verify:packages": "node scripts/verify-packages.mjs",
     "lint": "eslint .",

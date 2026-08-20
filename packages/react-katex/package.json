@@ -2,7 +2,7 @@
   "name": "@equakit/react-katex",
   "version": "0.1.0",
   "description": "用于安全渲染单个 LaTeX 公式的 React 组件",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "author": {
     "name": "leci",
