@@ -622,6 +622,11 @@ button {
   margin: 0;
 }
 
+.demo-formula-layout__sample--responsive {
+  display: flex;
+  flex-direction: column;
+}
+
 .demo-formula-resize__header,
 .demo-formula-resize__control {
   display: flex;
@@ -651,7 +656,15 @@ button {
   accent-color: var(--accent);
 }
 
+.demo-formula-resize__stage {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
 .demo-formula-resize__frame {
+  display: flex;
+  align-items: center;
   max-width: 100%;
   min-height: 6.5rem;
   padding: 0.85rem;
@@ -661,7 +674,12 @@ button {
   transition: width 180ms ease;
 }
 
-.demo-formula-resize__frame .mre-markdown-math,
+.demo-formula-resize__frame .mre-markdown-math {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
 .demo-formula-resize__frame .katex-display {
   margin: 0;
 }

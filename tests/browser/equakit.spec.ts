@@ -98,6 +98,13 @@ test('容器宽度变化时滚动提示自动出现并消失', async ({ page }) 
   await expect(sample.locator('output')).toHaveText('220px');
   await expect(formula).toHaveClass(/mre-math-overflowing/);
 
+  const stage = sample.getByTestId('formula-responsive-width-stage');
+  const frame = sample.getByTestId('formula-responsive-width-frame');
+  await expect(stage).toHaveCSS('display', 'flex');
+  await expect(stage).toHaveCSS('align-items', 'center');
+  await expect(frame).toHaveCSS('display', 'flex');
+  await expect(frame).toHaveCSS('align-items', 'center');
+
   await slider.fill('640');
   await expect(sample.locator('output')).toHaveText('640px');
   await expect(formula).not.toHaveClass(/mre-math-overflowing/);

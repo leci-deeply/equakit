@@ -19,7 +19,7 @@ const tipTapMathExtensions = createTipTapMathExtensions();
 
 const heroSpecimen = String.raw`\int_{-\infty}^{\infty}e^{-x^2}\,\mathrm{d}x=\sqrt{\pi}`;
 const tallFormula = String.raw`\left\{\begin{aligned}F(x)&=\frac{\displaystyle\sum_{k=1}^{n}\frac{x_k^2}{1+x_k^2}}{\displaystyle\sqrt{\int_{0}^{\infty}\frac{e^{-t^2}}{1+t^4}\,\mathrm{d}t}}\\[0.8em]G(x)&=\prod_{j=1}^{m}\left(1+\frac{a_j^2}{b_j^2}\right)^{\frac{1}{j}}\end{aligned}\right.`;
-const responsiveFormula = String.raw`\displaystyle A^n=P\begin{pmatrix}\lambda_1^n&0&0\\0&\lambda_2^n&0\\0&0&\lambda_3^n\end{pmatrix}P^{-1}`;
+const responsiveFormula = String.raw`\displaystyle \widehat{f}(\xi)=\int_{-\infty}^{\infty}f(x)e^{-2\pi i x\xi}\,\mathrm{d}x,\qquad f(x)=\int_{-\infty}^{\infty}\widehat{f}(\xi)e^{2\pi i x\xi}\,\mathrm{d}\xi`;
 const copyFormula = String.raw`\int_0^\infty e^{-x^2}\,\mathrm{d}x=\frac{\sqrt{\pi}}{2}`;
 
 export function App() {
@@ -168,7 +168,7 @@ function FormulaLayoutDemos() {
         <p data-testid="formula-height-following">公式后的正文不会被上下标或根式覆盖。</p>
       </section>
       <section
-        className="demo-formula-layout__sample"
+        className="demo-formula-layout__sample demo-formula-layout__sample--responsive"
         data-testid="formula-responsive-width-sample"
       >
         <div className="demo-formula-resize__header">
@@ -187,14 +187,16 @@ function FormulaLayoutDemos() {
             value={containerWidth}
           />
         </label>
-        <div
-          className="demo-formula-resize__frame"
-          data-testid="formula-responsive-width-frame"
-          style={{ width: `${containerWidth}px` }}
-        >
-          <MarkdownMath overflowIndicator="hover-scrollbar">
-            {`$$${responsiveFormula}$$`}
-          </MarkdownMath>
+        <div className="demo-formula-resize__stage" data-testid="formula-responsive-width-stage">
+          <div
+            className="demo-formula-resize__frame"
+            data-testid="formula-responsive-width-frame"
+            style={{ width: `${containerWidth}px` }}
+          >
+            <MarkdownMath overflowIndicator="hover-scrollbar">
+              {`$$${responsiveFormula}$$`}
+            </MarkdownMath>
+          </div>
         </div>
       </section>
     </div>
