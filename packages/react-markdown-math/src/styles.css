@@ -3,6 +3,71 @@
   overflow-wrap: anywhere;
 }
 
+.mre-markdown-math .katex-display {
+  max-width: 100%;
+  height: auto;
+  margin: 0.25em 0;
+  overflow: visible;
+  line-height: normal;
+}
+
+.mre-markdown-math .katex {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-block: 0.5em;
+  line-height: normal;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+  vertical-align: middle;
+}
+
+.mre-markdown-math .katex-display > .katex {
+  display: block;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-block: 0.5em;
+}
+
+.mre-markdown-math .katex::-webkit-scrollbar {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mre-markdown-math--overflow-aware .katex.mre-math-overflowing {
+    padding-bottom: 8px;
+  }
+
+  .mre-markdown-math--overflow-aware .katex.mre-math-overflowing:hover,
+  .mre-markdown-math--overflow-aware .katex.mre-math-overflowing:focus-within {
+    scrollbar-width: thin;
+  }
+
+  .mre-markdown-math--overflow-aware .katex.mre-math-overflowing:hover::-webkit-scrollbar,
+  .mre-markdown-math--overflow-aware .katex.mre-math-overflowing:focus-within::-webkit-scrollbar {
+    display: block;
+    height: 5px;
+  }
+
+  .mre-markdown-math--overflow-aware .katex.mre-math-overflowing:hover::-webkit-scrollbar-thumb,
+  .mre-markdown-math--overflow-aware
+    .katex.mre-math-overflowing:focus-within::-webkit-scrollbar-thumb {
+    background: var(--mre-formula-scrollbar-thumb, rgba(71, 84, 103, 0.45));
+    border-radius: 999px;
+  }
+
+  .mre-markdown-math--overflow-aware .katex.mre-math-overflowing:hover::-webkit-scrollbar-track,
+  .mre-markdown-math--overflow-aware
+    .katex.mre-math-overflowing:focus-within::-webkit-scrollbar-track {
+    background: var(--mre-formula-scrollbar-track, rgba(71, 84, 103, 0.1));
+    border-radius: 999px;
+  }
+}
+
 .mre-markdown-math :where(p, ul, ol, blockquote, pre, table) {
   margin: 0.65rem 0;
 }

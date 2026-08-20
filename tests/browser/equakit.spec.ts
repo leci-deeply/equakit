@@ -18,6 +18,89 @@ test('Playground 提供 API 文档和 GitHub 导航', async ({ page }) => {
   );
 });
 
+test('高公式按字形撑开且不会覆盖后续正文', async ({ page }) => {
+  const sample = page.getByTestId('formula-height-sample');
+  const formula = sample.locator('.mre-math-formula--display');
+  const glyphs = formula.locator('.katex');
+  const following = sample.getByTestId('formula-height-following');
+
+  const geometry = await Promise.all([
+    formula.boundingBox(),
+    glyphs.boundingBox(),
+    following.boundingBox(),
+  ]);
+  const [formulaBox, glyphBox, followingBox] = geometry;
+  expect(formulaBox).not.toBeNull();
+  expect(glyphBox).not.toBeNull();
+  expect(followingBox).not.toBeNull();
+  expect(glyphBox!.y).toBeGreaterThanOrEqual(formulaBox!.y - 1);
+  expect(glyphBox!.y + glyphBox!.height).toBeLessThanOrEqual(
+    formulaBox!.y + formulaBox!.height + 1,
+  );
+  expect(followingBox!.y).toBeGreaterThanOrEqual(formulaBox!.y + formulaBox!.height - 1);
+});
+
+test('所有超宽公式均可键盘访问且视觉提示保持按需启用', async ({ page, browserName }) => {
+  const overflowing = page
+    .getByTestId('formula-overflow-sample')
+    .locator('.katex-display > .katex');
+  const defaultOverflowing = page
+    .getByTestId('formula-default-overflow-sample')
+    .locator('.katex-display > .katex');
+  const directOverflowing = page
+    .getByTestId('formula-direct-overflow-sample')
+    .locator('.mre-math-formula__scroll');
+  const short = page.getByTestId('formula-short-sample').locator('.katex');
+
+  for (const formula of [overflowing, defaultOverflowing, directOverflowing]) {
+    await expect(formula).toHaveClass(/mre-math-overflowing/);
+    await expect(formula).toHaveAttribute('tabindex', '0');
+    const dimensions = await formula.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+    }));
+    expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
+
+    await formula.focus();
+    for (let index = 0; index < 5; index += 1) await page.keyboard.press('ArrowRight');
+    await expect.poll(() => formula.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  }
+
+  await expect(
+    page.getByTestId('formula-default-overflow-sample').locator('.mre-markdown-math'),
+  ).not.toHaveClass(/mre-markdown-math--overflow-aware/);
+  await expect(short).not.toHaveClass(/mre-math-overflowing/);
+  await expect(short).not.toHaveAttribute('tabindex');
+
+  if (browserName === 'chromium') {
+    await overflowing.hover();
+    const scrollbar = await overflowing.evaluate((element) => {
+      const style = getComputedStyle(element, '::-webkit-scrollbar');
+      return { display: style.display, height: style.height };
+    });
+    expect(scrollbar.display).toBe('block');
+    expect(scrollbar.height).toBe('5px');
+  }
+});
+
+test('缺少 CSS Font Loading API 时公式溢出检测仍能工作', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(document, 'fonts', {
+      configurable: true,
+      value: undefined,
+    });
+  });
+  await page.reload();
+
+  expect(await page.evaluate(() => typeof document.fonts)).toBe('undefined');
+  await expect(
+    page.getByTestId('formula-default-overflow-sample').locator('.katex-display > .katex'),
+  ).toHaveAttribute('tabindex', '0');
+  await expect(
+    page.getByTestId('formula-direct-overflow-sample').locator('.mre-math-formula__scroll'),
+  ).toHaveAttribute('tabindex', '0');
+});
+
 test('把浏览器选区中的渲染公式复制为可编辑 LaTeX', async ({ page, browserName }) => {
   test.skip(
     browserName !== 'chromium',

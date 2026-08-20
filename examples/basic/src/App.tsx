@@ -31,6 +31,8 @@ $$
 `;
 
 const heroSpecimen = String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`;
+const tallFormula = String.raw`\int\limits_{-\infty}^{+\infty}\sqrt{\frac{x^2+1}{x^2+2}}\,\mathrm{d}x`;
+const longFormula = String.raw`\displaystyle \sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\left(\prod_{j=1}^{m}\frac{x_j^2+a_j^2}{\sqrt{x_j^2+b_j^2}}\right)=\int_{0}^{\infty}\frac{\sin(tx)}{1+t^2}\,\mathrm{d}t`;
 
 export function App() {
   const [formula, setFormula] = useState(String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`);
@@ -152,6 +154,7 @@ export function App() {
             <h2>KaTeX 视觉回归矩阵</h2>
             <p>覆盖分式、根式、定界符、矩阵、极限、积分、字体和上下标布局。</p>
             <KaTeXVisualMatrix />
+            <FormulaLayoutDemos />
           </article>
 
           <article className="demo-card demo-card--span-4">
@@ -248,6 +251,37 @@ function KaTeXVisualMatrix() {
           <MathFormula ariaLabel={`视觉公式 ${index + 1}`} display expression={expression} />
         </div>
       ))}
+    </div>
+  );
+}
+
+function FormulaLayoutDemos() {
+  return (
+    <div className="demo-formula-layout" aria-label="公式布局验证">
+      <section className="demo-formula-layout__sample" data-testid="formula-height-sample">
+        <h3>高度自适应</h3>
+        <MathFormula ariaLabel="高度自适应公式" display expression={tallFormula} />
+        <p data-testid="formula-height-following">公式后的正文不会被上下标或根式覆盖。</p>
+      </section>
+      <section className="demo-formula-layout__sample" data-testid="formula-overflow-sample">
+        <h3>超长公式滚动提示</h3>
+        <MarkdownMath overflowIndicator="hover-scrollbar">{`$$${longFormula}$$`}</MarkdownMath>
+      </section>
+      <section
+        className="demo-formula-layout__sample"
+        data-testid="formula-default-overflow-sample"
+      >
+        <h3>默认滚动可访问</h3>
+        <MarkdownMath>{`$$${longFormula}$$`}</MarkdownMath>
+      </section>
+      <section className="demo-formula-layout__sample" data-testid="formula-direct-overflow-sample">
+        <h3>单公式滚动可访问</h3>
+        <MathFormula ariaLabel="超长单公式" display expression={longFormula} />
+      </section>
+      <section className="demo-formula-layout__sample" data-testid="formula-short-sample">
+        <h3>短公式保持干净</h3>
+        <MarkdownMath overflowIndicator="hover-scrollbar">{'$x^2+y^2=z^2$'}</MarkdownMath>
+      </section>
     </div>
   );
 }

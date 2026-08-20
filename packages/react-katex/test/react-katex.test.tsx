@@ -23,7 +23,16 @@ describe('@equakit/react-katex', () => {
       <MathFormula className="custom" display expression={'\\[x^2\\]'} />,
     );
     expect(html).toContain('mre-math-formula--display');
+    expect(html).toContain('mre-math-formula__scroll');
     expect(html).toContain('custom');
     expect(html).toMatch(/data-math-source="x\^2"/);
+  });
+
+  it('块级公式渲染失败时仍保留独立横向滚动容器', () => {
+    const html = renderToStaticMarkup(<MathFormula display expression={'\\frac{1'} />);
+    expect(html).toContain('mre-math-formula--display');
+    expect(html).toContain('mre-math-formula__scroll');
+    expect(html).toContain('\\frac{1');
+    expect(html).not.toContain('data-math-source');
   });
 });

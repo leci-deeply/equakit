@@ -39,7 +39,7 @@ export type {
 export { InteractiveChoices } from '@equakit/react-choice';
 export type { InteractiveChoice, InteractiveChoicesProps } from '@equakit/react-choice';
 export { MarkdownMath, safeUrlTransform } from '@equakit/react-markdown-math';
-export type { MarkdownMathProps } from '@equakit/react-markdown-math';
+export type { FormulaOverflowIndicator, MarkdownMathProps } from '@equakit/react-markdown-math';
 export { MathFormula } from '@equakit/react-katex';
 export type { MathFormulaProps } from '@equakit/react-katex';
 export {

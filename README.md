@@ -279,6 +279,14 @@ export function Article() {
 
 `MarkdownMath` 默认不启用原始 HTML，并拒绝不安全 URL 协议。
 
+AI 对话或其他窄容器可以按需启用超长公式滚动提示：
+
+```tsx
+<MarkdownMath overflowIndicator="hover-scrollbar">{answer}</MarkdownMath>
+```
+
+公式始终可以横向滚动；真正溢出的公式会进入键盘 Tab 顺序，并支持方向键、Home 和 End。`hover-scrollbar` 只控制桌面端 hover/focus 时的滚动条提示。块级和行内公式也会按实际字形撑高，避免上下标、根号和积分限被裁切。
+
 ### 公式输入
 
 ```tsx

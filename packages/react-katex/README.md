@@ -24,4 +24,4 @@ export function Example() {
 - `MathFormula`：渲染公式，KaTeX 解析失败时显示 `fallback` 或归一化后的源码文本。
 - `MathFormulaProps`：组件属性类型。
 
-组件保留 `role="math"`、`aria-label` 和 `data-math-source` 行为，便于无障碍访问和复制适配器恢复 LaTeX。
+组件会按公式字形自动撑高；块级公式将纵向布局和横向滚动分层，避免根号、上下标、积分限被裁切或覆盖后续正文。真正超宽的公式会进入键盘 Tab 顺序，并支持方向键、Home 和 End 横向滚动。组件保留 `role="math"`、`aria-label` 和 `data-math-source` 行为，便于无障碍访问和复制适配器恢复 LaTeX。
