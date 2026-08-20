@@ -183,6 +183,7 @@ test('可视化输入区与公式键盘左右排列并直接插入公式', async
   const keyboard = card.getByRole('toolbar', { name: '公式面板' });
 
   await expect(mathfield).toHaveAttribute('aria-label', '可视化公式输入区');
+  await expect(keyboard).toHaveCSS('display', 'flex');
   await expect(mathfield).toHaveAttribute('role', 'group');
   await expect(mathfield).not.toHaveAttribute('contenteditable');
   await expect
