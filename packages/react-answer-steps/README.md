@@ -24,5 +24,6 @@ export function Example() {
 ## API
 
 - `AnswerStepsEditor`：受控步骤编辑器，保留中文默认文案与删除边界交互。
+- `renderStepEditor`：按需替换单步输入器，例如接入所见即所得公式编辑器；不传时继续使用带边界删除保护的 textarea。
 - `getStepBoundaryAction`：根据按键、选区和边界状态返回动作。
 - `mergeStepAtBoundary`：按 Backspace/Delete 合并相邻步骤。

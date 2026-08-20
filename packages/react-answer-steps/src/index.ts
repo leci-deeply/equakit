@@ -4,6 +4,7 @@ export {
   mergeStepAtBoundary,
 } from './AnswerStepsEditor.js';
 export type {
+  AnswerStepEditorRenderProps,
   AnswerStepsEditorProps,
   StepBoundaryAction,
   StepBoundaryKey,

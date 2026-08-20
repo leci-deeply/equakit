@@ -17,8 +17,7 @@
       "@equakit/react-clipboard": ["packages/react-clipboard/src/index.ts"],
       "@equakit/react-formula-input": ["packages/react-formula-input/src/index.ts"],
       "@equakit/react-katex": ["packages/react-katex/src/index.ts"],
-      "@equakit/react-markdown-math": ["packages/react-markdown-math/src/index.ts"],
-      "@equakit/tiptap-math": ["packages/tiptap-math/src/index.ts"]
+      "@equakit/react-markdown-math": ["packages/react-markdown-math/src/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"]

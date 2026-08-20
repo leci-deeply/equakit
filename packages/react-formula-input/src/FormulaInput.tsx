@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
-import type { ForwardRefExoticComponent, RefAttributes } from 'react';
+import type { ForwardRefExoticComponent, KeyboardEvent, RefAttributes } from 'react';
 
 import {
   validateLatexExpression,
@@ -34,6 +34,18 @@ export interface FormulaInputProps {
   editor?: FormulaInputEditorComponent;
   className?: string;
   onValidationChange?: (result: MathValidationResult | null) => void;
+  onEditorKeyDown?: (event: FormulaInputEditorKeyDownEvent) => void;
+}
+
+export interface FormulaInputEditorKeyDownEvent {
+  key: string;
+  repeat: boolean;
+  selectionCollapsed: boolean;
+  atStart: boolean;
+  atEnd: boolean;
+  valueBeforeCursor: string;
+  valueAfterCursor: string;
+  preventDefault: () => void;
 }
 
 export interface FormulaInputEditorHandle {
@@ -49,6 +61,7 @@ export interface FormulaInputEditorProps {
   disabled: boolean;
   placeholder: string;
   rows: number;
+  onKeyDown?: (event: FormulaInputEditorKeyDownEvent) => void;
 }
 
 export type FormulaInputEditorComponent = ForwardRefExoticComponent<
@@ -132,6 +145,7 @@ export function FormulaInput({
   editor,
   className,
   onValidationChange,
+  onEditorKeyDown,
 }: FormulaInputProps) {
   const editorRef = useRef<FormulaInputEditorHandle>(null);
   const Editor = editor ?? TextareaFormulaEditor;
@@ -157,32 +171,34 @@ export function FormulaInput({
 
   return (
     <div className={className ? `mre-formula-input ${className}` : 'mre-formula-input'}>
-      <div className="mre-formula-input__palette" role="toolbar" aria-label="公式面板">
-        {palette.map((group) => (
-          <div
-            aria-label={group.label}
-            className="mre-formula-input__group"
-            key={group.label}
-            role="group"
-          >
-            {group.keys.map((key) => (
-              <button
-                className="mre-formula-input__key"
-                disabled={disabled}
-                key={`${group.label}:${key.label}:${key.insert}`}
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  insertKey(key);
-                }}
-                title={key.title ?? key.insert.trim()}
-                type="button"
-              >
-                {key.label}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
+      {palette.length > 0 && (
+        <div className="mre-formula-input__palette" role="toolbar" aria-label="公式面板">
+          {palette.map((group) => (
+            <div
+              aria-label={group.label}
+              className="mre-formula-input__group"
+              key={group.label}
+              role="group"
+            >
+              {group.keys.map((key) => (
+                <button
+                  className="mre-formula-input__key"
+                  disabled={disabled}
+                  key={`${group.label}:${key.label}:${key.insert}`}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    insertKey(key);
+                  }}
+                  title={key.title ?? key.insert.trim()}
+                  type="button"
+                >
+                  {key.label}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
       <Editor
         ariaLabel={textareaLabel}
         className="mre-formula-input__textarea"
@@ -192,6 +208,7 @@ export function FormulaInput({
         ref={editorRef}
         rows={rows}
         value={value}
+        {...(onEditorKeyDown ? { onKeyDown: onEditorKeyDown } : {})}
       />
       {!hidePreview && (
         <div aria-label={previewLabel} className="mre-formula-input__preview" role="region">
@@ -214,7 +231,7 @@ export function FormulaInput({
 
 const TextareaFormulaEditor = forwardRef<FormulaInputEditorHandle, FormulaInputEditorProps>(
   function TextareaFormulaEditor(
-    { value, onChange, ariaLabel, className, disabled, placeholder, rows },
+    { value, onChange, onKeyDown, ariaLabel, className, disabled, placeholder, rows },
     ref,
   ) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -246,6 +263,7 @@ const TextareaFormulaEditor = forwardRef<FormulaInputEditorHandle, FormulaInputE
         className={className}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
+        onKeyDown={(event) => emitTextareaKeyDown(event, onKeyDown)}
         placeholder={placeholder}
         ref={textareaRef}
         rows={rows}
@@ -254,3 +272,21 @@ const TextareaFormulaEditor = forwardRef<FormulaInputEditorHandle, FormulaInputE
     );
   },
 );
+
+function emitTextareaKeyDown(
+  event: KeyboardEvent<HTMLTextAreaElement>,
+  onKeyDown: FormulaInputEditorProps['onKeyDown'],
+) {
+  if (!onKeyDown) return;
+  const target = event.currentTarget;
+  onKeyDown({
+    key: event.key,
+    repeat: event.repeat,
+    selectionCollapsed: target.selectionStart === target.selectionEnd,
+    atStart: target.selectionStart === 0,
+    atEnd: target.selectionEnd === target.value.length,
+    valueBeforeCursor: target.value.slice(0, target.selectionStart),
+    valueAfterCursor: target.value.slice(target.selectionEnd),
+    preventDefault: () => event.preventDefault(),
+  });
+}

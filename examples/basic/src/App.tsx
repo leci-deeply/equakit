@@ -1,58 +1,81 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import {
+  mergeStepWithNext,
+  mergeStepWithPrevious,
+  stepBoundaryDeletionAction,
+  textToStepAnswer,
+} from '@equakit/answer-steps';
 import type { MathClipboardFormatConverter } from '@equakit/clipboard-formats';
+import { extractMathTokens, normalizeMarkdownMath } from '@equakit/math-text';
 import { MathLiveFormulaEditor } from '@equakit/mathlive-editor';
-import { AnswerStepsEditor } from '@equakit/react-answer-steps';
-import { InteractiveChoices } from '@equakit/react-choice';
+import { AnswerStepsEditor, type AnswerStepEditorRenderProps } from '@equakit/react-answer-steps';
 import { MathCopyBoundary } from '@equakit/react-clipboard';
-import { FormulaInput } from '@equakit/react-formula-input';
+import { FormulaInput, type FormulaInputEditorKeyDownEvent } from '@equakit/react-formula-input';
 import { MathFormula } from '@equakit/react-katex';
 import { MarkdownMath } from '@equakit/react-markdown-math';
-import {
-  TIPTAP_MATH_CLIPBOARD_OPTIONS,
-  createTipTapMathExtensions,
-  migrateEquaKitMathStrings,
-} from '@equakit/tiptap-math';
-import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 
-const tipTapMathExtensions = createTipTapMathExtensions();
+const heroSpecimen = String.raw`\int_{-\infty}^{\infty}e^{-x^2}\,\mathrm{d}x=\sqrt{\pi}`;
+const tallFormula = String.raw`\left\{\begin{aligned}F(x)&=\frac{\displaystyle\sum_{k=1}^{n}\frac{x_k^2}{1+x_k^2}}{\displaystyle\sqrt{\int_{0}^{\infty}\frac{e^{-t^2}}{1+t^4}\,\mathrm{d}t}}\\[0.8em]G(x)&=\prod_{j=1}^{m}\left(1+\frac{a_j^2}{b_j^2}\right)^{\frac{1}{j}}\end{aligned}\right.`;
+const responsiveFormula = String.raw`\displaystyle \widehat{f}(\xi)=\int_{-\infty}^{\infty}f(x)e^{-2\pi i x\xi}\,\mathrm{d}x,\qquad f(x)=\int_{-\infty}^{\infty}\widehat{f}(\xi)e^{2\pi i x\xi}\,\mathrm{d}\xi`;
+const copyFormula = String.raw`\int_0^\infty e^{-x^2}\,\mathrm{d}x=\frac{\sqrt{\pi}}{2}`;
+const initialMarkdownSource = String.raw`圆的面积为 \(S=\pi r^2\)。
 
-const explanation = String.raw`
-## 安全的数学富文本工作流
-
-渲染器可以接受 Markdown 和 LaTeX，例如 $f(x)=x^2+1$，并且默认不会启用原始 HTML。
-
-$$
+\[
 \int_0^1 x^2\,\mathrm{d}x=\frac{1}{3}
+\]`;
+const richMarkdownSource = String.raw`使用 **配方法** 求解 $x^2-6x+5=0$：
+
+- 配方得到 $(x-3)^2=4$
+- 因此有两个解
+
 $$
+x=1\quad\text{或}\quad x=5
+$$`;
+const initialStepImport = String.raw`1. x^2-5x+6=0
+2. (x-2)(x-3)=0
+3. x=2\text{ 或 }x=3`;
+const STEP_MERGE_CONFIRMATION_DELAY_MS = 60;
 
-选中并复制这段内容时，复制边界会保留规范化的 LaTeX，而不是视觉字形。
-`;
-
-const heroSpecimen = String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`;
-const tallFormula = String.raw`\int\limits_{-\infty}^{+\infty}\sqrt{\frac{x^2+1}{x^2+2}}\,\mathrm{d}x`;
-const longFormula = String.raw`\displaystyle \sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\left(\prod_{j=1}^{m}\frac{x_j^2+a_j^2}{\sqrt{x_j^2+b_j^2}}\right)=\int_{0}^{\infty}\frac{\sin(tx)}{1+t^2}\,\mathrm{d}t`;
+function renderMathStepEditor({
+  value,
+  onChange,
+  ariaLabel,
+  disabled,
+  placeholder,
+}: AnswerStepEditorRenderProps) {
+  return (
+    <FormulaInput
+      className="demo-answer-step__formula"
+      disabled={disabled}
+      editor={MathLiveFormulaEditor}
+      hidePreview
+      onChange={onChange}
+      palette={[]}
+      placeholder={placeholder}
+      textareaLabel={`${ariaLabel}公式`}
+      value={value}
+    />
+  );
+}
 
 export function App() {
-  const [formula, setFormula] = useState(String.raw`\frac{-b\pm\sqrt{b^2-4ac}}{2a}`);
-  const [mathLiveFormula, setMathLiveFormula] = useState(String.raw`x^2+1`);
+  const [formula, setFormula] = useState(String.raw`\sum_{k=1}^{n}k=\frac{n(n+1)}{2}`);
+  const [stepImport, setStepImport] = useState(initialStepImport);
   const [steps, setSteps] = useState([
-    String.raw`展开 $(x+1)^2=x^2+2x+1$。`,
-    String.raw`合并同类项并求出 $x$。`,
+    String.raw`x^2-5x+6=0`,
+    String.raw`(x-2)(x-3)=0`,
+    String.raw`x\in\{2,3\}`,
   ]);
-  const [selected, setSelected] = useState<string[]>([]);
-  const correct = useMemo(() => ['1'], []);
 
   return (
     <main className="demo-shell" id="main-content" tabIndex={-1}>
       <a className="demo-skip-link" href="#demo-collection">
-        跳到功能矩阵
+        跳到示例
       </a>
 
       <header className="demo-topbar">
         <a className="demo-brand" href="#main-content" aria-label="返回页面顶部">
-          <span className="demo-brand__mark">EQK</span>
           <span className="demo-brand__name">EquaKit Playground</span>
         </a>
 
@@ -64,48 +87,12 @@ export function App() {
 
       <section className="demo-hero" aria-labelledby="demo-title">
         <div className="demo-hero__copy">
-          <p className="demo-eyebrow">数学工具 / Playground / 文档同构</p>
           <h1 id="demo-title">EquaKit</h1>
-          <p className="demo-hero__lede">
-            从 LaTeX 规范化到编辑器接入，让数学内容始终保持为可渲染、可复制、
-            可继续编辑的结构化文本。
-          </p>
-          <div className="demo-hero__chips" aria-label="页面特征">
-            <span className="demo-chip">16 个原子包</span>
-            <span className="demo-chip">5 种剪贴板格式</span>
-            <span className="demo-chip">SSR 安全</span>
-            <span className="demo-chip">无障碍优先</span>
-          </div>
         </div>
 
-        <aside className="demo-hero__panel" aria-label="示例仪表板">
-          <div className="demo-specimen">
-            <div className="demo-specimen__top">
-              <span className="demo-specimen__label">首屏样本</span>
-              <span className="demo-specimen__badge">LaTeX / Markdown</span>
-            </div>
-            <div className="demo-specimen__formula">
-              <MathFormula display expression={heroSpecimen} />
-            </div>
-            <p className="demo-specimen__caption">
-              同一份 LaTeX 数据贯穿输入、渲染、复制与编辑流程，不被视觉字形取代。
-            </p>
-          </div>
-
-          <ul className="demo-hero__facts" aria-label="关键规格">
-            <li>
-              <strong>16</strong>
-              <span>个原子能力包</span>
-            </li>
-            <li>
-              <strong>3</strong>
-              <span>种浏览器验证</span>
-            </li>
-            <li>
-              <strong>65</strong>
-              <span>项单元验证</span>
-            </li>
-          </ul>
+        <aside className="demo-hero__formula" aria-label="LaTeX 示例">
+          <MathFormula display expression={heroSpecimen} />
+          <p>同一份公式可渲染、复制并继续编辑。</p>
         </aside>
       </section>
 
@@ -115,34 +102,35 @@ export function App() {
         aria-labelledby="demo-collection-title"
       >
         <div className="demo-collection__head">
-          <p className="demo-collection__eyebrow">功能矩阵</p>
           <h2 id="demo-collection-title" className="demo-collection__title">
-            安全默认的数学富文本工作台
+            交互示例
           </h2>
-          <p className="demo-collection__lede">
-            按渲染、复制、输入、编辑与作答能力拆分，每个示例都可直接操作并对应独立的软件包。
-          </p>
         </div>
 
         <div className="demo-grid">
-          <article className="demo-card demo-card--span-7">
+          <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
               <span className="demo-card__index">01</span>
-              <span className="demo-card__spec">复制 / Markdown</span>
+              <span className="demo-card__spec">MathLive / 所见即所得</span>
             </header>
-            <h2>Markdown 与复制恢复</h2>
-            <MathCopyBoundary>
-              <MarkdownMath>{explanation}</MarkdownMath>
-            </MathCopyBoundary>
+            <h2>可视化公式输入</h2>
+            <FormulaInput
+              className="demo-formula-workbench"
+              editor={MathLiveFormulaEditor}
+              hidePreview
+              onChange={setFormula}
+              palette={[]}
+              textareaLabel="可视化公式输入区"
+              value={formula}
+            />
           </article>
 
-          <article className="demo-card demo-card--span-5">
+          <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
               <span className="demo-card__index">02</span>
-              <span className="demo-card__spec">多 MIME / 剪贴板</span>
+              <span className="demo-card__spec">复制 / 粘贴 / 继续编辑</span>
             </header>
-            <h2>多格式公式复制</h2>
-            <p>选中公式后复制，同时提供 LaTeX、MathML、AsciiMath 和 MathJSON。</p>
+            <h2>公式复制与继续编辑</h2>
             <MultiFormatCopyDemo />
           </article>
 
@@ -152,84 +140,274 @@ export function App() {
               <span className="demo-card__spec">视觉回归 / KaTeX</span>
             </header>
             <h2>KaTeX 视觉回归矩阵</h2>
-            <p>覆盖分式、根式、定界符、矩阵、极限、积分、字体和上下标布局。</p>
-            <KaTeXVisualMatrix />
-            <FormulaLayoutDemos />
+            <MathCopyBoundary>
+              <KaTeXVisualMatrix />
+              <FormulaLayoutDemos />
+            </MathCopyBoundary>
           </article>
 
-          <article className="demo-card demo-card--span-4">
+          <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
               <span className="demo-card__index">04</span>
-              <span className="demo-card__spec">输入 / 预览</span>
+              <span className="demo-card__spec">文本导入 / 分步作答</span>
             </header>
-            <h2>公式输入</h2>
-            <FormulaInput onChange={setFormula} value={formula} />
-            <div className="demo-result">
-              <MathFormula display expression={formula} />
+            <h2>解题过程转为公式步骤</h2>
+            <div className="demo-step-converter">
+              <section className="demo-step-converter__panel" aria-labelledby="step-source-title">
+                <div className="demo-panel-heading">
+                  <strong id="step-source-title">粘贴解题过程</strong>
+                  <span>每行一个公式</span>
+                </div>
+                <textarea
+                  aria-label="粘贴解题过程"
+                  id="step-import-source"
+                  onChange={(event) => setStepImport(event.target.value)}
+                  rows={7}
+                  spellCheck={false}
+                  value={stepImport}
+                />
+                <button
+                  className="demo-action"
+                  onClick={() => setSteps(textToStepAnswer(stepImport).steps)}
+                  type="button"
+                >
+                  转换为步骤
+                </button>
+              </section>
+              <span className="demo-step-converter__arrow" aria-hidden="true">
+                →
+              </span>
+              <section className="demo-step-converter__panel" aria-labelledby="step-result-title">
+                <div className="demo-panel-heading">
+                  <strong id="step-result-title">可编辑公式步骤</strong>
+                  <span>{steps.length} 步</span>
+                </div>
+                <AnswerStepsEditor
+                  addLabel="＋ 添加一步"
+                  className="demo-answer-steps"
+                  onChange={setSteps}
+                  renderStepEditor={renderMathStepEditor}
+                  steps={steps}
+                />
+              </section>
             </div>
           </article>
 
-          <article className="demo-card demo-card--span-4">
-            <header className="demo-card__header">
+          <article className="demo-card demo-card--span-12">
+            <header className="demo-card__header demo-card__header--stacked">
               <span className="demo-card__index">05</span>
-              <span className="demo-card__spec">MathLive / 可选</span>
+              <div className="demo-card__meta">
+                <span className="demo-card__spec">不同公式写法自动兼容</span>
+                <div className="demo-syntax-legend" aria-label="支持的公式写法">
+                  <span>
+                    <code>\(...\)</code> 行内公式
+                  </span>
+                  <span>
+                    <code>\[...\]</code> 块级公式
+                  </span>
+                </div>
+              </div>
             </header>
-            <h2>MathLive 可选输入</h2>
-            <p>主包保持轻量，按需安装 adapter 后可以切换为结构化数学输入器。</p>
-            <FormulaInput
-              editor={MathLiveFormulaEditor}
-              onChange={setMathLiveFormula}
-              previewLabel="MathLive 预览"
-              textareaLabel="MathLive 公式源码"
-              value={mathLiveFormula}
-            />
+            <h2>数学文本转换</h2>
+            <MarkdownCompatibilityDemo />
           </article>
 
-          <article className="demo-card demo-card--span-4">
+          <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
               <span className="demo-card__index">06</span>
-              <span className="demo-card__spec">TipTap / 节点</span>
+              <span className="demo-card__spec">复制 / Markdown / LaTeX</span>
             </header>
-            <h2>TipTap inline/block 数学节点</h2>
-            <p>节点保存 LaTeX 属性，使用官方命令编辑，并接入 EquaKit 数学剪贴板。</p>
-            <TipTapMathDemo />
+            <h2>富文本公式恢复</h2>
+            <RichTextRestoreDemo />
           </article>
 
-          <article className="demo-card demo-card--span-5">
+          <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
               <span className="demo-card__index">07</span>
-              <span className="demo-card__spec">练习 / 交互</span>
+              <span className="demo-card__spec">步骤 / 拆分 / 合并</span>
             </header>
-            <h2>可访问的选择题</h2>
-            <InteractiveChoices
-              choices={['$x=1$', '$x=2$', '$x=3$']}
-              correct={correct}
-              onChange={setSelected}
-              reveal={selected.length > 0}
-              selected={selected}
-            />
-          </article>
-
-          <article className="demo-card demo-card--span-7">
-            <header className="demo-card__header">
-              <span className="demo-card__index">08</span>
-              <span className="demo-card__spec">步骤 / 合并</span>
-            </header>
-            <h2>分步答案编辑器</h2>
-            <p>
-              在分步边界处，第一次按 Backspace/Delete 会进入合并待确认状态，第二次才真正合并，
-              从而避免误删。
-            </p>
-            <AnswerStepsEditor onChange={setSteps} steps={steps} />
+            <h2>步骤结构编辑</h2>
+            <StepStructureDemo />
           </article>
         </div>
       </section>
 
       <footer className="demo-footer">
-        <p>EquaKit · 数学富文本复制、渲染与答案编辑工具集。</p>
-        <p>查看 API 文档了解接口，或前往 GitHub 阅读源码与集成示例。</p>
+        <p>EquaKit · MIT License</p>
       </footer>
     </main>
+  );
+}
+
+function MarkdownCompatibilityDemo() {
+  const [markdownSource, setMarkdownSource] = useState(initialMarkdownSource);
+  const normalizedMarkdown = normalizeMarkdownMath(markdownSource);
+  const mathTokens = extractMathTokens(normalizedMarkdown);
+  const inlineFormulaCount = mathTokens.filter((token) => !token.display).length;
+  const blockFormulaCount = mathTokens.filter((token) => token.display).length;
+
+  return (
+    <div className="demo-transform-grid">
+      <div className="demo-field">
+        <textarea
+          aria-label="公式内容"
+          id="markdown-source"
+          onChange={(event) => setMarkdownSource(event.target.value)}
+          rows={9}
+          spellCheck={false}
+          value={markdownSource}
+        />
+      </div>
+      <div className="demo-transform-output" aria-live="polite">
+        <span className="demo-field__label">识别后的显示</span>
+        <MarkdownMath>{normalizedMarkdown}</MarkdownMath>
+        <output className="demo-transform-output__status">
+          已识别 {inlineFormulaCount} 个行内公式和 {blockFormulaCount} 个块级公式
+        </output>
+      </div>
+    </div>
+  );
+}
+
+function RichTextRestoreDemo() {
+  const [restoredMarkdown, setRestoredMarkdown] = useState('');
+
+  return (
+    <div className="demo-transform-grid">
+      <div className="demo-rich-source">
+        <span className="demo-field__label">框选并复制</span>
+        <MathCopyBoundary options={{ displayMathSelector: '.katex-display .katex' }}>
+          <div data-testid="rich-math-source">
+            <MarkdownMath>{richMarkdownSource}</MarkdownMath>
+          </div>
+        </MathCopyBoundary>
+      </div>
+      <label className="demo-field" htmlFor="restored-markdown">
+        <span>粘贴后的 Markdown + LaTeX</span>
+        <textarea
+          id="restored-markdown"
+          onChange={(event) => setRestoredMarkdown(event.target.value)}
+          placeholder="在这里粘贴"
+          rows={11}
+          spellCheck={false}
+          value={restoredMarkdown}
+        />
+      </label>
+    </div>
+  );
+}
+
+function StepStructureDemo() {
+  const [structuredSteps, setStructuredSteps] = useState([
+    String.raw`x^2-5x+6=0`,
+    String.raw`(x-2)(x-3)=0`,
+    String.raw`x\in\{2,3\}`,
+  ]);
+  const [armedStep, setArmedStep] = useState<number | null>(null);
+  const armedStepRef = useRef<number | null>(null);
+  const armedStepAtRef = useRef(0);
+
+  function setMergeArm(index: number | null) {
+    armedStepRef.current = index;
+    armedStepAtRef.current = index === null ? 0 : Date.now();
+    setArmedStep(index);
+  }
+
+  function updateStep(index: number, value: string) {
+    setMergeArm(null);
+    setStructuredSteps((current) =>
+      current.map((step, stepIndex) => (stepIndex === index ? value : step)),
+    );
+  }
+
+  function focusStep(index: number, caret: 'start' | 'end') {
+    globalThis.requestAnimationFrame?.(() => {
+      const target = document.querySelector<
+        HTMLElement & { position: number; lastOffset: number; shadowRoot: ShadowRoot | null }
+      >(`math-field[aria-label="结构步骤 ${index + 1}"]`);
+      if (!target) return;
+      const keyboardSink = target.shadowRoot?.querySelector<HTMLElement>('[part~="keyboard-sink"]');
+      (keyboardSink ?? target).focus();
+      target.position = caret === 'start' ? 0 : target.lastOffset;
+    });
+  }
+
+  function handleStepKey(event: FormulaInputEditorKeyDownEvent, index: number) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      setStructuredSteps((current) => {
+        const next = [...current];
+        next.splice(index, 1, event.valueBeforeCursor, event.valueAfterCursor);
+        return next;
+      });
+      setMergeArm(null);
+      focusStep(index + 1, 'start');
+      return;
+    }
+
+    const atStepBoundary =
+      (event.key === 'Backspace' && event.atStart && index > 0) ||
+      (event.key === 'Delete' && event.atEnd && index < structuredSteps.length - 1);
+    const action = stepBoundaryDeletionAction({
+      key: event.key,
+      selectionCollapsed: event.selectionCollapsed,
+      atStepBoundary,
+      targetAlreadyArmed:
+        armedStepRef.current === index &&
+        Date.now() - armedStepAtRef.current >= STEP_MERGE_CONFIRMATION_DELAY_MS,
+      repeat: event.repeat,
+    });
+
+    if (action === 'none') {
+      setMergeArm(null);
+      return;
+    }
+
+    event.preventDefault();
+    if (action === 'hold') return;
+    if (action === 'arm') {
+      setMergeArm(index);
+      return;
+    }
+
+    const mergingBackward = event.key === 'Backspace';
+    setStructuredSteps((current) =>
+      mergingBackward ? mergeStepWithPrevious(current, index) : mergeStepWithNext(current, index),
+    );
+    setMergeArm(null);
+    focusStep(mergingBackward ? index - 1 : index, 'end');
+  }
+
+  return (
+    <div className="demo-step-structure">
+      <div className="demo-step-shortcuts" aria-label="步骤编辑操作">
+        <span>Enter 拆分</span>
+        <span>两次 Backspace / Delete 合并</span>
+      </div>
+      <div className="demo-step-structure__list">
+        {structuredSteps.map((step, index) => (
+          <div className="demo-step-structure__row" key={index}>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <FormulaInput
+              className="demo-step-structure__formula"
+              editor={MathLiveFormulaEditor}
+              hidePreview
+              onChange={(value) => updateStep(index, value)}
+              onEditorKeyDown={(event) => handleStepKey(event, index)}
+              palette={[]}
+              placeholder=""
+              textareaLabel={`结构步骤 ${index + 1}`}
+              value={step}
+            />
+          </div>
+        ))}
+      </div>
+      {armedStep !== null && (
+        <p className="demo-step-structure__status" role="status">
+          再次按相同按键以合并相邻步骤。
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -256,6 +434,8 @@ function KaTeXVisualMatrix() {
 }
 
 function FormulaLayoutDemos() {
+  const [containerWidth, setContainerWidth] = useState(220);
+
   return (
     <div className="demo-formula-layout" aria-label="公式布局验证">
       <section className="demo-formula-layout__sample" data-testid="formula-height-sample">
@@ -263,24 +443,37 @@ function FormulaLayoutDemos() {
         <MathFormula ariaLabel="高度自适应公式" display expression={tallFormula} />
         <p data-testid="formula-height-following">公式后的正文不会被上下标或根式覆盖。</p>
       </section>
-      <section className="demo-formula-layout__sample" data-testid="formula-overflow-sample">
-        <h3>超长公式滚动提示</h3>
-        <MarkdownMath overflowIndicator="hover-scrollbar">{`$$${longFormula}$$`}</MarkdownMath>
-      </section>
       <section
-        className="demo-formula-layout__sample"
-        data-testid="formula-default-overflow-sample"
+        className="demo-formula-layout__sample demo-formula-layout__sample--responsive"
+        data-testid="formula-responsive-width-sample"
       >
-        <h3>默认滚动可访问</h3>
-        <MarkdownMath>{`$$${longFormula}$$`}</MarkdownMath>
-      </section>
-      <section className="demo-formula-layout__sample" data-testid="formula-direct-overflow-sample">
-        <h3>单公式滚动可访问</h3>
-        <MathFormula ariaLabel="超长单公式" display expression={longFormula} />
-      </section>
-      <section className="demo-formula-layout__sample" data-testid="formula-short-sample">
-        <h3>短公式保持干净</h3>
-        <MarkdownMath overflowIndicator="hover-scrollbar">{'$x^2+y^2=z^2$'}</MarkdownMath>
+        <div className="demo-formula-resize__header">
+          <h3>动态宽度适配</h3>
+          <output htmlFor="formula-width-control">{containerWidth}px</output>
+        </div>
+        <label className="demo-formula-resize__control" htmlFor="formula-width-control">
+          <span>容器宽度</span>
+          <input
+            id="formula-width-control"
+            max="640"
+            min="220"
+            onChange={(event) => setContainerWidth(Number(event.target.value))}
+            step="20"
+            type="range"
+            value={containerWidth}
+          />
+        </label>
+        <div className="demo-formula-resize__stage" data-testid="formula-responsive-width-stage">
+          <div
+            className="demo-formula-resize__frame"
+            data-testid="formula-responsive-width-frame"
+            style={{ width: `${containerWidth}px` }}
+          >
+            <MarkdownMath overflowIndicator="hover-scrollbar">
+              {`$$${responsiveFormula}$$`}
+            </MarkdownMath>
+          </div>
+        </div>
       </section>
     </div>
   );
@@ -289,6 +482,7 @@ function FormulaLayoutDemos() {
 function MultiFormatCopyDemo() {
   const [converter, setConverter] = useState<MathClipboardFormatConverter | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [targetFormula, setTargetFormula] = useState('');
 
   useEffect(() => {
     let disposed = false;
@@ -308,84 +502,38 @@ function MultiFormatCopyDemo() {
   if (!converter) return <span role="status">正在加载多格式转换器。</span>;
 
   return (
-    <>
-      <span className="mre-visually-hidden" role="status">
-        多格式转换器已加载。
+    <div className="demo-copy-transfer">
+      <section className="demo-copy-transfer__panel" aria-labelledby="copy-source-label">
+        <span className="demo-copy-transfer__label" id="copy-source-label">
+          复制公式
+        </span>
+        <MathCopyBoundary converter={converter}>
+          <div className="demo-copy-example" aria-label="多格式复制公式" role="group">
+            <MathFormula ariaLabel="高斯积分" display expression={copyFormula} />
+            <code>LaTeX · MathML · AsciiMath · MathJSON</code>
+          </div>
+        </MathCopyBoundary>
+      </section>
+
+      <span className="demo-copy-transfer__arrow" aria-hidden="true">
+        →
       </span>
-      <MathCopyBoundary converter={converter}>
-        <div aria-label="多格式复制公式" role="group">
-          <MathFormula ariaLabel="二分之一" display expression={'\\frac{1}{2}'} />
-        </div>
-      </MathCopyBoundary>
-    </>
-  );
-}
 
-function TipTapMathDemo() {
-  const editor = useEditor({
-    content: String.raw`
-      <p>行内公式：<span data-type="inline-math" data-latex="x^2+1"></span></p>
-      <div data-type="block-math" data-latex="\int_0^1 x^2\,\mathrm{d}x"></div>
-    `,
-    editorProps: {
-      attributes: {
-        'aria-label': 'TipTap 数学编辑器',
-        'aria-multiline': 'true',
-        class: 'demo-tiptap__editor',
-        role: 'textbox',
-      },
-    },
-    extensions: [StarterKit, ...tipTapMathExtensions],
-    immediatelyRender: false,
-  });
-
-  return (
-    <div className="demo-tiptap">
-      <div className="demo-actions" role="toolbar" aria-label="TipTap 数学节点操作">
-        <button
-          disabled={!editor}
-          onClick={() => {
-            if (!editor) return;
-            const paragraphEnd = Math.max(1, (editor.state.doc.firstChild?.nodeSize ?? 2) - 1);
-            const inserted = editor.commands.insertInlineMath({
-              latex: '\\sqrt{x}',
-              pos: paragraphEnd,
-            });
-            if (inserted) editor.commands.focus();
-          }}
-          type="button"
-        >
-          插入行内公式
-        </button>
-        <button
-          disabled={!editor}
-          onClick={() => {
-            if (!editor) return;
-            const inserted = editor.commands.insertBlockMath({
-              latex: '\\sum_{i=1}^{n} i',
-              pos: editor.state.doc.content.size,
-            });
-            if (inserted) editor.commands.focus();
-          }}
-          type="button"
-        >
-          插入块级公式
-        </button>
-        <button
-          disabled={!editor}
-          onClick={() => {
-            if (!editor) return;
-            editor.commands.setContent('<p>价格 $100$，旧公式 $a+b$。</p>');
-            migrateEquaKitMathStrings(editor);
-          }}
-          type="button"
-        >
-          迁移旧公式文本
-        </button>
-      </div>
-      <MathCopyBoundary options={TIPTAP_MATH_CLIPBOARD_OPTIONS}>
-        <EditorContent editor={editor} />
-      </MathCopyBoundary>
+      <section className="demo-copy-transfer__panel" aria-labelledby="copy-target-label">
+        <span className="demo-copy-transfer__label" id="copy-target-label">
+          粘贴并继续编辑
+        </span>
+        <FormulaInput
+          className="demo-copy-transfer__input"
+          editor={MathLiveFormulaEditor}
+          hidePreview
+          onChange={setTargetFormula}
+          palette={[]}
+          placeholder=""
+          textareaLabel="公式粘贴输入区"
+          value={targetFormula}
+        />
+      </section>
     </div>
   );
 }
