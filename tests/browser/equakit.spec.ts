@@ -18,6 +18,13 @@ test('Playground 提供 API 文档和 GitHub 导航', async ({ page }) => {
   );
 });
 
+test('可视化公式输入是首个交互示例', async ({ page }) => {
+  const cards = page.locator('.demo-grid > .demo-card');
+
+  await expect(cards.first().getByRole('heading', { name: '可视化公式输入' })).toBeVisible();
+  await expect(cards.locator('.demo-card__index')).toHaveText(['01', '02', '03', '04', '05']);
+});
+
 test('高公式按字形撑开且不会覆盖后续正文', async ({ page }) => {
   const sample = page.getByTestId('formula-height-sample');
   const formula = sample.locator('.mre-math-formula--display');
@@ -40,37 +47,21 @@ test('高公式按字形撑开且不会覆盖后续正文', async ({ page }) => 
   expect(followingBox!.y).toBeGreaterThanOrEqual(formulaBox!.y + formulaBox!.height - 1);
 });
 
-test('所有超宽公式均可键盘访问且视觉提示保持按需启用', async ({ page, browserName }) => {
+test('窄容器公式可键盘访问且显示按需滚动提示', async ({ page, browserName }) => {
   const overflowing = page
-    .getByTestId('formula-overflow-sample')
+    .getByTestId('formula-responsive-width-sample')
     .locator('.katex-display > .katex');
-  const defaultOverflowing = page
-    .getByTestId('formula-default-overflow-sample')
-    .locator('.katex-display > .katex');
-  const directOverflowing = page
-    .getByTestId('formula-direct-overflow-sample')
-    .locator('.mre-math-formula__scroll');
-  const short = page.getByTestId('formula-short-sample').locator('.katex');
+  await expect(overflowing).toHaveClass(/mre-math-overflowing/);
+  await expect(overflowing).toHaveAttribute('tabindex', '0');
+  const dimensions = await overflowing.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }));
+  expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
 
-  for (const formula of [overflowing, defaultOverflowing, directOverflowing]) {
-    await expect(formula).toHaveClass(/mre-math-overflowing/);
-    await expect(formula).toHaveAttribute('tabindex', '0');
-    const dimensions = await formula.evaluate((element) => ({
-      clientWidth: element.clientWidth,
-      scrollWidth: element.scrollWidth,
-    }));
-    expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth);
-
-    await formula.focus();
-    for (let index = 0; index < 5; index += 1) await page.keyboard.press('ArrowRight');
-    await expect.poll(() => formula.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
-  }
-
-  await expect(
-    page.getByTestId('formula-default-overflow-sample').locator('.mre-markdown-math'),
-  ).not.toHaveClass(/mre-markdown-math--overflow-aware/);
-  await expect(short).not.toHaveClass(/mre-math-overflowing/);
-  await expect(short).not.toHaveAttribute('tabindex');
+  await overflowing.focus();
+  for (let index = 0; index < 5; index += 1) await page.keyboard.press('ArrowRight');
+  await expect.poll(() => overflowing.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
 
   if (browserName === 'chromium') {
     await overflowing.hover();
@@ -83,7 +74,7 @@ test('所有超宽公式均可键盘访问且视觉提示保持按需启用', as
   }
 });
 
-test('缺少 CSS Font Loading API 时公式溢出检测仍能工作', async ({ page }) => {
+test('缺少 CSS Font Loading API 时滚动提示检测仍能工作', async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(document, 'fonts', {
       configurable: true,
@@ -94,11 +85,22 @@ test('缺少 CSS Font Loading API 时公式溢出检测仍能工作', async ({ p
 
   expect(await page.evaluate(() => typeof document.fonts)).toBe('undefined');
   await expect(
-    page.getByTestId('formula-default-overflow-sample').locator('.katex-display > .katex'),
+    page.getByTestId('formula-responsive-width-sample').locator('.katex-display > .katex'),
   ).toHaveAttribute('tabindex', '0');
-  await expect(
-    page.getByTestId('formula-direct-overflow-sample').locator('.mre-math-formula__scroll'),
-  ).toHaveAttribute('tabindex', '0');
+});
+
+test('容器宽度变化时滚动提示自动出现并消失', async ({ page }) => {
+  const sample = page.getByTestId('formula-responsive-width-sample');
+  const slider = sample.getByRole('slider', { name: '容器宽度' });
+  const formula = sample.locator('.katex-display > .katex');
+
+  await slider.fill('220');
+  await expect(sample.locator('output')).toHaveText('220px');
+  await expect(formula).toHaveClass(/mre-math-overflowing/);
+
+  await slider.fill('640');
+  await expect(sample.locator('output')).toHaveText('640px');
+  await expect(formula).not.toHaveClass(/mre-math-overflowing/);
 });
 
 test('复制左侧公式后可粘贴到右侧并继续可视化编辑', async ({ page, browserName }) => {

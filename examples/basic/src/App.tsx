@@ -18,8 +18,8 @@ import StarterKit from '@tiptap/starter-kit';
 const tipTapMathExtensions = createTipTapMathExtensions();
 
 const heroSpecimen = String.raw`\int_{-\infty}^{\infty}e^{-x^2}\,\mathrm{d}x=\sqrt{\pi}`;
-const tallFormula = String.raw`\int\limits_{-\infty}^{+\infty}\sqrt{\frac{x^2+1}{x^2+2}}\,\mathrm{d}x`;
-const longFormula = String.raw`\displaystyle \sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\left(\prod_{j=1}^{m}\frac{x_j^2+a_j^2}{\sqrt{x_j^2+b_j^2}}\right)=\int_{0}^{\infty}\frac{\sin(tx)}{1+t^2}\,\mathrm{d}t`;
+const tallFormula = String.raw`\left\{\begin{aligned}F(x)&=\frac{\displaystyle\sum_{k=1}^{n}\frac{x_k^2}{1+x_k^2}}{\displaystyle\sqrt{\int_{0}^{\infty}\frac{e^{-t^2}}{1+t^4}\,\mathrm{d}t}}\\[0.8em]G(x)&=\prod_{j=1}^{m}\left(1+\frac{a_j^2}{b_j^2}\right)^{\frac{1}{j}}\end{aligned}\right.`;
+const responsiveFormula = String.raw`\displaystyle A^n=P\begin{pmatrix}\lambda_1^n&0&0\\0&\lambda_2^n&0\\0&0&\lambda_3^n\end{pmatrix}P^{-1}`;
 const copyFormula = String.raw`\int_0^\infty e^{-x^2}\,\mathrm{d}x=\frac{\sqrt{\pi}}{2}`;
 
 export function App() {
@@ -73,27 +73,6 @@ export function App() {
           <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
               <span className="demo-card__index">01</span>
-              <span className="demo-card__spec">复制 / 粘贴 / 继续编辑</span>
-            </header>
-            <h2>公式复制与继续编辑</h2>
-            <MultiFormatCopyDemo />
-          </article>
-
-          <article className="demo-card demo-card--span-12">
-            <header className="demo-card__header">
-              <span className="demo-card__index">02</span>
-              <span className="demo-card__spec">视觉回归 / KaTeX</span>
-            </header>
-            <h2>KaTeX 视觉回归矩阵</h2>
-            <MathCopyBoundary>
-              <KaTeXVisualMatrix />
-              <FormulaLayoutDemos />
-            </MathCopyBoundary>
-          </article>
-
-          <article className="demo-card demo-card--span-12">
-            <header className="demo-card__header">
-              <span className="demo-card__index">03</span>
               <span className="demo-card__spec">MathLive / 所见即所得</span>
             </header>
             <h2>可视化公式输入</h2>
@@ -106,6 +85,27 @@ export function App() {
               textareaLabel="可视化公式输入区"
               value={formula}
             />
+          </article>
+
+          <article className="demo-card demo-card--span-12">
+            <header className="demo-card__header">
+              <span className="demo-card__index">02</span>
+              <span className="demo-card__spec">复制 / 粘贴 / 继续编辑</span>
+            </header>
+            <h2>公式复制与继续编辑</h2>
+            <MultiFormatCopyDemo />
+          </article>
+
+          <article className="demo-card demo-card--span-12">
+            <header className="demo-card__header">
+              <span className="demo-card__index">03</span>
+              <span className="demo-card__spec">视觉回归 / KaTeX</span>
+            </header>
+            <h2>KaTeX 视觉回归矩阵</h2>
+            <MathCopyBoundary>
+              <KaTeXVisualMatrix />
+              <FormulaLayoutDemos />
+            </MathCopyBoundary>
           </article>
 
           <article className="demo-card demo-card--span-12">
@@ -158,6 +158,8 @@ function KaTeXVisualMatrix() {
 }
 
 function FormulaLayoutDemos() {
+  const [containerWidth, setContainerWidth] = useState(220);
+
   return (
     <div className="demo-formula-layout" aria-label="公式布局验证">
       <section className="demo-formula-layout__sample" data-testid="formula-height-sample">
@@ -165,24 +167,35 @@ function FormulaLayoutDemos() {
         <MathFormula ariaLabel="高度自适应公式" display expression={tallFormula} />
         <p data-testid="formula-height-following">公式后的正文不会被上下标或根式覆盖。</p>
       </section>
-      <section className="demo-formula-layout__sample" data-testid="formula-overflow-sample">
-        <h3>超长公式滚动提示</h3>
-        <MarkdownMath overflowIndicator="hover-scrollbar">{`$$${longFormula}$$`}</MarkdownMath>
-      </section>
       <section
         className="demo-formula-layout__sample"
-        data-testid="formula-default-overflow-sample"
+        data-testid="formula-responsive-width-sample"
       >
-        <h3>默认滚动可访问</h3>
-        <MarkdownMath>{`$$${longFormula}$$`}</MarkdownMath>
-      </section>
-      <section className="demo-formula-layout__sample" data-testid="formula-direct-overflow-sample">
-        <h3>单公式滚动可访问</h3>
-        <MathFormula ariaLabel="超长单公式" display expression={longFormula} />
-      </section>
-      <section className="demo-formula-layout__sample" data-testid="formula-short-sample">
-        <h3>短公式不显示滚动提示</h3>
-        <MarkdownMath overflowIndicator="hover-scrollbar">{'$e^{i\\pi}+1=0$'}</MarkdownMath>
+        <div className="demo-formula-resize__header">
+          <h3>动态宽度适配</h3>
+          <output htmlFor="formula-width-control">{containerWidth}px</output>
+        </div>
+        <label className="demo-formula-resize__control" htmlFor="formula-width-control">
+          <span>容器宽度</span>
+          <input
+            id="formula-width-control"
+            max="640"
+            min="220"
+            onChange={(event) => setContainerWidth(Number(event.target.value))}
+            step="20"
+            type="range"
+            value={containerWidth}
+          />
+        </label>
+        <div
+          className="demo-formula-resize__frame"
+          data-testid="formula-responsive-width-frame"
+          style={{ width: `${containerWidth}px` }}
+        >
+          <MarkdownMath overflowIndicator="hover-scrollbar">
+            {`$$${responsiveFormula}$$`}
+          </MarkdownMath>
+        </div>
       </section>
     </div>
   );
