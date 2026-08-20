@@ -157,7 +157,9 @@ pnpm check
 pnpm release:formula:dry-run
 ```
 
-只有在 `main` 干净检出、版本和 tag 已确认后，才运行 `pnpm release:formula:publish`。
+后续版本在 4 个公开 package 的版本与签名 `v*` tag 一致后，通过 `.github/workflows/publish.yml`
+从 `main` 自动发布。工作流会重新运行完整检查、生成 tarball，并使用 npm Trusted Publishing 的
+短期 OIDC 凭据发布 provenance；`pnpm release:formula:publish` 只保留为维护者人工恢复入口。
 
 ## 原子包使用示例
 

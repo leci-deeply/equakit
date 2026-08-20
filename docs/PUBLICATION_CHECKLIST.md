@@ -52,4 +52,6 @@
 - [x] 已加入 CodeQL JavaScript/TypeScript 安全扫描工作流。
 - [x] 已加入 Demo JavaScript/CSS 体积预算和 MathLive 独立分块检查。
 - [x] 已创建并推送签名的 `v0.1.0` tag，并发布 GitHub Release；首版未启用 npm provenance。
+- [x] 已加入校验 main、tag、版本和 tarball 的 npm OIDC 发布工作流。
+- [ ] 为 4 个公开包绑定 npm Trusted Publisher；后续版本自动生成 provenance。
 - [x] GitHub Pages Playground 与 API 文档公开地址部署成功。

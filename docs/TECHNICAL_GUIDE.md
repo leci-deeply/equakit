@@ -636,8 +636,8 @@ GitHub Pages workflow 使用官方 configure/upload/deploy actions，在 `main` 
 
 - Demo 同时打包所有能力，chunk 偏大；
 - 已提供 Chromium、Firefox、WebKit 兼容矩阵，以及 Demo JavaScript/CSS 和 MathLive 独立分块预算；
-- npm `equakit` 组织与 `@equakit` scope 已创建；package 已补齐 GitHub、作者和公开发布
-  策略元数据，但在首次发布准备完成前仍保持 private。
+- npm `equakit` 组织与 `@equakit` scope 已创建；4 个公式原子包已公开发布，其余 package 继续
+  保持 private。后续版本通过 GitHub Actions OIDC 和 npm Trusted Publishing 生成 provenance。
 
 ## 23. 技术决策总结
 
