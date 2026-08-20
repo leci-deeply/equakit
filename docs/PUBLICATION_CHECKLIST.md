@@ -51,7 +51,9 @@
 - [x] 已启用 Dependabot security updates 和 GitHub Private Vulnerability Reporting。
 - [x] 已加入 CodeQL JavaScript/TypeScript 安全扫描工作流。
 - [x] 已加入 Demo JavaScript/CSS 体积预算和 MathLive 独立分块检查。
-- [x] 已创建并推送签名的 `v0.1.0` tag，并发布 GitHub Release；首版未启用 npm provenance。
+- [x] 已创建并推送 `v0.1.0` tag 和 GitHub Release；首版 tag 具备本地 SSH 签名，但旧密钥未被
+      GitHub 账号验证，且首版未启用 npm provenance。为保持公开 tag 不变，不回写首版发布。
+- [x] 已登记 EquaKit 专用 GitHub Signing Key；后续提交与 tag 使用 GitHub 可验证签名。
 - [x] 已加入校验 main、tag、版本和 tarball 的 npm OIDC 发布工作流。
-- [ ] 为 4 个公开包绑定 npm Trusted Publisher；后续版本自动生成 provenance。
+- [x] 已为 4 个公开包绑定 `publish.yml` npm Trusted Publisher；后续版本自动生成 provenance。
 - [x] GitHub Pages Playground 与 API 文档公开地址部署成功。
