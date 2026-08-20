@@ -14,7 +14,6 @@
     "@equakit/mathlive-editor": "workspace:*",
     "@equakit/mathlive-formats": "workspace:*",
     "@equakit/react-answer-steps": "workspace:*",
-    "@equakit/react-choice": "workspace:*",
     "@equakit/react-clipboard": "workspace:*",
     "@equakit/react-formula-input": "workspace:*",
     "@equakit/react-katex": "workspace:*",

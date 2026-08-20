@@ -62,9 +62,6 @@ importers:
       '@equakit/react-answer-steps':
         specifier: workspace:*
         version: link:../../packages/react-answer-steps
-      '@equakit/react-choice':
-        specifier: workspace:*
-        version: link:../../packages/react-choice
       '@equakit/react-clipboard':
         specifier: workspace:*
         version: link:../../packages/react-clipboard
