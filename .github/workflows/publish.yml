@@ -1,0 +1,123 @@
+name: 发布 npm 包
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: 验证发布标签和 package 版本
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          git fetch --no-tags origin main
+          git merge-base --is-ancestor HEAD origin/main
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+
+          const tag = process.env.RELEASE_TAG ?? '';
+          if (!/^v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(tag)) {
+            throw new Error(`发布标签格式无效：${tag}`);
+          }
+
+          const version = tag.slice(1);
+          const manifests = [
+            'packages/math-text/package.json',
+            'packages/katex-engine/package.json',
+            'packages/react-katex/package.json',
+            'packages/react-markdown-math/package.json',
+          ];
+
+          for (const path of manifests) {
+            const manifest = JSON.parse(readFileSync(path, 'utf8'));
+            if (manifest.private !== false) {
+              throw new Error(`${manifest.name} 未声明为公开发布包。`);
+            }
+            if (manifest.version !== version) {
+              throw new Error(`${manifest.name} 版本 ${manifest.version} 与标签 ${tag} 不一致。`);
+            }
+          }
+          NODE
+          echo "RELEASE_VERSION=${RELEASE_TAG#v}" >> "$GITHUB_ENV"
+      - name: 验证 GitHub 标签签名
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          tag_object="$(gh api \
+            "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" \
+            --jq '.object.sha')"
+          verified="$(gh api \
+            "repos/${GITHUB_REPOSITORY}/git/tags/${tag_object}" \
+            --jq '.verification.verified')"
+          if [ "$verified" != 'true' ]; then
+            gh api \
+              "repos/${GITHUB_REPOSITORY}/git/tags/${tag_object}" \
+              --jq '.verification'
+            exit 1
+          fi
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.18.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm check
+      - name: 生成发布 tarball
+        run: |
+          mkdir -p "$RUNNER_TEMP/equakit-release"
+          pnpm --filter @equakit/math-text pack --pack-destination "$RUNNER_TEMP/equakit-release"
+          pnpm --filter @equakit/katex-engine pack --pack-destination "$RUNNER_TEMP/equakit-release"
+          pnpm --filter @equakit/react-katex pack --pack-destination "$RUNNER_TEMP/equakit-release"
+          pnpm --filter @equakit/react-markdown-math pack --pack-destination "$RUNNER_TEMP/equakit-release"
+      - name: 通过 npm OIDC 发布并生成 provenance
+        env:
+          NPM_CONFIG_PROVENANCE: 'true'
+        run: |
+          publish_or_verify() {
+            package_name="$1"
+            tarball="$2"
+            expected_shasum="$(sha1sum "$tarball" | awk '{print $1}')"
+
+            if published_shasum="$(npm view "${package_name}@${RELEASE_VERSION}" dist.shasum 2>/dev/null)"; then
+              if [ "$published_shasum" != "$expected_shasum" ]; then
+                echo "${package_name}@${RELEASE_VERSION} 已存在，但 tarball 校验和不一致。" >&2
+                return 1
+              fi
+              echo "${package_name}@${RELEASE_VERSION} 已发布且 tarball 一致，跳过。"
+              return 0
+            fi
+
+            npm publish "$tarball" --access public
+          }
+
+          publish_or_verify \
+            @equakit/math-text \
+            "$RUNNER_TEMP/equakit-release/equakit-math-text-${RELEASE_VERSION}.tgz"
+          publish_or_verify \
+            @equakit/katex-engine \
+            "$RUNNER_TEMP/equakit-release/equakit-katex-engine-${RELEASE_VERSION}.tgz"
+          publish_or_verify \
+            @equakit/react-katex \
+            "$RUNNER_TEMP/equakit-release/equakit-react-katex-${RELEASE_VERSION}.tgz"
+          publish_or_verify \
+            @equakit/react-markdown-math \
+            "$RUNNER_TEMP/equakit-release/equakit-react-markdown-math-${RELEASE_VERSION}.tgz"

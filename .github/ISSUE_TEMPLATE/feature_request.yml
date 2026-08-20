@@ -40,5 +40,5 @@ body:
     attributes:
       label: 提交前确认
       options:
-        - label: 我理解当前 0.1.0 尚未发布到 npm，所有 workspace package 仍保持 private。
+        - label: 我理解目前只有 4 个公式原子包公开发布，其余 workspace package 仍保持 private。
           required: true
