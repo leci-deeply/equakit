@@ -27,6 +27,14 @@ describe('@equakit/react-formula-input', () => {
     expect(html).toContain('aria-label="公式源码"');
   });
 
+  it('空面板不渲染公式工具栏', () => {
+    const html = renderToStaticMarkup(
+      <FormulaInput hidePreview onChange={() => undefined} palette={[]} value="" />,
+    );
+    expect(html).not.toContain('mre-formula-input__palette');
+    expect(html).not.toContain('role="toolbar"');
+  });
+
   it('显示校验错误并保留可访问状态', () => {
     const html = renderToStaticMarkup(<FormulaInput onChange={() => undefined} value="\\frac{1" />);
     expect(html).toContain('预览');

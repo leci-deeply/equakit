@@ -386,18 +386,11 @@ button {
 }
 
 .demo-formula-workbench {
-  display: grid;
-  grid-template-areas:
-    'editor keyboard'
-    'error keyboard';
-  grid-template-columns: minmax(0, 7fr) minmax(18rem, 5fr);
-  gap: 0.75rem 1rem;
-  align-items: stretch;
+  display: block;
 }
 
 .demo-formula-workbench > [data-equakit-mathlive-host='true'] {
   display: flex;
-  grid-area: editor;
   min-width: 0;
 }
 
@@ -417,46 +410,8 @@ button {
   outline-offset: 2px;
 }
 
-.demo-formula-workbench .mre-formula-input__palette {
-  display: flex;
-  flex-direction: column;
-  grid-area: keyboard;
-  align-items: stretch;
-  padding: 0.85rem;
-  border: 1px solid var(--soft);
-  border-radius: 10px;
-  background: #faf9f6;
-}
-
-.demo-formula-workbench .mre-formula-input__palette::before {
-  content: '公式键盘';
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.demo-formula-workbench .mre-formula-input__group {
-  gap: 0.4rem;
-  padding-top: 0.65rem;
-  border-top: 1px solid var(--soft);
-}
-
-.demo-formula-workbench .mre-formula-input__group::before {
-  content: attr(aria-label);
-  flex-basis: 100%;
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-.demo-formula-workbench .mre-formula-input__key {
-  min-width: 2.5rem;
-  min-height: 2.35rem;
-}
-
 .demo-formula-workbench > .mre-formula-input__error {
-  grid-area: error;
+  margin-top: 0.75rem;
 }
 
 .demo-card table {
@@ -481,11 +436,39 @@ button {
   text-transform: uppercase;
 }
 
+.demo-copy-transfer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: stretch;
+}
+
+.demo-copy-transfer__panel {
+  display: flex;
+  min-width: 0;
+  min-height: 17rem;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--soft);
+  border-radius: 10px;
+  background: #faf9f6;
+}
+
+.demo-copy-transfer__label {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
 .demo-copy-example {
   display: grid;
-  min-height: 14rem;
+  flex: 1;
   align-content: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  min-height: 10rem;
 }
 
 .demo-copy-example .mre-math-formula--display {
@@ -500,6 +483,30 @@ button {
   font-size: 0.72rem;
   line-height: 1.6;
   text-align: center;
+}
+
+.demo-copy-transfer__arrow {
+  align-self: center;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 1.2rem;
+}
+
+.demo-copy-transfer__input,
+.demo-copy-transfer__input > [data-equakit-mathlive-host='true'] {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.demo-copy-transfer__input .mre-formula-input__textarea {
+  width: 100%;
+  min-height: 12rem;
+  padding: 1rem;
+  border: 1px solid var(--soft-strong);
+  border-radius: 8px;
+  background: #fff;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
 }
 
 .demo-tiptap__editor {
@@ -620,12 +627,12 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .demo-formula-workbench {
-    grid-template-areas:
-      'editor'
-      'keyboard'
-      'error';
+  .demo-copy-transfer {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .demo-copy-transfer__arrow {
+    transform: rotate(90deg);
   }
 
   .demo-formula-workbench .mre-formula-input__textarea {

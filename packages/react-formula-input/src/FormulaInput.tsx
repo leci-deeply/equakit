@@ -157,32 +157,34 @@ export function FormulaInput({
 
   return (
     <div className={className ? `mre-formula-input ${className}` : 'mre-formula-input'}>
-      <div className="mre-formula-input__palette" role="toolbar" aria-label="公式面板">
-        {palette.map((group) => (
-          <div
-            aria-label={group.label}
-            className="mre-formula-input__group"
-            key={group.label}
-            role="group"
-          >
-            {group.keys.map((key) => (
-              <button
-                className="mre-formula-input__key"
-                disabled={disabled}
-                key={`${group.label}:${key.label}:${key.insert}`}
-                onMouseDown={(event) => {
-                  event.preventDefault();
-                  insertKey(key);
-                }}
-                title={key.title ?? key.insert.trim()}
-                type="button"
-              >
-                {key.label}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
+      {palette.length > 0 && (
+        <div className="mre-formula-input__palette" role="toolbar" aria-label="公式面板">
+          {palette.map((group) => (
+            <div
+              aria-label={group.label}
+              className="mre-formula-input__group"
+              key={group.label}
+              role="group"
+            >
+              {group.keys.map((key) => (
+                <button
+                  className="mre-formula-input__key"
+                  disabled={disabled}
+                  key={`${group.label}:${key.label}:${key.insert}`}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    insertKey(key);
+                  }}
+                  title={key.title ?? key.insert.trim()}
+                  type="button"
+                >
+                  {key.label}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
       <Editor
         ariaLabel={textareaLabel}
         className="mre-formula-input__textarea"

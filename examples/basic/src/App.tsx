@@ -17,21 +17,6 @@ import StarterKit from '@tiptap/starter-kit';
 
 const tipTapMathExtensions = createTipTapMathExtensions();
 
-const explanation = String.raw`
-### 高斯函数的傅里叶变换
-
-对 $f(x)=e^{-\pi x^2}$，同一段 Markdown 同时包含行内公式、块级公式和表格：
-
-$$
-\widehat{f}(\xi)=\int_{-\infty}^{\infty}e^{-\pi x^2}e^{-2\pi i x\xi}\,\mathrm{d}x
-=e^{-\pi \xi^2}
-$$
-
-| 输入 | 输出 |
-| --- | --- |
-| Markdown + LaTeX | 安全 HTML + 可编辑公式 |
-`;
-
 const heroSpecimen = String.raw`\int_{-\infty}^{\infty}e^{-x^2}\,\mathrm{d}x=\sqrt{\pi}`;
 const tallFormula = String.raw`\int\limits_{-\infty}^{+\infty}\sqrt{\frac{x^2+1}{x^2+2}}\,\mathrm{d}x`;
 const longFormula = String.raw`\displaystyle \sum_{k=1}^{n}\frac{(-1)^{k+1}}{k}\left(\prod_{j=1}^{m}\frac{x_j^2+a_j^2}{\sqrt{x_j^2+b_j^2}}\right)=\int_{0}^{\infty}\frac{\sin(tx)}{1+t^2}\,\mathrm{d}t`;
@@ -85,47 +70,39 @@ export function App() {
         </div>
 
         <div className="demo-grid">
-          <article className="demo-card demo-card--span-7">
+          <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
               <span className="demo-card__index">01</span>
-              <span className="demo-card__spec">复制 / Markdown</span>
+              <span className="demo-card__spec">复制 / 粘贴 / 继续编辑</span>
             </header>
-            <h2>Markdown 与复制恢复</h2>
-            <MathCopyBoundary>
-              <MarkdownMath>{explanation}</MarkdownMath>
-            </MathCopyBoundary>
-          </article>
-
-          <article className="demo-card demo-card--span-5">
-            <header className="demo-card__header">
-              <span className="demo-card__index">02</span>
-              <span className="demo-card__spec">多 MIME / 剪贴板</span>
-            </header>
-            <h2>多格式公式复制</h2>
+            <h2>公式复制与继续编辑</h2>
             <MultiFormatCopyDemo />
           </article>
 
           <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
-              <span className="demo-card__index">03</span>
+              <span className="demo-card__index">02</span>
               <span className="demo-card__spec">视觉回归 / KaTeX</span>
             </header>
             <h2>KaTeX 视觉回归矩阵</h2>
-            <KaTeXVisualMatrix />
-            <FormulaLayoutDemos />
+            <MathCopyBoundary>
+              <KaTeXVisualMatrix />
+              <FormulaLayoutDemos />
+            </MathCopyBoundary>
           </article>
 
           <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
-              <span className="demo-card__index">04</span>
-              <span className="demo-card__spec">可视化输入 / 公式键盘</span>
+              <span className="demo-card__index">03</span>
+              <span className="demo-card__spec">MathLive / 所见即所得</span>
             </header>
-            <h2>公式键盘输入</h2>
+            <h2>可视化公式输入</h2>
             <FormulaInput
               className="demo-formula-workbench"
               editor={MathLiveFormulaEditor}
               hidePreview
               onChange={setFormula}
+              palette={[]}
               textareaLabel="可视化公式输入区"
               value={formula}
             />
@@ -133,7 +110,7 @@ export function App() {
 
           <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
-              <span className="demo-card__index">05</span>
+              <span className="demo-card__index">04</span>
               <span className="demo-card__spec">TipTap / 节点</span>
             </header>
             <h2>TipTap inline/block 数学节点</h2>
@@ -142,7 +119,7 @@ export function App() {
 
           <article className="demo-card demo-card--span-12">
             <header className="demo-card__header">
-              <span className="demo-card__index">06</span>
+              <span className="demo-card__index">05</span>
               <span className="demo-card__spec">步骤 / 合并</span>
             </header>
             <h2>分步答案编辑器</h2>
@@ -214,6 +191,7 @@ function FormulaLayoutDemos() {
 function MultiFormatCopyDemo() {
   const [converter, setConverter] = useState<MathClipboardFormatConverter | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [targetFormula, setTargetFormula] = useState('');
 
   useEffect(() => {
     let disposed = false;
@@ -233,17 +211,39 @@ function MultiFormatCopyDemo() {
   if (!converter) return <span role="status">正在加载多格式转换器。</span>;
 
   return (
-    <>
-      <span className="mre-visually-hidden" role="status">
-        多格式转换器已加载。
+    <div className="demo-copy-transfer">
+      <section className="demo-copy-transfer__panel" aria-labelledby="copy-source-label">
+        <span className="demo-copy-transfer__label" id="copy-source-label">
+          复制公式
+        </span>
+        <MathCopyBoundary converter={converter}>
+          <div className="demo-copy-example" aria-label="多格式复制公式" role="group">
+            <MathFormula ariaLabel="高斯积分" display expression={copyFormula} />
+            <code>LaTeX · MathML · AsciiMath · MathJSON</code>
+          </div>
+        </MathCopyBoundary>
+      </section>
+
+      <span className="demo-copy-transfer__arrow" aria-hidden="true">
+        →
       </span>
-      <MathCopyBoundary converter={converter}>
-        <div className="demo-copy-example" aria-label="多格式复制公式" role="group">
-          <MathFormula ariaLabel="高斯积分" display expression={copyFormula} />
-          <code>text/plain · LaTeX · MathML · AsciiMath · MathJSON</code>
-        </div>
-      </MathCopyBoundary>
-    </>
+
+      <section className="demo-copy-transfer__panel" aria-labelledby="copy-target-label">
+        <span className="demo-copy-transfer__label" id="copy-target-label">
+          粘贴并继续编辑
+        </span>
+        <FormulaInput
+          className="demo-copy-transfer__input"
+          editor={MathLiveFormulaEditor}
+          hidePreview
+          onChange={setTargetFormula}
+          palette={[]}
+          placeholder=""
+          textareaLabel="公式粘贴输入区"
+          value={targetFormula}
+        />
+      </section>
+    </div>
   );
 }
 
