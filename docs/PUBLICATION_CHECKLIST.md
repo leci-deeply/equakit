@@ -1,13 +1,13 @@
 # 发布清单
 
-当前状态：首批 npm `0.1.0` 只发布公式链路的 4 个原子包：`math-text`、`katex-engine`、
+当前状态：首批 npm `0.1.0` 已公开发布公式链路的 4 个原子包：`math-text`、`katex-engine`、
 `react-katex` 和 `react-markdown-math`。其余 16 个 package 保留 `private: true`；`core`、`react`、
 `adapter-mathlive` 和 `adapter-tiptap` 只保留仓库内兼容重导出。
 
 ## 法律与所有权
 
 - [x] 项目维护者已选择以 MIT License 对外授权。
-- [ ] 确认贡献者署名要求。
+- [x] 已确认当前版本没有需要补充署名的其他贡献者。
 - [x] 已加入 `Copyright (c) 2026 leci` 的 MIT License。
 - [x] 已完成有限名称初筛，未发现 `EquaKit` 精确同名公开结果；该结论不等同于完整商标清查。
 - [x] 仓库、完整 Git 历史和发布 tarball 的技术扫描未发现复制的第三方源码、素材或私有 fixtures；生产依赖均通过包管理器引用并已记录许可证。
@@ -45,10 +45,11 @@
 - [x] 已通过 npm CLI 验证 `leci0099` 是 `equakit` organization owner。
 - [x] npm maintainer 账号已启用 `auth-and-writes` 2FA。
 - [x] `pnpm release:formula:dry-run` 已验证 4 个公开包的最终 tarball 和 public access。
+- [x] 4 个公式包的 `0.1.0` 已发布，npm access 状态均为 public。
 - [x] 已启用 `main` 分支保护、必需 `check`、管理员约束、密钥扫描和 push protection。
 - [x] 已加入 Dependabot npm 和 GitHub Actions 更新配置。
 - [x] 已启用 Dependabot security updates 和 GitHub Private Vulnerability Reporting。
 - [x] 已加入 CodeQL JavaScript/TypeScript 安全扫描工作流。
 - [x] 已加入 Demo JavaScript/CSS 体积预算和 MathLive 独立分块检查。
-- [ ] 创建签名的 `v0.1.0` tag，并在需要时附带生成的 provenance。
+- [x] 已创建并推送签名的 `v0.1.0` tag，并发布 GitHub Release；首版未启用 npm provenance。
 - [x] GitHub Pages Playground 与 API 文档公开地址部署成功。
