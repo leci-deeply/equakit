@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@cortex-js/compute-engine": "^0.58.0",
+    "@cortex-js/compute-engine": "^0.120.0",
     "@equakit/answer-steps": "workspace:*",
     "@equakit/clipboard-formats": "workspace:*",
     "@equakit/math-text": "workspace:*",
