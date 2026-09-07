@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@cortex-js/compute-engine": "^0.58.0",
+    "@cortex-js/compute-engine": "^0.121.1",
     "@equakit/answer-steps": "workspace:*",
     "@equakit/clipboard-formats": "workspace:*",
     "@equakit/math-text": "workspace:*",
@@ -20,7 +20,7 @@
     "@equakit/react-formula-input": "workspace:*",
     "@equakit/react-katex": "workspace:*",
     "@equakit/react-markdown-math": "workspace:*",
-    "katex": "^0.18.4",
+    "katex": "^0.18.5",
     "mathlive": "^0.110.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
