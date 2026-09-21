@@ -58,7 +58,7 @@
     "react-dom": "^18.3.1 || ^19.0.0"
   },
   "devDependencies": {
-    "katex": "^0.18.4",
+    "katex": "^0.18.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "vitest": "^3.2.6"
