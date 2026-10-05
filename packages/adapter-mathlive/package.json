@@ -57,9 +57,9 @@
     "@equakit/react-formula-input": "workspace:^"
   },
   "peerDependencies": {
-    "@cortex-js/compute-engine": "^0.58.0",
+    "@cortex-js/compute-engine": "^0.145.0",
     "@equakit/react": "^0.1.0",
-    "mathlive": "^0.110.0",
+    "mathlive": "^0.111.0",
     "react": "^18.3.1 || ^19.0.0"
   },
   "peerDependenciesMeta": {
@@ -68,12 +68,12 @@
     }
   },
   "devDependencies": {
-    "@cortex-js/compute-engine": "^0.58.0",
+    "@cortex-js/compute-engine": "^0.145.0",
     "@equakit/mathlive-editor": "workspace:^",
     "@equakit/mathlive-formats": "workspace:^",
     "@equakit/react": "workspace:^",
     "@equakit/react-formula-input": "workspace:^",
-    "mathlive": "^0.110.0",
+    "mathlive": "^0.111.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
