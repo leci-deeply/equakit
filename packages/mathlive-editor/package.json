@@ -50,12 +50,12 @@
   },
   "peerDependencies": {
     "@equakit/react-formula-input": "^0.1.0",
-    "mathlive": "^0.110.0",
+    "mathlive": "^0.111.0",
     "react": "^18.3.1 || ^19.0.0"
   },
   "devDependencies": {
     "@equakit/react-formula-input": "workspace:^",
-    "mathlive": "^0.110.0",
+    "mathlive": "^0.111.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
